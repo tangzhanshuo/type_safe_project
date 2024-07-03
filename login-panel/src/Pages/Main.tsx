@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import axios, { isAxiosError } from 'axios'
 import { API } from 'Plugins/CommonUtils/API'
-import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage'
-import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage'
-import { PatientLoginMessage } from 'Plugins/PatientAPI/PatientLoginMessage'
-import { PatientRegisterMessage } from 'Plugins/PatientAPI/PatientRegisterMessage'
-import { AddPatientMessage } from 'Plugins/DoctorAPI/AddPatientMessage'
+import { UserLoginMessage } from 'Plugins/UserAPI/UserLoginMessage'
+import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage'
 import { useHistory } from 'react-router';
 
 export function Main(){
-    const history=useHistory()
+    const history=useHistory();
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const sendPostRequest = async (message: API) => {
         try {
             const response = await axios.post(message.getURL(), JSON.stringify(message), {
@@ -37,30 +36,27 @@ export function Main(){
                 <h1>HTTP Post Requests</h1>
             </header>
             <main>
-                <button onClick={() => sendPostRequest(new LoginMessage('aaaa', 'bbbb'))}>
-                    Doctor Login aaaa
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <button onClick={() => sendPostRequest(new UserLoginMessage(username, password))}>
+                    Login
                 </button>
-                <button onClick={() => sendPostRequest(new RegisterMessage('aaaa', 'bbbb'))}>
-                    Doctor Register aaaa
-                </button>
-                <button onClick={() => sendPostRequest(new LoginMessage('aaaab', 'bbbb'))}>
-                    Doctor Login aaaab
-                </button>
-                <button onClick={() => sendPostRequest(new PatientLoginMessage('cccc', 'bbbb'))}>
-                    Patient Login cccc
-                </button>
-                <button onClick={() => sendPostRequest(new PatientRegisterMessage('cccc', 'bbbb'))}>
-                    Patient Register cccc
-                </button>
-                <button onClick={() => sendPostRequest(new AddPatientMessage('aaaa', 'cccc'))}>
-                    Add Patient
-                </button>
-                <button onClick={() => history.push("/another")}>
-                    jump to another page
+                <button onClick={() => sendPostRequest(new UserRegisterMessage(username, password))}>
+                    Register
                 </button>
             </main>
         </div>
     );
-};
+}
 
 
