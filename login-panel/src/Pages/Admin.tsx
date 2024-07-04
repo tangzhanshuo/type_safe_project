@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
-import { UserLoginMessage } from 'Plugins/UserAPI/UserLoginMessage';
+import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage';
+import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage';
+import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage';
+import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage';
 import { useHistory } from 'react-router-dom';
 import './css/Main.css'; // Import the CSS file
 
-export function Main() {
+export function Admin() {
     const history = useHistory();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    const [foundPassword, setFoundPassword] = useState('');
 
     const sendPostRequest = async (message: API) => {
         try {
@@ -18,13 +21,9 @@ export function Main() {
             });
             console.log('Response status:', response.status);
             console.log('Response body:', response.data);
-            if (message instanceof UserLoginMessage) {
-                const responseData = response.data as string;
-                if (responseData === 'Valid user') {
-                    history.push('/studentmain');
-                } else {
-                    setErrorMessage('Invalid username or password');
-                }
+            if (message instanceof UserFindMessage) {
+                const responseData = response.data;
+                setFoundPassword(responseData.password || 'User not found');
             }
         } catch (error) {
             if (isAxiosError(error)) {
@@ -42,7 +41,7 @@ export function Main() {
     return (
         <div className="App">
             <header className="App-header">
-                <h1>用户登录</h1>
+                <h1>大家都是Admin</h1>
             </header>
             <main className="App-main">
                 <div className="input-group">
@@ -61,17 +60,27 @@ export function Main() {
                         className="input-field"
                     />
                 </div>
-                {errorMessage && <p className="error">{errorMessage}</p>}
                 <div className="button-group">
-                    <button onClick={() => sendPostRequest(new UserLoginMessage(username, password))}
+                    <button onClick={() => sendPostRequest(new UserRegisterMessage(username, password))}
                             className="button">
-                        Login
+                        Register
                     </button>
-                    <button onClick={() => history.push('/admin')} className="button">
-                        Go to Admin
+                    <button onClick={() => sendPostRequest(new UserDeleteMessage(username, password))}
+                            className="button">
+                        Delete
                     </button>
-
+                    <button onClick={() => sendPostRequest(new UserUpdateMessage(username, password))}
+                            className="button">
+                        Update
+                    </button>
+                    <button onClick={() => sendPostRequest(new UserFindMessage(username))} className="button">
+                        Find
+                    </button>
+                    <button onClick={() => history.push('/')} className="button">
+                        Back to main
+                    </button>
                 </div>
+                {foundPassword && <p className="result">Found Password: {foundPassword}</p>}
             </main>
         </div>
     );

@@ -2,14 +2,16 @@ import React from 'react'
 import { render } from 'react-dom'
 import { HashRouter, Route, Switch } from 'react-router-dom'
 import { Main } from 'Pages/Main'
-import { AnotherPage } from 'Pages/AnotherPage'
+import { StudentMain } from 'Pages/StudentMain'
+import { Admin } from 'Pages/Admin'
 
 const Layout = () => {
     return (
         <HashRouter>
             <Switch>
                 <Route path="/" exact component={Main} />
-                <Route path="/another" exact component={AnotherPage} />
+                <Route path="/studentmain" exact component={StudentMain} />
+                <Route path="/admin" exact component={Admin} />
             </Switch>
         </HashRouter>
     )
