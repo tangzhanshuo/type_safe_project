@@ -6,7 +6,8 @@ import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage';
 import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage';
 import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage';
 import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage';
-import { useHistory } from 'react-router';
+import { useHistory } from 'react-router-dom';
+import './css/Main.css'; // Import the CSS file
 
 export function Main() {
     const history = useHistory();
@@ -41,37 +42,43 @@ export function Main() {
     return (
         <div className="App">
             <header className="App-header">
-                <h1>HTTP Post Requests</h1>
+                <h1>大家都是Admin</h1>
             </header>
-            <main>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <button onClick={() => sendPostRequest(new UserLoginMessage(username, password))}>
-                    Login
-                </button>
-                <button onClick={() => sendPostRequest(new UserRegisterMessage(username, password))}>
-                    Register
-                </button>
-                <button onClick={() => sendPostRequest(new UserDeleteMessage(username, password))}>
-                    Delete
-                </button>
-                <button onClick={() => sendPostRequest(new UserUpdateMessage(username, password))}>
-                    Update
-                </button>
-                <button onClick={() => sendPostRequest(new UserFindMessage(username))}>
-                    Find
-                </button>
-                {foundPassword && <p>Found Password: {foundPassword}</p>}
+            <main className="App-main">
+                <div className="input-group">
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="input-field"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="input-field"
+                    />
+                </div>
+                <div className="button-group">
+                    <button onClick={() => sendPostRequest(new UserLoginMessage(username, password))} className="button">
+                        Login
+                    </button>
+                    <button onClick={() => sendPostRequest(new UserRegisterMessage(username, password))} className="button">
+                        Register
+                    </button>
+                    <button onClick={() => sendPostRequest(new UserDeleteMessage(username, password))} className="button">
+                        Delete
+                    </button>
+                    <button onClick={() => sendPostRequest(new UserUpdateMessage(username, password))} className="button">
+                        Update
+                    </button>
+                    <button onClick={() => sendPostRequest(new UserFindMessage(username))} className="button">
+                        Find
+                    </button>
+                </div>
+                {foundPassword && <p className="result">Found Password: {foundPassword}</p>}
             </main>
         </div>
     );
