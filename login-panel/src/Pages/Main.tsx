@@ -3,7 +3,12 @@ import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { UserLoginMessage } from 'Plugins/UserAPI/UserLoginMessage';
 import { useHistory } from 'react-router-dom';
-import './css/Main.css'; // Import the CSS file
+import { sendPostRequest } from 'Plugins/API/Utils';
+import './css/Main.css';
+import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage'
+import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage'
+import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage'
+import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage'
 
 export function Main() {
     const history = useHistory();
@@ -11,32 +16,35 @@ export function Main() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [foundPassword, setFoundPassword] = useState('');
 
-    const sendPostRequest = async (message: API) => {
-        try {
-            const response = await axios.post(message.getURL(), JSON.stringify(message), {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            console.log('Response status:', response.status);
-            console.log('Response body:', response.data);
-            if (message instanceof UserLoginMessage) {
-                const responseData = response.data as string;
-                if (responseData === 'Valid user') {
-                    history.push('/studentmain');
-                } else {
-                    setErrorMessage('Invalid username or password');
-                }
-            }
-        } catch (error) {
-            if (isAxiosError(error)) {
-                if (error.response && error.response.data) {
-                    console.error('Error sending request:', error.response.data);
-                } else {
-                    console.error('Error sending request:', error.message);
-                }
-            } else {
-                console.error('Unexpected error:', error);
-            }
+    const sendRequestWithCheck = async (messageType: string, usertype: string, username: string, password: string) => {
+        if (!usertype || !username) {
+            setErrorMessage('Some required fields are missing');
+            return;
+        }
+        if (!password && messageType !== 'find') {
+            setErrorMessage('Password is required');
+            return;
+        }
+        setErrorMessage('');
+        switch (messageType) {
+            case "login":
+                await sendPostRequest(new UserLoginMessage(usertype, username, password));
+                break;
+            case "register":
+                await sendPostRequest(new UserRegisterMessage(usertype, username, password));
+                break;
+            case "delete":
+                await sendPostRequest(new UserDeleteMessage(usertype, username, password));
+                break;
+            case "update":
+                await sendPostRequest(new UserUpdateMessage(usertype, username, password));
+                break;
+            case "find":
+                const response = await sendPostRequest(new UserFindMessage(usertype, username));
+                setFoundPassword(response.data.password);
+                break;
         }
     };
 
@@ -74,7 +82,7 @@ export function Main() {
                 </div>
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 <div className="button-group">
-                    <button onClick={() => sendPostRequest(new UserLoginMessage(usertype, username, password))}
+                    <button onClick={() => sendRequestWithCheck("login", usertype, username, password)}
                             className="button">
                         Login
                     </button>

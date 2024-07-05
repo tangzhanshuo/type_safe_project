@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
+import { UserLoginMessage } from 'Plugins/UserAPI/UserLoginMessage';
 import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage';
 import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage';
 import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage';
 import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage';
 import { useHistory } from 'react-router-dom';
+import { sendPostRequest } from 'Plugins/API/Utils';
 import './css/Main.css'; // Import the CSS file
 
 export function Admin() {
@@ -13,29 +15,36 @@ export function Admin() {
     const [usertype, setUsertype] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const [foundPassword, setFoundPassword] = useState('');
 
-    const sendPostRequest = async (message: API) => {
-        try {
-            const response = await axios.post(message.getURL(), JSON.stringify(message), {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            console.log('Response status:', response.status);
-            console.log('Response body:', response.data);
-            if (message instanceof UserFindMessage) {
-                const responseData = response.data;
-                setFoundPassword(responseData.password || 'User not found');
-            }
-        } catch (error) {
-            if (isAxiosError(error)) {
-                if (error.response && error.response.data) {
-                    console.error('Error sending request:', error.response.data);
-                } else {
-                    console.error('Error sending request:', error.message);
-                }
-            } else {
-                console.error('Unexpected error:', error);
-            }
+    const sendRequestWithCheck = async (messageType: string, usertype: string, username: string, password: string) => {
+        if (!usertype || !username) {
+            setErrorMessage('Some required fields are missing');
+            return;
+        }
+        if (!password && messageType !== 'find') {
+            setErrorMessage('Password is required');
+            return;
+        }
+        setErrorMessage('');
+        switch (messageType) {
+            case "login":
+                await sendPostRequest(new UserLoginMessage(usertype, username, password));
+                break;
+            case "register":
+                await sendPostRequest(new UserRegisterMessage(usertype, username, password));
+                break;
+            case "delete":
+                await sendPostRequest(new UserDeleteMessage(usertype, username, password));
+                break;
+            case "update":
+                await sendPostRequest(new UserUpdateMessage(usertype, username, password));
+                break;
+            case "find":
+                const response = await sendPostRequest(new UserFindMessage(usertype, username));
+                setFoundPassword(response.data.password);
+                break;
         }
     };
 
@@ -71,20 +80,22 @@ export function Admin() {
                         className="input-field"
                     />
                 </div>
+                {errorMessage && <p className="error">{errorMessage}</p>}
                 <div className="button-group">
-                    <button onClick={() => sendPostRequest(new UserRegisterMessage(usertype, username, password))}
+                    <button onClick={() => sendRequestWithCheck("register", usertype, username, password)}
                             className="button">
                         Register
                     </button>
-                    <button onClick={() => sendPostRequest(new UserDeleteMessage(usertype, username, password))}
+                    <button onClick={() => sendRequestWithCheck("delete", usertype, username, password)}
                             className="button">
                         Delete
                     </button>
-                    <button onClick={() => sendPostRequest(new UserUpdateMessage(usertype, username, password))}
+                    <button onClick={() => sendRequestWithCheck("update", usertype, username, password)}
                             className="button">
                         Update
                     </button>
-                    <button onClick={() => sendPostRequest(new UserFindMessage(usertype, username))} className="button">
+                    <button onClick={() => sendRequestWithCheck("find", usertype, username, password)}
+                            className="button">
                         Find
                     </button>
                     <button onClick={() => history.push('/')} className="button">
