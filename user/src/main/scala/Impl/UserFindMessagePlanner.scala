@@ -7,10 +7,11 @@ import Common.DBAPI.*
 import Common.Object.SqlParameter
 import Common.ServiceUtils.schemaName
 
-case class UserFindMessagePlanner(userName: String, override val planContext: PlanContext) extends Planner[String] {
+case class UserFindMessagePlanner(userType: String, userName: String, override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
+    val dbName = userType.toLowerCase
     // Query to find the user's password
-    val findPasswordQuery = s"SELECT password FROM ${schemaName}.user_name WHERE user_name = ?"
+    val findPasswordQuery = s"SELECT password FROM ${dbName}.user_name WHERE user_name = ?"
 
     // Execute the query to get the password
     readDBString(findPasswordQuery, List(SqlParameter("String", userName))).flatMap {

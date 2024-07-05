@@ -7,10 +7,11 @@ import Common.DBAPI.*
 import Common.Object.SqlParameter
 import Common.ServiceUtils.schemaName
 
-case class UserRegisterMessagePlanner(userName: String, password: String, override val planContext: PlanContext) extends Planner[String]:
+case class UserRegisterMessagePlanner(userType: String, userName: String, password: String, override val planContext: PlanContext) extends Planner[String]:
   override def plan(using planContext: PlanContext): IO[String] = {
+    val dbName = userType.toLowerCase
     // Check if the user is already registered
-    val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${schemaName}.user_name WHERE user_name = ?)",
+    val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${dbName}.user_name WHERE user_name = ?)",
         List(SqlParameter("String", userName))
       )
 
@@ -18,7 +19,7 @@ case class UserRegisterMessagePlanner(userName: String, password: String, overri
       if (exists) {
         IO.raiseError(new Exception("already registered"))
       } else {
-        writeDB(s"INSERT INTO ${schemaName}.user_name (user_name, password) VALUES (?, ?)",
+        writeDB(s"INSERT INTO ${dbName}.user_name (user_name, password) VALUES (?, ?)",
           List(SqlParameter("String", userName),
                SqlParameter("String", password)
           ))

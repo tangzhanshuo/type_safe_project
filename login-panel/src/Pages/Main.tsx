@@ -7,6 +7,7 @@ import './css/Main.css'; // Import the CSS file
 
 export function Main() {
     const history = useHistory();
+    const [usertype, setUsertype] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -46,6 +47,16 @@ export function Main() {
             </header>
             <main className="App-main">
                 <div className="input-group">
+                    <select
+                        value={usertype}
+                        onChange={(e) => setUsertype(e.target.value)}
+                        className="input-field"
+                    >
+                        <option value="">Select Type</option>
+                        <option value="admin">Admin</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="student">Student</option>
+                    </select>
                     <input
                         type="text"
                         placeholder="Username"
@@ -63,7 +74,7 @@ export function Main() {
                 </div>
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 <div className="button-group">
-                    <button onClick={() => sendPostRequest(new UserLoginMessage(username, password))}
+                    <button onClick={() => sendPostRequest(new UserLoginMessage(usertype, username, password))}
                             className="button">
                         Login
                     </button>

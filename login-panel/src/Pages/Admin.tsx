@@ -10,6 +10,7 @@ import './css/Main.css'; // Import the CSS file
 
 export function Admin() {
     const history = useHistory();
+    const [usertype, setUsertype] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [foundPassword, setFoundPassword] = useState('');
@@ -45,6 +46,16 @@ export function Admin() {
             </header>
             <main className="App-main">
                 <div className="input-group">
+                    <select
+                        value={usertype}
+                        onChange={(e) => setUsertype(e.target.value)}
+                        className="input-field"
+                    >
+                        <option value="">Select Type</option>
+                        <option value="admin">Admin</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="student">Student</option>
+                    </select>
                     <input
                         type="text"
                         placeholder="Username"
@@ -61,19 +72,19 @@ export function Admin() {
                     />
                 </div>
                 <div className="button-group">
-                    <button onClick={() => sendPostRequest(new UserRegisterMessage(username, password))}
+                    <button onClick={() => sendPostRequest(new UserRegisterMessage(usertype, username, password))}
                             className="button">
                         Register
                     </button>
-                    <button onClick={() => sendPostRequest(new UserDeleteMessage(username, password))}
+                    <button onClick={() => sendPostRequest(new UserDeleteMessage(usertype, username, password))}
                             className="button">
                         Delete
                     </button>
-                    <button onClick={() => sendPostRequest(new UserUpdateMessage(username, password))}
+                    <button onClick={() => sendPostRequest(new UserUpdateMessage(usertype, username, password))}
                             className="button">
                         Update
                     </button>
-                    <button onClick={() => sendPostRequest(new UserFindMessage(username))} className="button">
+                    <button onClick={() => sendPostRequest(new UserFindMessage(usertype, username))} className="button">
                         Find
                     </button>
                     <button onClick={() => history.push('/')} className="button">
