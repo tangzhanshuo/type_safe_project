@@ -16,7 +16,7 @@ case class UserDeleteMessagePlanner(userName: String, override val planContext: 
 
     checkUserExists.flatMap { exists =>
       if (exists) {
-        deleteDB(s"DELETE FROM ${schemaName}.user_name WHERE user_name = ?",
+        writeDB(s"DELETE FROM ${schemaName}.user_name WHERE user_name = ?",
           List(SqlParameter("String", userName))
         )
       } else {

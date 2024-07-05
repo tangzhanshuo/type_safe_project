@@ -10,6 +10,7 @@ import io.circe.parser.decode
 import org.http4s.client.Client
 import org.joda.time.format.ISODateTimeFormat
 
+
 package object DBAPI {
   given Conversion[DateTime, String] = dateTime => {
     dateTime.getMillis.toString
@@ -75,10 +76,6 @@ package object DBAPI {
   def writeDB(sqlQuery: String, parameters: List[SqlParameter])(using Encoder[WriteDBMessage], PlanContext): IO[String] = WriteDBMessage(sqlQuery, parameters).send
 
   def writeDBList(sqlQuery: String, parameters: List[ParameterList])(using Encoder[WriteDBListMessage], PlanContext): IO[String] = WriteDBListMessage(sqlQuery, parameters).send
-
-  def deleteDB(sqlQuery: String, parameters: List[SqlParameter])(using Encoder[DeleteDBMessage], PlanContext): IO[String] = DeleteDBMessage(sqlQuery, parameters).send
-
-  def updateDB(sqlQuery: String, parameters: List[SqlParameter])(using Encoder[UpdateDBMessage], PlanContext): IO[String] = UpdateDBMessage(sqlQuery, parameters).send
 
   implicit val dateTimeDecoder: Decoder[DateTime] = new Decoder[DateTime] {
     private val formatter = ISODateTimeFormat.dateTimeParser()

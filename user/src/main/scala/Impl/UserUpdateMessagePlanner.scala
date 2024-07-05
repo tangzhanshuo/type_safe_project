@@ -16,7 +16,7 @@ case class UserUpdateMessagePlanner(userName: String, password: String, override
 
     checkUserExists.flatMap { exists =>
       if (exists) {
-        updateDB(s"UPDATE ${schemaName}.user_name SET password = ? WHERE user_name = ?",
+        writeDB(s"UPDATE ${schemaName}.user_name SET password = ? WHERE user_name = ?",
           List(
             SqlParameter("String", password),
             SqlParameter("String", userName)
