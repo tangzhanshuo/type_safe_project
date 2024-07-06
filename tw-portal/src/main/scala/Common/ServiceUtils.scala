@@ -22,9 +22,7 @@ object ServiceUtils{
 
   def serviceName(serviceCode: String): String = {
     val fullName = fullNameMap(serviceCode)
-    val start = fullName.indexOf("（")
-    val end = fullName.indexOf("）")
-    fullNameMap(serviceCode).substring(start + 1, end).toLowerCase
+    fullNameMap(serviceCode).toLowerCase
   }
 
   def portMap(serviceCode: String): Int = {
