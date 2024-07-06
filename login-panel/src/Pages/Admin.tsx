@@ -103,7 +103,9 @@ export function Admin() {
                     </button>
                 </div>
                 {foundPassword && <p className="result">Found Password: {foundPassword}</p>}
+
             </main>
         </div>
+
     );
 }

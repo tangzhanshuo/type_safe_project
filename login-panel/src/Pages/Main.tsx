@@ -89,7 +89,9 @@ export function Main() {
                     <button onClick={() => history.push('/admin')} className="button">
                         Go to Admin
                     </button>
-
+                    <button onClick={() => history.push('/admincourse')} className="button">
+                        Go to AdminCourse
+                    </button>
                 </div>
             </main>
         </div>

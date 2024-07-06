@@ -18,8 +18,8 @@ case class ReadDBValueMessagePlanner(sqlQuery: String, parameters: List[SqlParam
           case "string"  => preparedStatement.setString(index + 1, param.value)
           case "int"     => preparedStatement.setInt(index + 1, param.value.toInt)
           case "boolean" => preparedStatement.setBoolean(index + 1, param.value.toBoolean)
-          case "datetime" =>
-            preparedStatement.setTimestamp(index + 1, new Timestamp(param.value.toLong)) // Convert DateTime to Timestamp          // Add more type cases as needed
+          case "datetime" => preparedStatement.setTimestamp(index + 1, new Timestamp(param.value.toLong)) // Convert DateTime to Timestamp
+          case "json"    => preparedStatement.setString(index + 1, param.value) // Treat JSON as a string
           // Add more type cases as needed
           case _ => throw new IllegalArgumentException("Unsupported data type")
         }

@@ -22,8 +22,8 @@ case class ReadDBRowsMessagePlanner(sqlQuery: String, parameters: List[SqlParame
           case "string" => preparedStatement.setString(index + 1, param.value)
           case "int" => preparedStatement.setInt(index + 1, param.value.toInt)
           case "boolean" => preparedStatement.setBoolean(index + 1, param.value.toBoolean)
-          case "datetime" =>
-            preparedStatement.setTimestamp(index + 1, new Timestamp(param.value.toLong)) // Convert DateTime to Timestamp
+          case "datetime" => preparedStatement.setTimestamp(index + 1, new Timestamp(param.value.toLong)) // Convert DateTime to Timestamp
+          case "json" => preparedStatement.setString(index + 1, param.value) // Treat JSON as a string
           // Add more type cases as needed
           case _ => throw new IllegalArgumentException("Unsupported data type")
         }
@@ -55,7 +55,7 @@ case class ReadDBRowsMessagePlanner(sqlQuery: String, parameters: List[SqlParame
               case _ => Json.Null
             }: _*)
             case v: Timestamp => Json.fromString(v.getTime.toString) // Convert Timestamp to String
-            case s: String if columnName.endsWith("_") => parser.parse(s).fold(throw _, a=>a)
+            case s: String if columnName.endsWith("_") => parser.parse(s).fold(throw _, a => a)
             case s: String => Json.fromString(s)
             case i: Integer => Json.fromInt(i)
             case b: java.lang.Boolean => Json.fromBoolean(b)

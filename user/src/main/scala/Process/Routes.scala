@@ -40,14 +40,19 @@ object Routes:
               Map("password" -> password).asJson.noSpaces
             }
           }
+      case "UserAddCourseMessage" =>
+        IO(decode[UserAddCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
 
   val service: HttpRoutes[IO] = HttpRoutes.of[IO]:
     case req @ POST -> Root / "api" / name =>
-        println("request received")
-        req.as[String].flatMap{executePlan(name, _)}.flatMap(Ok(_))
+      println("request received")
+      req.as[String].flatMap{executePlan(name, _)}.flatMap(Ok(_))
         .handleErrorWith{e =>
           println(e)
           BadRequest(e.getMessage)

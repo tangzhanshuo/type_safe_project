@@ -41,8 +41,8 @@ case class WriteDBListMessagePlanner(sqlStatement: String, parameters: List[Para
       case "string" => statement.setString(index, sqlParameter.value)
       case "int"    => statement.setInt(index, sqlParameter.value.toInt)
       case "double" => statement.setDouble(index, sqlParameter.value.toDouble)
-      case "datetime" => statement.setTimestamp(index, new Timestamp(sqlParameter.value.toLong)) // Convert DateTime to Timestamp          // Add more type cases as needed
-
+      case "datetime" => statement.setTimestamp(index, new Timestamp(sqlParameter.value.toLong)) // Convert DateTime to Timestamp
+      case "json" => statement.setString(index, sqlParameter.value) // Treat JSON as a string
       // Add more cases for other data types
       case _        => throw new IllegalArgumentException(s"Unhandled parameter type: ${sqlParameter.dataType}")
     }
