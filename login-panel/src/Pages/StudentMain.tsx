@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
-import './css/Main.css'; // Import the CSS file
+import 'Pages/css/Main.css'; // Import the CSS file
 
 export function StudentMain() {
     const history = useHistory();

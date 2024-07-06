@@ -8,7 +8,7 @@ import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage';
 import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/API/Utils';
-import './css/Main.css'; // Import the CSS file
+import 'Pages/css/Main.css'; // Import the CSS file
 
 export function Admin() {
     const history = useHistory();

@@ -4,11 +4,12 @@ import { API } from 'Plugins/CommonUtils/API';
 import { UserLoginMessage } from 'Plugins/UserAPI/UserLoginMessage';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/API/Utils';
-import './css/Main.css';
+import 'Pages/css/Main.css';
 import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage'
 import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage'
 import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage'
 import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage'
+import { UserJokeMessage } from 'Plugins/UserAPI/UserJokeMessage'
 
 export function Main() {
     const history = useHistory();
@@ -17,6 +18,7 @@ export function Main() {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [foundPassword, setFoundPassword] = useState('');
+    const [jokeGet, setJokeGet] = useState('');
 
     const sendRequestWithCheck = async (messageType: string, usertype: string, username: string, password: string) => {
         if (!usertype || !username) {
@@ -40,6 +42,22 @@ export function Main() {
                 break;
             case "update":
                 await sendPostRequest(new UserUpdateMessage(usertype, username, password));
+                break;
+            case "joke":
+                const JokeResponse = await sendPostRequest(new UserJokeMessage(usertype, username, password));
+                switch (JokeResponse.data) {
+                    case 'student':
+                        history.push('/StudentJoke');
+                        break;
+                    case 'teacher':
+                        history.push('/TeacherJoke');
+                        break;
+                    case 'admin':
+                        history.push('/AdminJoke');
+                        break;
+                    default:
+                        setErrorMessage('Unknown user type');
+                }
                 break;
             case "find":
                 const response = await sendPostRequest(new UserFindMessage(usertype, username));
@@ -82,6 +100,10 @@ export function Main() {
                 </div>
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 <div className="button-group">
+                    <button onClick={() => sendRequestWithCheck("joke", usertype, username, password)}
+                            className="button">
+                        Joke
+                    </button>
                     <button onClick={() => sendRequestWithCheck("login", usertype, username, password)}
                             className="button">
                         Login
@@ -89,7 +111,6 @@ export function Main() {
                     <button onClick={() => history.push('/admin')} className="button">
                         Go to Admin
                     </button>
-
                 </div>
             </main>
         </div>

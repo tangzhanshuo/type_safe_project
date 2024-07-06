@@ -40,6 +40,11 @@ object Routes:
               Map("password" -> password).asJson.noSpaces
             }
           }
+      case "UserJokeMessage" =>
+        IO(decode[UserJokeMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserJokeMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
