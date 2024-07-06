@@ -40,9 +40,23 @@ object PortalService {
       planContextJson = planContext.asJson
       updatedJson = bodyJson.deepMerge(Json.obj("planContext" -> planContextJson))
       _ <- IO.println(updatedJson)
-      newUri <- IO.fromEither(Uri.fromString("http://" + address(serviceName) + "/api/" + messageName))
-      _ <- IO.println(newUri)
-      response <- sendRequest(client, newUri, updatedJson)
+      verificationResponse <- if (serviceName != "User") {
+        val verificationUri = Uri.unsafeFromString(s"http://${address("User")}/api/UserLoginMessage")
+        sendRequest(client, verificationUri, updatedJson).flatMap {
+          case Right(json) if json.asString.contains("Valid user") => IO.pure(Right(json))
+          case _ => IO.pure(Left(new Exception("Invalid user")))
+        }
+      } else {
+        IO.pure(Right(Json.fromString("Bypassed user validation")))
+      }
+      response <- verificationResponse match {
+        case Right(_) => {
+          val newUri = Uri.unsafeFromString(s"http://${address(serviceName)}/api/$messageName")
+          IO.println(newUri) *>
+          sendRequest(client, newUri, updatedJson)
+        }
+        case Left(e) => IO.pure(Left(e))
+      }
     } yield response
   }
 
