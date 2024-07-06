@@ -7,12 +7,12 @@ import Common.DBAPI.*
 import Common.Object.SqlParameter
 import Common.ServiceUtils.schemaName
 
-case class UserUpdateMessagePlanner(userType: String, userName: String, password: String, override val planContext: PlanContext) extends Planner[String] {
+case class UserUpdateMessagePlanner(usertype: String, username: String, password: String, override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    val dbName = userType.toLowerCase
+    val dbName = usertype.toLowerCase
     // Check if the user is already registered
     val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${dbName}.user_name WHERE user_name = ?)",
-      List(SqlParameter("String", userName))
+      List(SqlParameter("String", username))
     )
 
     checkUserExists.flatMap { exists =>
@@ -20,7 +20,7 @@ case class UserUpdateMessagePlanner(userType: String, userName: String, password
         writeDB(s"UPDATE ${dbName}.user_name SET password = ? WHERE user_name = ?",
           List(
             SqlParameter("String", password),
-            SqlParameter("String", userName)
+            SqlParameter("String", username)
           )
         )
       } else {

@@ -1,12 +1,12 @@
 import { UserMessage } from 'Plugins/UserAPI/UserMessage'
 
 export class UserFindMessage extends UserMessage {
-    userType: string;
-    userName: string;
+    usertype: string;
+    username: string;
 
-    constructor(userType: string, userName: string) {
+    constructor(usertype: string, username: string) {
         super();
-        this.userType = userType;
-        this.userName = userName;
+        this.usertype = usertype;
+        this.username = username;
     }
 }

@@ -7,13 +7,13 @@ import Common.DBAPI.{readDBRows, readDBString}
 import Common.Object.SqlParameter
 import Common.ServiceUtils.schemaName
 
-case class UserLoginMessagePlanner(userType: String, userName:String, password:String, override val planContext: PlanContext) extends Planner[String]:
+case class UserLoginMessagePlanner(usertype: String, username:String, password:String, override val planContext: PlanContext) extends Planner[String]:
   override def plan(using PlanContext): IO[String] = {
-    val dbName = userType.toLowerCase
+    val dbName = usertype.toLowerCase
     // Attempt to validate the user by reading the rows from the database
     readDBRows(
       s"SELECT user_name FROM ${dbName}.user_name WHERE user_name = ? AND password = ?",
-      List(SqlParameter("String", userName), SqlParameter("String", password))
+      List(SqlParameter("String", username), SqlParameter("String", password))
     ).map{
       case Nil => "Invalid user"
       case _ => "Valid user"

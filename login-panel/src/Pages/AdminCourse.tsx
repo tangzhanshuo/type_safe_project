@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { UserAddCourseMessage } from 'Plugins/UserAPI/UserAddCourseMessage';
 import { useHistory } from 'react-router-dom';
-import { sendPostRequest } from 'Plugins/API/Utils';
+import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import './css/Main.css'; // Import the CSS file
 
 export function AdminCourse() {

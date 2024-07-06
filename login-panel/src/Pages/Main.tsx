@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
-import { UserLoginMessage } from 'Plugins/UserAPI/UserLoginMessage';
 import { useHistory } from 'react-router-dom';
-import { sendPostRequest } from 'Plugins/API/Utils';
-import './css/Main.css';
-import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage'
-import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage'
-import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage'
-import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage'
+import 'Pages/css/Main.css';
+import { sendUserRequest } from 'Plugins/CommonUtils/UserManager'
+import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { MessageTest } from 'Plugins/MessageAPI/MessageTest';
 
 export function Main() {
     const history = useHistory();
@@ -17,36 +14,6 @@ export function Main() {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [foundPassword, setFoundPassword] = useState('');
-
-    const sendRequestWithCheck = async (messageType: string, usertype: string, username: string, password: string) => {
-        if (!usertype || !username) {
-            setErrorMessage('Some required fields are missing');
-            return;
-        }
-        if (!password && messageType !== 'find') {
-            setErrorMessage('Password is required');
-            return;
-        }
-        setErrorMessage('');
-        switch (messageType) {
-            case "login":
-                await sendPostRequest(new UserLoginMessage(usertype, username, password));
-                break;
-            case "register":
-                await sendPostRequest(new UserRegisterMessage(usertype, username, password));
-                break;
-            case "delete":
-                await sendPostRequest(new UserDeleteMessage(usertype, username, password));
-                break;
-            case "update":
-                await sendPostRequest(new UserUpdateMessage(usertype, username, password));
-                break;
-            case "find":
-                const response = await sendPostRequest(new UserFindMessage(usertype, username));
-                setFoundPassword(response.data.password);
-                break;
-        }
-    };
 
     return (
         <div className="App">
@@ -82,9 +49,16 @@ export function Main() {
                 </div>
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 <div className="button-group">
-                    <button onClick={() => sendRequestWithCheck("login", usertype, username, password)}
+                    <button onClick={() => sendUserRequest("login", usertype, username, password)}
                             className="button">
                         Login
+                    </button>
+                    <button onClick={async () => {
+                        const response = await sendPostRequest(new MessageTest())
+                        console.log(response)
+                    }}
+                            className="button">
+                        Test
                     </button>
                     <button onClick={() => history.push('/admin')} className="button">
                         Go to Admin

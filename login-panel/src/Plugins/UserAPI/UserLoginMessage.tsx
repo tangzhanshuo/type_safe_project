@@ -1,14 +1,14 @@
 import { UserMessage } from 'Plugins/UserAPI/UserMessage'
 
 export class UserLoginMessage extends UserMessage {
-    userType: string;
-    userName: string;
+    usertype: string;
+    username: string;
     password: string;
 
-    constructor(userType: string, userName: string, password: string) {
+    constructor(usertype: string, username: string, password: string) {
         super();
-        this.userType = userType;
-        this.userName = userName;
+        this.usertype = usertype;
+        this.username = username;
         this.password = password;
     }
 }
