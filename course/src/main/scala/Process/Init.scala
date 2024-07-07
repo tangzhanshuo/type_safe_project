@@ -24,9 +24,18 @@ object Init {
            |  teacher_username TEXT,
            |  teacher_name TEXT,
            |  capacity INT,
-           |  enrolled_students JSON
+           |  info TEXT,
+           |  course_hour JSON,
+           |  credits INT,
+           |  enrolled_students JSON,
+           |  kwargs JSON
            |)
          """.stripMargin, List()
+        // The course_hour should be a list of Ints with value 42*w + 6*d + h where
+        // w = 0, 1 stands for 前八周，后八周
+        // d = 1, 2, 3, 4, 5, 6, 7 stands for 星期d
+        // h = 1, 2, 3, 4, 5, 6 stands for 第h段时间
+        // kwargs contain other info
       )
     } yield ()
   }

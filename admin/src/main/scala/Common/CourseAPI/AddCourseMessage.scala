@@ -1,7 +1,17 @@
 package Common.CourseAPI
 
 import Common.API.API
-import Common.Object.SqlParameter
 import Global.ServiceCenter.courseServiceCode
 
-case class AddCourseMessage(courseID: Int, courseName: String, teacherUsername: String, teacherName: String, capacity: Int) extends API[String](courseServiceCode)
+case class AddCourseMessage(
+                             courseID: Int,
+                             courseName: String,
+                             teacherUsername: String,
+                             teacherName: String,
+                             capacity: Int,
+                             info: String,
+                             courseHourJson: String, // JSON represented as String
+                             credits: Int,
+                             enrolledStudentsJson: String, // JSON represented as String
+                             kwargsJson: String // JSON represented as String
+                           ) extends API[String](courseServiceCode)
