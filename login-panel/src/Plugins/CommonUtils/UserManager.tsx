@@ -20,7 +20,9 @@ export const sendUserRequest = async (messageType: string, usertype: string, use
                 Auth.getState().setUsertype(usertype);
                 Auth.getState().setUsername(username);
                 Auth.getState().setPassword(password);
+                return 'Login successful';
             }
+            return 'Invalid user';
             break;
         case "register":
             await sendUserPostRequest(new UserRegisterMessage(usertype, username, password));

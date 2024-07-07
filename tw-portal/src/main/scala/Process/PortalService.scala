@@ -51,12 +51,11 @@ object PortalService {
         IO.pure(Right(Json.fromString("Bypassed user validation")))
       }
       response <- verificationResponse match {
-        case Right(_) if serviceName != "Test" => {
+        case Right(_) => {
           val newUri = Uri.unsafeFromString(s"http://${address(serviceName)}/api/$messageName")
           IO.println(newUri) *>
           sendRequest(client, newUri, updatedJson)
         }
-        case Right(_) => IO.pure(Right(Json.fromString(":)")))
         case Left(e) => IO.pure(Left(e))
       }
     } yield response

@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
-import 'Pages/css/Main.css'; // Import the CSS file
+import 'Pages/css/Main.css';
 import { sendUserRequest } from 'Plugins/CommonUtils/UserManager'
+import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 
-export function Admin() {
+export function Login() {
     const history = useHistory();
     const [usertype, setUsertype] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [foundPassword, setFoundPassword] = useState('');
 
     return (
         <div className="App">
             <header className="App-header">
-                <h1>大家都是Admin</h1>
+                <h1>用户登录</h1>
             </header>
             <main className="App-main">
                 <div className="input-group">
@@ -47,30 +47,17 @@ export function Admin() {
                 </div>
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 <div className="button-group">
-                    <button onClick={() => sendUserRequest("register", usertype, username, password)}
+                    <button onClick={async () => {
+                        const response = await sendUserRequest("login", usertype, username, password)
+                        if (response === 'Login successful') {
+                            history.push('/' + usertype)
+                        }
+                    }}
                             className="button">
-                        Register
-                    </button>
-                    <button onClick={() => sendUserRequest("delete", usertype, username, password)}
-                            className="button">
-                        Delete
-                    </button>
-                    <button onClick={() => sendUserRequest("update", usertype, username, password)}
-                            className="button">
-                        Update
-                    </button>
-                    <button onClick={() => sendUserRequest("find", usertype, username, password, (password) => setFoundPassword(password))}
-                            className="button">
-                        Find
-                    </button>
-                    <button onClick={() => history.push('/')} className="button">
-                        Back to main
+                        Login
                     </button>
                 </div>
-                {foundPassword && <p className="result">Found Password: {foundPassword}</p>}
-
             </main>
         </div>
-
     );
 }
