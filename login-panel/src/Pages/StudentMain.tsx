@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
-import './css/Main.css'; // Import the CSS file
+import Auth from 'Plugins/CommonUtils/AuthState';
+import 'Pages/css/Main.css'; // Import the CSS file
 
 export function StudentMain() {
     const history = useHistory();
+
+    useEffect(() => {
+        // Assuming username and password are stored in localStorage
+        const { usertype, username, password } = Auth.getState();
+
+        if (!usertype || !username || !password) {
+            // Redirect to login page
+            history.push('/login');
+        }
+        else if (usertype !== 'student') {
+            history.push('/');
+        }
+    }, []);
 
     return (
         <div className="App">

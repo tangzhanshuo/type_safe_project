@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
 import 'Pages/css/Main.css'; // Import the CSS file
 import { sendUserRequest } from 'Plugins/CommonUtils/UserManager'
+import Auth from 'Plugins/CommonUtils/AuthState'
 
 export function AdminMain() {
     const history = useHistory();
@@ -12,6 +13,19 @@ export function AdminMain() {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [foundPassword, setFoundPassword] = useState('');
+
+    useEffect(() => {
+        // Assuming username and password are stored in localStorage
+        const { usertype, username, password } = Auth.getState();
+
+        if (!usertype || !username || !password) {
+            // Redirect to login page
+            history.push('/login');
+        }
+        else if (usertype !== 'admin') {
+            history.push('/');
+        }
+    }, []);
 
     return (
         <div className="App">

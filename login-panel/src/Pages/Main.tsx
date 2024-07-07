@@ -19,6 +19,15 @@ export function Main() {
                     <button onClick={() => history.push('/login')} className="button">
                         Login
                     </button>
+                    <button onClick={() => history.push('/student')} className="button">
+                        Student
+                    </button>
+                    <button onClick={() => history.push('/teacher')} className="button">
+                        Teacher
+                    </button>
+                    <button onClick={() => history.push('/admin')} className="button">
+                        Admin
+                    </button>
                 </div>
             </main>
         </div>

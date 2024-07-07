@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import axios, { isAxiosError } from 'axios';
 import { TeacherAddCourseMessage } from 'Plugins/TeacherAPI/TeacherAddCourseMessage';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
-import './css/Main.css'; // Import the CSS file
+import 'Pages/css/Main.css';
+import Auth from 'Plugins/CommonUtils/AuthState' // Import the CSS file
 
 export function AdminCourse() {
     const history = useHistory();
@@ -14,6 +15,21 @@ export function AdminCourse() {
     const [capacity, setCapacity] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+
+    useEffect(() => {
+        // Assuming username and password are stored in localStorage
+        const { usertype, username, password } = Auth.getState();
+
+        if (!usertype || !username || !password) {
+            // Redirect to login page
+            history.push('/');
+        }
+
+        if (usertype !== 'admin') {
+            // Redirect to login page
+            history.push('/login');
+        }
+    }, []);
 
     const handleAddCourse = async () => {
         if (!courseID || !courseName || !teacherUsername || !teacherName || !capacity) {
