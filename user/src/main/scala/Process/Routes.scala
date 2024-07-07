@@ -5,6 +5,7 @@ import Impl.*
 import cats.effect.*
 import io.circe.generic.auto.*
 import io.circe.parser.decode
+import io.circe.parser.parse
 import io.circe.syntax.*
 import org.http4s.*
 import org.http4s.client.Client
@@ -44,6 +45,16 @@ object Routes:
         IO(decode[UserAddCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
+          }
+      case "UserGetCourseMessage" =>
+        IO(decode[UserGetCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
           }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))

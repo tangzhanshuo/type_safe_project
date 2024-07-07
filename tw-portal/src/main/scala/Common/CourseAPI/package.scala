@@ -4,10 +4,10 @@ import Common.API.{API, PlanContext, TraceID}
 import Common.Object.SqlParameter
 import Global.ServiceCenter.courseServiceCode
 import cats.effect.IO
+import io.circe.Json
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.http4s.client.Client
-import io.circe.Json
 
 package object CourseAPI {
 
@@ -17,7 +17,7 @@ package object CourseAPI {
   def deleteCourse(courseID: Int)(using PlanContext): IO[String] =
     DeleteCourseMessage(courseID).send
 
-  def getCourse(courseID: Int)(using PlanContext): IO[Json] =
+  def getCourse(courseID: Int)(using PlanContext): IO[String] =
     GetCourseMessage(courseID).send
 
   def updateCourse(courseID: Int, courseName: Option[String], teacherUsername: Option[String], teacherName: Option[String], capacity: Option[Int])(using PlanContext): IO[String] =

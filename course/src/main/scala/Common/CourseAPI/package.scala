@@ -17,7 +17,7 @@ package object CourseAPI {
   def deleteCourse(courseID: Int)(using PlanContext): IO[String] =
     DeleteCourseMessage(courseID).send
 
-  def getCourse(courseID: Int)(using PlanContext): IO[Json] =
+  def getCourse(courseID: Int)(using PlanContext): IO[String] =
     GetCourseMessage(courseID).send
 
   def updateCourse(courseID: Int, courseName: Option[String], teacherUsername: Option[String], teacherName: Option[String], capacity: Option[Int])(using PlanContext): IO[String] =

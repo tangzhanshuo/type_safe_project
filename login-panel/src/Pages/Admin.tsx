@@ -59,7 +59,7 @@ export function Admin() {
                             className="button">
                         Update
                     </button>
-                    <button onClick={() => sendUserRequest("find", usertype, username, password)}
+                    <button onClick={() => sendUserRequest("find", usertype, username, password, (password) => setFoundPassword(password))}
                             className="button">
                         Find
                     </button>
