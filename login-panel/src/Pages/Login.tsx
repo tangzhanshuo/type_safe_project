@@ -56,6 +56,9 @@ export function Login() {
                             className="button">
                         Login
                     </button>
+                    <button onClick={() => history.push('/')} className="button">
+                        Back
+                    </button>
                 </div>
             </main>
         </div>
