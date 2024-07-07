@@ -21,7 +21,7 @@ case class AddCourseMessagePlanner(
                                     override val planContext: PlanContext
                                   ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    val checkCourseExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM course WHERE course_ID = ?)",
+    val checkCourseExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM course WHERE courseid = ?)",
       List(SqlParameter("int", courseID.toString))
     )
 
@@ -38,7 +38,7 @@ case class AddCourseMessagePlanner(
           case (Right(_), Right(_), Right(_)) =>
             writeDB(s"""
                        |INSERT INTO course (
-                       |  course_ID, course_name, teacher_username, teacher_name, capacity, info, course_hour, credits, enrolled_students, kwargs
+                       |  courseid, coursename, teacherusername, teachername, capacity, info, coursehour, credits, enrolledstudents, kwargs
                        |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.stripMargin,
               List(

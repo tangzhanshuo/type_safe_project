@@ -10,11 +10,11 @@ import io.circe.Json
 
 case class GetCourseMessagePlanner(courseID: Int, override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    val query = "SELECT * FROM course WHERE course_ID = ?"
+    val query = "SELECT * FROM course WHERE courseid = ?"
     readDBRows(query, List(SqlParameter("int", courseID.toString))).map { rows =>
       rows.headOption match {
         case Some(row) => row.noSpaces
-        case None => throw new NoSuchElementException(s"No course found with course_ID: $courseID")
+        case None => throw new NoSuchElementException(s"No course found with courseid: $courseID")
       }
     }
   }

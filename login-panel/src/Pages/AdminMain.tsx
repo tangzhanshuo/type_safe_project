@@ -61,21 +61,25 @@ export function AdminMain() {
                 </div>
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 <div className="button-group">
-                    <button onClick={() => sendUserRequest("register", usertype, username, password)}
+                    <button onClick={() => sendUserRequest('register', usertype, username, password)}
                             className="button">
                         Register
                     </button>
-                    <button onClick={() => sendUserRequest("delete", usertype, username, password)}
+                    <button onClick={() => sendUserRequest('delete', usertype, username, password)}
                             className="button">
                         Delete
                     </button>
-                    <button onClick={() => sendUserRequest("update", usertype, username, password)}
+                    <button onClick={() => sendUserRequest('update', usertype, username, password)}
                             className="button">
                         Update
                     </button>
-                    <button onClick={() => sendUserRequest("find", usertype, username, password, (password) => setFoundPassword(password))}
-                            className="button">
+                    <button
+                        onClick={() => sendUserRequest('find', usertype, username, password, (password) => setFoundPassword(password))}
+                        className="button">
                         Find
+                    </button>
+                    <button onClick={() => history.push('/admin/course')} className="button">
+                        Go to AdminCourse
                     </button>
                     <button onClick={() => history.push('/')} className="button">
                         Back to main

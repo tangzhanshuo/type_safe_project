@@ -23,24 +23,24 @@ case class UpdateCourseMessagePlanner(
                                        override val planContext: PlanContext
                                      ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    val getCurrentCourseQuery = "SELECT * FROM course WHERE course_ID = ?"
+    val getCurrentCourseQuery = "SELECT * FROM course WHERE courseid = ?"
     val getCurrentCourseParams = List(SqlParameter("int", courseID.toString))
 
-    val updateCourseQuery = "UPDATE course SET %s WHERE course_ID = ?"
+    val updateCourseQuery = "UPDATE course SET %s WHERE courseid = ?"
 
     readDBRows(getCurrentCourseQuery, getCurrentCourseParams).flatMap { rows =>
       rows.headOption match {
         case Some(currentCourse) =>
           val existingCourse = currentCourse.hcursor
 
-          val updatedCourseName = courseName.getOrElse(existingCourse.get[String]("course_name").getOrElse(""))
-          val updatedTeacherUsername = teacherUsername.getOrElse(existingCourse.get[String]("teacher_username").getOrElse(""))
-          val updatedTeacherName = teacherName.getOrElse(existingCourse.get[String]("teacher_name").getOrElse(""))
+          val updatedCourseName = courseName.getOrElse(existingCourse.get[String]("coursename").getOrElse(""))
+          val updatedTeacherUsername = teacherUsername.getOrElse(existingCourse.get[String]("teacherusername").getOrElse(""))
+          val updatedTeacherName = teacherName.getOrElse(existingCourse.get[String]("teachername").getOrElse(""))
           val updatedCapacity = capacity.getOrElse(existingCourse.get[Int]("capacity").getOrElse(0))
           val updatedInfo = info.getOrElse(existingCourse.get[String]("info").getOrElse(""))
-          val updatedCourseHourJson = courseHourJson.getOrElse(existingCourse.get[String]("course_hour").getOrElse("[]"))
+          val updatedCourseHourJson = courseHourJson.getOrElse(existingCourse.get[String]("coursehour").getOrElse("[]"))
           val updatedCredits = credits.getOrElse(existingCourse.get[Int]("credits").getOrElse(0))
-          val updatedEnrolledStudentsJson = enrolledStudentsJson.getOrElse(existingCourse.get[String]("enrolled_students").getOrElse("[]"))
+          val updatedEnrolledStudentsJson = enrolledStudentsJson.getOrElse(existingCourse.get[String]("enrolledstudents").getOrElse("[]"))
           val updatedKwargsJson = kwargsJson.getOrElse(existingCourse.get[String]("kwargs").getOrElse("{}"))
 
           // Validate the JSON strings by parsing them
@@ -51,14 +51,14 @@ case class UpdateCourseMessagePlanner(
           (courseHourValidation, enrolledStudentsValidation, kwargsValidation) match {
             case (Right(_), Right(_), Right(_)) =>
               val updates = List(
-                Some("course_name = ?"),
-                Some("teacher_username = ?"),
-                Some("teacher_name = ?"),
+                Some("coursename = ?"),
+                Some("teacherusername = ?"),
+                Some("teachername = ?"),
                 Some("capacity = ?"),
                 Some("info = ?"),
-                Some("course_hour = ?"),
+                Some("coursehour = ?"),
                 Some("credits = ?"),
-                Some("enrolled_students = ?"),
+                Some("enrolledstudents = ?"),
                 Some("kwargs = ?")
               ).flatten.mkString(", ")
 

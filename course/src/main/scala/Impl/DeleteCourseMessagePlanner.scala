@@ -8,6 +8,6 @@ import Common.Object.SqlParameter
 
 case class DeleteCourseMessagePlanner(courseID: Int, override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    writeDB(s"DELETE FROM course WHERE course_ID = ?", List(SqlParameter("int", courseID.toString)))
+    writeDB(s"DELETE FROM course WHERE courseid = ?", List(SqlParameter("int", courseID.toString)))
   }
 }

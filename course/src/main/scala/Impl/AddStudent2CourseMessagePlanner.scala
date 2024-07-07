@@ -11,13 +11,13 @@ import Common.Object.SqlParameter
 
 case class AddStudent2CourseMessagePlanner(courseID: Int, studentUsername: Option[String], override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    val checkCourseExistsQuery = "SELECT EXISTS(SELECT 1 FROM course WHERE course_ID = ?)"
+    val checkCourseExistsQuery = "SELECT EXISTS(SELECT 1 FROM course WHERE courseid = ?)"
     val checkCourseExistsParams = List(SqlParameter("int", courseID.toString))
 
-    val getCourseInfoQuery = "SELECT capacity, enrolled_students FROM course WHERE course_ID = ?"
+    val getCourseInfoQuery = "SELECT capacity, enrolledstudents FROM course WHERE courseid = ?"
     val getCourseInfoParams = List(SqlParameter("int", courseID.toString))
 
-    val updateEnrolledStudentsQuery = "UPDATE course SET enrolled_students = ? WHERE course_ID = ?"
+    val updateEnrolledStudentsQuery = "UPDATE course SET enrolledstudents = ? WHERE courseid = ?"
 
     // Check if the course exists
     val courseExistsIO = readDBBoolean(checkCourseExistsQuery, checkCourseExistsParams)
@@ -26,13 +26,13 @@ case class AddStudent2CourseMessagePlanner(courseID: Int, studentUsername: Optio
         else IO.pure(())
       )
 
-    // Get the course info (capacity and enrolled_students list)
+    // Get the course info (capacity and enrolledStudents list)
     val courseInfoIO = readDBRows(getCourseInfoQuery, getCourseInfoParams)
       .flatMap { rows =>
         rows.headOption match {
           case Some(row) =>
-            val capacity = row.hcursor.get[Int]("capacity").getOrElse(0)
-            val enrolledStudentsJsonString = row.hcursor.get[String]("enrolled_students").getOrElse("[]")
+            val capacity = row.hcursor.get[Int]("capacity").toOption.getOrElse(0)
+            val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledstudents").toOption.getOrElse("[]")
             val enrolledStudentsJson = parse(enrolledStudentsJsonString).getOrElse(Json.arr())
             val enrolledStudents = enrolledStudentsJson.as[List[String]].getOrElse(Nil)
             IO.pure((capacity, enrolledStudents))

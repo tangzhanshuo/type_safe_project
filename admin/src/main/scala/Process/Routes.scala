@@ -4,7 +4,7 @@ import Common.API.PlanContext
 import Impl.*
 import cats.effect.*
 import io.circe.generic.auto.*
-import io.circe.parser.decode
+import io.circe.parser.{decode, parse}
 import io.circe.syntax.*
 import org.http4s.*
 import org.http4s.client.Client
@@ -15,6 +15,36 @@ object Routes:
     messageType match {
       case "UserLoginMessage" =>
         IO(decode[UserLoginMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserLoginMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminAddCourseMessage" =>
+        IO(decode[AdminAddCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminGetCourseMessage" =>
+        IO(decode[AdminGetCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
+          }
+      case "AdminDeleteCourseMessage" =>
+        IO(decode[AdminDeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminUpdateCourseMessage" =>
+        IO(decode[AdminUpdateCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminAddStudent2CourseMessage" =>
+        IO(decode[AdminAddStudent2CourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }

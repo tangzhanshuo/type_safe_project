@@ -19,15 +19,15 @@ object Init {
       _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS course (
-           |  course_ID INT PRIMARY KEY,
-           |  course_name TEXT,
-           |  teacher_username TEXT,
-           |  teacher_name TEXT,
+           |  courseid INT PRIMARY KEY,
+           |  coursename TEXT,
+           |  teacherusername TEXT,
+           |  teachername TEXT,
            |  capacity INT,
            |  info TEXT,
-           |  course_hour JSON,
+           |  coursehour JSON,
            |  credits INT,
-           |  enrolled_students JSON,
+           |  enrolledstudents JSON,
            |  kwargs JSON
            |)
          """.stripMargin, List()
