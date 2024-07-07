@@ -1,7 +1,7 @@
 import { Message } from 'Plugins/MessageAPI/Message';
 
-export class MessageTest extends Message {
-    override serviceName: string = "Test"
+export abstract class AdminMessage extends Message {
+    override serviceName: string = "Admin"
 
     constructor() {
         super();

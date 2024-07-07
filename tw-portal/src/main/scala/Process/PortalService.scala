@@ -44,18 +44,18 @@ object PortalService {
         val verificationUri = Uri.unsafeFromString(s"http://${address("User")}/api/UserLoginMessage")
         sendRequest(client, verificationUri, updatedJson).flatMap {
           case Right(json) if json.asString.contains("Valid user") => IO.pure(Right(json))
-          case _ => IO.pure(Left(new Exception("Invalid user")))
+          case Right(_) => IO.pure(Left(new Exception("Invalid user")))
+          case Left(e) => IO.pure(Left(e))
         }
       } else {
         IO.pure(Right(Json.fromString("Bypassed user validation")))
       }
       response <- verificationResponse match {
-        case Right(_) if serviceName != "Test" => {
+        case Right(_) => {
           val newUri = Uri.unsafeFromString(s"http://${address(serviceName)}/api/$messageName")
           IO.println(newUri) *>
           sendRequest(client, newUri, updatedJson)
         }
-        case Right(_) => IO.pure(Right(Json.fromString(":)")))
         case Left(e) => IO.pure(Left(e))
       }
     } yield response

@@ -41,11 +41,6 @@ object Routes:
               Map("password" -> password).asJson.noSpaces
             }
           }
-      case "UserAddCourseMessage" =>
-        IO(decode[UserAddCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddCourseMessage")))
-          .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
-          }
       case "UserGetCourseMessage" =>
         IO(decode[UserGetCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetCourseMessage")))
           .flatMap { m =>

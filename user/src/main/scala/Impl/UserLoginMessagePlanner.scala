@@ -9,14 +9,17 @@ import Common.ServiceUtils.schemaName
 
 case class UserLoginMessagePlanner(usertype: String, username:String, password:String, override val planContext: PlanContext) extends Planner[String]:
   override def plan(using PlanContext): IO[String] = {
-    val dbName = usertype.toLowerCase
-    // Attempt to validate the user by reading the rows from the database
-    readDBRows(
-      s"SELECT user_name FROM ${dbName}.user_name WHERE user_name = ? AND password = ?",
-      List(SqlParameter("String", username), SqlParameter("String", password))
-    ).map{
-      case Nil => "Invalid user"
-      case _ => "Valid user"
+    if (usertype.isEmpty || username.isEmpty || password.isEmpty) {
+      IO.pure("Invalid user")
+    } else {
+      val dbName = usertype.toLowerCase
+      readDBRows(
+        s"SELECT user_name FROM ${dbName}.user_name WHERE user_name = ? AND password = ?",
+        List(SqlParameter("String", username), SqlParameter("String", password))
+      ).map {
+        case Nil => "Invalid user"
+        case _ => "Valid user"
+      }
     }
   }
 

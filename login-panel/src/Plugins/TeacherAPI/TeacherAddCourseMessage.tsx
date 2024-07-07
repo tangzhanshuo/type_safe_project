@@ -1,6 +1,6 @@
-import { UserMessage } from 'Plugins/UserAPI/UserMessage';
+import { TeacherMessage } from 'Plugins/TeacherAPI/TeacherMessage'
 
-export class UserAddCourseMessage extends UserMessage {
+export class TeacherAddCourseMessage extends TeacherMessage {
     courseID: number;
     courseName: string;
     teacherUsername: string;

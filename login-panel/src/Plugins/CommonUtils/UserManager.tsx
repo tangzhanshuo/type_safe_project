@@ -3,7 +3,7 @@ import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage';
 import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage';
 import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage';
 import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendUserPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import Auth from 'Plugins/CommonUtils/AuthState';
 
 export const sendUserRequest = async (messageType: string, usertype: string, username: string, password: string, setFoundPassword?: (password: string) => void) => {
@@ -15,24 +15,26 @@ export const sendUserRequest = async (messageType: string, usertype: string, use
     }
     switch (messageType) {
         case "login":
-            const loginResponse = await sendPostRequest(new UserLoginMessage(usertype, username, password));
+            const loginResponse = await sendUserPostRequest(new UserLoginMessage(usertype, username, password));
             if (loginResponse.data === 'Valid user') {
                 Auth.getState().setUsertype(usertype);
                 Auth.getState().setUsername(username);
                 Auth.getState().setPassword(password);
+                return 'Login successful';
             }
+            return 'Invalid user';
             break;
         case "register":
-            await sendPostRequest(new UserRegisterMessage(usertype, username, password));
+            await sendUserPostRequest(new UserRegisterMessage(usertype, username, password));
             break;
         case "delete":
-            await sendPostRequest(new UserDeleteMessage(usertype, username, password));
+            await sendUserPostRequest(new UserDeleteMessage(usertype, username, password));
             break;
         case "update":
-            await sendPostRequest(new UserUpdateMessage(usertype, username, password));
+            await sendUserPostRequest(new UserUpdateMessage(usertype, username, password));
             break;
         case "find":
-            const response = await sendPostRequest(new UserFindMessage(usertype, username));
+            const response = await sendUserPostRequest(new UserFindMessage(usertype, username));
             if (setFoundPassword) setFoundPassword(response.data.password);
             break;
     }
