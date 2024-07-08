@@ -7,7 +7,6 @@ import io.circe.syntax.*
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.*
 import Common.Object.SqlParameter
-import Common.CourseAPI.UpdateCourseMessage
 
 case class UpdateCourseMessagePlanner(
                                        courseID: Int,
@@ -17,6 +16,7 @@ case class UpdateCourseMessagePlanner(
                                        capacity: Option[Int],
                                        info: Option[String],
                                        courseHourJson: Option[String], // JSON represented as String
+                                       classroomID: Option[Int],
                                        credits: Option[Int],
                                        enrolledStudentsJson: Option[String], // JSON represented as String
                                        kwargsJson: Option[String], // JSON represented as String
@@ -33,15 +33,16 @@ case class UpdateCourseMessagePlanner(
         case Some(currentCourse) =>
           val existingCourse = currentCourse.hcursor
 
-          val updatedCourseName = courseName.getOrElse(existingCourse.get[String]("coursename").getOrElse(""))
-          val updatedTeacherUsername = teacherUsername.getOrElse(existingCourse.get[String]("teacherusername").getOrElse(""))
-          val updatedTeacherName = teacherName.getOrElse(existingCourse.get[String]("teachername").getOrElse(""))
-          val updatedCapacity = capacity.getOrElse(existingCourse.get[Int]("capacity").getOrElse(0))
-          val updatedInfo = info.getOrElse(existingCourse.get[String]("info").getOrElse(""))
-          val updatedCourseHourJson = courseHourJson.getOrElse(existingCourse.get[String]("coursehour").getOrElse("[]"))
-          val updatedCredits = credits.getOrElse(existingCourse.get[Int]("credits").getOrElse(0))
-          val updatedEnrolledStudentsJson = enrolledStudentsJson.getOrElse(existingCourse.get[String]("enrolledstudents").getOrElse("[]"))
-          val updatedKwargsJson = kwargsJson.getOrElse(existingCourse.get[String]("kwargs").getOrElse("{}"))
+          val updatedCourseName = courseName.orElse(existingCourse.get[String]("coursename").toOption).getOrElse("")
+          val updatedTeacherUsername = teacherUsername.orElse(existingCourse.get[String]("teacherusername").toOption).getOrElse("")
+          val updatedTeacherName = teacherName.orElse(existingCourse.get[String]("teachername").toOption).getOrElse("")
+          val updatedCapacity = capacity.orElse(existingCourse.get[Int]("capacity").toOption).getOrElse(0)
+          val updatedInfo = info.orElse(existingCourse.get[String]("info").toOption).getOrElse("")
+          val updatedCourseHourJson = courseHourJson.orElse(existingCourse.get[String]("coursehour").toOption).getOrElse("[]")
+          val updatedClassroomID = classroomID.orElse(existingCourse.get[Int]("classroomid").toOption).getOrElse(0)
+          val updatedCredits = credits.orElse(existingCourse.get[Int]("credits").toOption).getOrElse(0)
+          val updatedEnrolledStudentsJson = enrolledStudentsJson.orElse(existingCourse.get[String]("enrolledstudents").toOption).getOrElse("[]")
+          val updatedKwargsJson = kwargsJson.orElse(existingCourse.get[String]("kwargs").toOption).getOrElse("{}")
 
           // Validate the JSON strings by parsing them
           val courseHourValidation = parse(updatedCourseHourJson).left.map(e => new Exception(s"Invalid JSON for courseHour: ${e.getMessage}"))
@@ -57,6 +58,7 @@ case class UpdateCourseMessagePlanner(
                 Some("capacity = ?"),
                 Some("info = ?"),
                 Some("coursehour = ?"),
+                Some("classroomid = ?"),
                 Some("credits = ?"),
                 Some("enrolledstudents = ?"),
                 Some("kwargs = ?")
@@ -68,10 +70,11 @@ case class UpdateCourseMessagePlanner(
                 SqlParameter("string", updatedTeacherName),
                 SqlParameter("int", updatedCapacity.toString),
                 SqlParameter("string", updatedInfo),
-                SqlParameter("json", updatedCourseHourJson),
+                SqlParameter("jsonb", updatedCourseHourJson),
+                SqlParameter("int", updatedClassroomID.toString),
                 SqlParameter("int", updatedCredits.toString),
-                SqlParameter("json", updatedEnrolledStudentsJson),
-                SqlParameter("json", updatedKwargsJson),
+                SqlParameter("jsonb", updatedEnrolledStudentsJson),
+                SqlParameter("jsonb", updatedKwargsJson),
                 SqlParameter("int", courseID.toString)
               )
 

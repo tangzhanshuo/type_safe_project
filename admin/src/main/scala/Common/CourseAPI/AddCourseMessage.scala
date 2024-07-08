@@ -11,6 +11,7 @@ case class AddCourseMessage(
                              capacity: Int,
                              info: String,
                              courseHourJson: String, // JSON represented as String
+                             classroomID: Int,
                              credits: Int,
                              enrolledStudentsJson: String, // JSON represented as String
                              kwargsJson: String // JSON represented as String

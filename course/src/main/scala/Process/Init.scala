@@ -26,10 +26,11 @@ object Init {
            |  teachername TEXT,
            |  capacity INT,
            |  info TEXT,
-           |  coursehour JSON,
+           |  coursehour JSONB,
+           |  classroomid INT,
            |  credits INT,
-           |  enrolledstudents JSON,
-           |  kwargs JSON
+           |  enrolledstudents JSONB,
+           |  kwargs JSONB
            |)
          """.stripMargin, List()
         // The course_hour should be a list of Ints with value 42*w + 6*d + h where
@@ -43,7 +44,7 @@ object Init {
            |CREATE TABLE IF NOT EXISTS classroom (
            |  classroomid TEXT PRIMARY KEY,
            |  classroomname TEXT,
-           |  enrolledcourses JSON
+           |  enrolledcourses JSONB
            |)
          """.stripMargin, List()
         // enrolledcourses should be a dict of "courseid: LIST[*coursehour]"

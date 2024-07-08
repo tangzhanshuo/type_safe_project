@@ -11,6 +11,7 @@ case class UpdateCourseMessage(
                                 capacity: Option[Int],
                                 info: Option[String],
                                 courseHourJson: Option[String], // JSON represented as String
+                                classroomID: Option[Int],
                                 credits: Option[Int],
                                 enrolledStudentsJson: Option[String], // JSON represented as String
                                 kwargsJson: Option[String] // JSON represented as String

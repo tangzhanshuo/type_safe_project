@@ -19,6 +19,7 @@ export function AdminCourse() {
     const [capacity, setCapacity] = useState('');
     const [info, setInfo] = useState('');
     const [courseHourJson, setCourseHourJson] = useState('');
+    const [classroomID, setClassroomID] = useState('');
     const [credits, setCredits] = useState('');
     const [enrolledStudentsJson, setEnrolledStudentsJson] = useState('');
     const [kwargsJson, setKwargsJson] = useState('');
@@ -40,7 +41,7 @@ export function AdminCourse() {
     }, []);
 
     const handleAddCourse = async () => {
-        if (!courseID || !courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHourJson || !credits || !enrolledStudentsJson || !kwargsJson) {
+        if (!courseID || !courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHourJson || !classroomID || !credits || !enrolledStudentsJson || !kwargsJson) {
             setErrorMessage('All fields are required');
             return;
         }
@@ -53,6 +54,7 @@ export function AdminCourse() {
             parseInt(capacity, 10),
             info,
             courseHourJson,
+            parseInt(classroomID, 10), // Added classroomID
             parseInt(credits, 10),
             enrolledStudentsJson,
             kwargsJson
@@ -72,6 +74,7 @@ export function AdminCourse() {
             setSuccessMessage('');
         }
     };
+
 
     const handleGetCourse = async () => {
         if (!courseID) {
@@ -134,6 +137,7 @@ export function AdminCourse() {
             capacity ? parseInt(capacity, 10) : undefined,
             info || undefined,
             courseHourJson || undefined,
+            classroomID ? parseInt(classroomID, 10) : undefined, // Added classroomID
             credits ? parseInt(credits, 10) : undefined,
             enrolledStudentsJson || undefined,
             kwargsJson || undefined
@@ -153,6 +157,7 @@ export function AdminCourse() {
             setSuccessMessage('');
         }
     };
+
 
     const handleAddStudent2Course = async () => {
         if (!courseID || !studentUsername) {
@@ -234,6 +239,13 @@ export function AdminCourse() {
                         placeholder="Course Hour (JSON)"
                         value={courseHourJson}
                         onChange={(e) => setCourseHourJson(e.target.value)}
+                        className="input-field"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Classroom ID"
+                        value={classroomID}
+                        onChange={(e) => setClassroomID(e.target.value)}
                         className="input-field"
                     />
                     <input

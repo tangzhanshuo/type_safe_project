@@ -38,7 +38,17 @@ object Routes:
             m.fullPlan.map(_.asJson.noSpaces)
           }
       case "GetCourseByTeacherUsernameMessage" =>
-        IO(decode[GetCourseByTeacherUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddStudent2CourseMessage")))
+        IO(decode[GetCourseByTeacherUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCourseByTeacherUsernameMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "DeleteStudentFromCourseMessage" =>
+        IO(decode[DeleteStudentFromCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for DeleteStudentFromCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "IsStudentEnrolledMessage" =>
+        IO(decode[DeleteStudentFromCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for IsStudentEnrolledMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }

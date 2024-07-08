@@ -12,12 +12,13 @@ case class AdminAddCourseMessagePlanner(
                                          capacity: Int,
                                          info: String,
                                          courseHourJson: String, // JSON represented as String
+                                         classroomID: Int,
                                          credits: Int,
                                          enrolledStudentsJson: String, // JSON represented as String
                                          kwargsJson: String, // JSON represented as String
                                          override val planContext: PlanContext
                                        ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    addCourse(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, credits, enrolledStudentsJson, kwargsJson)
+    addCourse(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, kwargsJson)
   }
 }

@@ -9,13 +9,13 @@ import Common.API.{PlanContext, Planner}
 import Common.DBAPI.*
 import Common.Object.SqlParameter
 
-case class AddStudent2CourseMessagePlanner(courseID: Int, studentUsername: Option[String], override val planContext: PlanContext) extends Planner[String] {
+case class DeleteStudentFromCourseMessagePlanner(courseID: Int, studentUsername: Option[String], override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
     val checkCourseExistsQuery = "SELECT EXISTS(SELECT 1 FROM course WHERE courseid = ?)"
     val checkCourseExistsParams = List(SqlParameter("int", courseID.toString))
 
-    val getCourseInfoQuery = "SELECT capacity, enrolledstudents FROM course WHERE courseid = ?"
-    val getCourseInfoParams = List(SqlParameter("int", courseID.toString))
+    val getEnrolledStudentsQuery = "SELECT enrolledstudents FROM course WHERE courseid = ?"
+    val getEnrolledStudentsParams = List(SqlParameter("int", courseID.toString))
 
     val updateEnrolledStudentsQuery = "UPDATE course SET enrolledstudents = ? WHERE courseid = ?"
 
@@ -26,34 +26,31 @@ case class AddStudent2CourseMessagePlanner(courseID: Int, studentUsername: Optio
         else IO.pure(())
       )
 
-    // Get the course info (capacity and enrolledStudents list)
-    val courseInfoIO = readDBRows(getCourseInfoQuery, getCourseInfoParams)
+    // Get the enrolled students list
+    val enrolledStudentsIO = readDBRows(getEnrolledStudentsQuery, getEnrolledStudentsParams)
       .flatMap { rows =>
         rows.headOption match {
           case Some(row) =>
-            val capacity = row.hcursor.get[Int]("capacity").toOption.getOrElse(0)
-            val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledstudents").toOption.getOrElse("[]")
+            val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledstudents").toOption.orElse(Some("[]")).get
             val enrolledStudentsJson = parse(enrolledStudentsJsonString).getOrElse(Json.arr())
             val enrolledStudents = enrolledStudentsJson.as[List[String]].getOrElse(Nil)
-            IO.pure((capacity, enrolledStudents))
+            IO.pure(enrolledStudents)
           case None => IO.raiseError(new Exception(s"Course with ID $courseID not found"))
         }
       }
 
     // Combine the checks and update
     courseExistsIO.flatMap { _ =>
-      courseInfoIO.flatMap { case (capacity, enrolledStudents) =>
+      enrolledStudentsIO.flatMap { enrolledStudents =>
         studentUsername match {
           case Some(username) =>
-            if (enrolledStudents.contains(username)) {
-              IO.raiseError(new Exception(s"Student $username is already enrolled in course $courseID"))
-            } else if (enrolledStudents.size >= capacity) {
-              IO.raiseError(new Exception(s"Course $courseID has reached its capacity of $capacity students"))
+            if (!enrolledStudents.contains(username)) {
+              IO.raiseError(new Exception(s"Student $username is not enrolled in course $courseID"))
             } else {
-              val updatedEnrolledStudents = enrolledStudents :+ username
+              val updatedEnrolledStudents = enrolledStudents.filterNot(_ == username)
               val updatedEnrolledStudentsJsonString = updatedEnrolledStudents.asJson.noSpaces
               writeDB(updateEnrolledStudentsQuery, List(SqlParameter("jsonb", updatedEnrolledStudentsJsonString), SqlParameter("int", courseID.toString)))
-                .map(_ => s"Student $username successfully added to course $courseID")
+                .map(_ => s"Student $username successfully removed from course $courseID")
             }
           case None => IO.raiseError(new Exception("Student username must be provided"))
         }

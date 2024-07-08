@@ -8,6 +8,7 @@ export class AdminUpdateCourseMessage extends AdminMessage {
     capacity?: number;
     info?: string;
     courseHourJson?: string; // JSON represented as String
+    classroomID?: number;
     credits?: number;
     enrolledStudentsJson?: string; // JSON represented as String
     kwargsJson?: string; // JSON represented as String
@@ -20,6 +21,7 @@ export class AdminUpdateCourseMessage extends AdminMessage {
         capacity?: number,
         info?: string,
         courseHourJson?: string,
+        classroomID?: number,
         credits?: number,
         enrolledStudentsJson?: string,
         kwargsJson?: string
@@ -32,6 +34,7 @@ export class AdminUpdateCourseMessage extends AdminMessage {
         this.capacity = capacity;
         this.info = info;
         this.courseHourJson = courseHourJson;
+        this.classroomID = classroomID;
         this.credits = credits;
         this.enrolledStudentsJson = enrolledStudentsJson;
         this.kwargsJson = kwargsJson;

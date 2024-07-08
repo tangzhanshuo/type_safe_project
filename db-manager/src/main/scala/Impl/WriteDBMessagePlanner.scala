@@ -45,9 +45,9 @@ case class WriteDBMessagePlanner(sqlStatement: String, parameters: List[SqlParam
       case "int" => statement.setInt(index, sqlParameter.value.toInt)
       case "double" => statement.setDouble(index, sqlParameter.value.toDouble)
       case "datetime" => statement.setTimestamp(index, new Timestamp(sqlParameter.value.toLong)) // Convert DateTime to Timestamp
-      case "json" =>
+      case "jsonb" =>
         val jsonObject = new PGobject()
-        jsonObject.setType("json")
+        jsonObject.setType("jsonb")
         jsonObject.setValue(sqlParameter.value)
         statement.setObject(index, jsonObject)
       // Add more cases for other data types

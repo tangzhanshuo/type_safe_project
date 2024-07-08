@@ -19,11 +19,12 @@ package object CourseAPI {
                  capacity: Int,
                  info: String,
                  courseHourJson: String,
+                 classroomID: Int,
                  credits: Int,
                  enrolledStudentsJson: String,
                  kwargsJson: String
                )(using PlanContext): IO[String] =
-    AddCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, credits, enrolledStudentsJson, kwargsJson).send
+    AddCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, kwargsJson).send
 
   def deleteCourse(courseID: Int)(using PlanContext): IO[String] =
     DeleteCourseMessage(courseID).send
@@ -39,12 +40,22 @@ package object CourseAPI {
                     capacity: Option[Int],
                     info: Option[String],
                     courseHourJson: Option[String],
+                    classroomID: Option[Int],
                     credits: Option[Int],
                     enrolledStudentsJson: Option[String],
                     kwargsJson: Option[String]
                   )(using PlanContext): IO[String] =
-    UpdateCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, credits, enrolledStudentsJson, kwargsJson).send
+    UpdateCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, kwargsJson).send
 
   def addStudent2Course(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
     AddStudent2CourseMessage(courseID, studentUsername).send
+
+  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[String] =
+    GetCourseByTeacherUsernameMessage(teacherUsername).send
+
+  def deleteStudentFromCourse(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
+    DeleteStudentFromCourseMessage(courseID, studentUsername).send
+
+  def isStudentEnrolled(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[Boolean] =
+    IsStudentEnrolledMessage(courseID, studentUsername).send
 }

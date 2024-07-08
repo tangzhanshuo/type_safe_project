@@ -15,6 +15,7 @@ case class AddCourseMessagePlanner(
                                     capacity: Int,
                                     info: String,
                                     courseHourJson: String, // JSON represented as String
+                                    classroomID: Int,
                                     credits: Int,
                                     enrolledStudentsJson: String, // JSON represented as String
                                     kwargsJson: String, // JSON represented as String
@@ -38,8 +39,8 @@ case class AddCourseMessagePlanner(
           case (Right(_), Right(_), Right(_)) =>
             writeDB(s"""
                        |INSERT INTO course (
-                       |  courseid, coursename, teacherusername, teachername, capacity, info, coursehour, credits, enrolledstudents, kwargs
-                       |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                       |  courseid, coursename, teacherusername, teachername, capacity, info, coursehour, classroomid, credits, enrolledstudents, kwargs
+                       |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.stripMargin,
               List(
                 SqlParameter("int", courseID.toString),
@@ -48,10 +49,11 @@ case class AddCourseMessagePlanner(
                 SqlParameter("string", teacherName),
                 SqlParameter("int", capacity.toString),
                 SqlParameter("string", info),
-                SqlParameter("json", courseHourJson),
+                SqlParameter("jsonb", courseHourJson),
+                SqlParameter("int", classroomID.toString),
                 SqlParameter("int", credits.toString),
-                SqlParameter("json", enrolledStudentsJson),
-                SqlParameter("json", kwargsJson)
+                SqlParameter("jsonb", enrolledStudentsJson),
+                SqlParameter("jsonb", kwargsJson)
               )
             ).map(_ => s"Course $courseName with ID $courseID successfully added")
 
