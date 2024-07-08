@@ -47,4 +47,7 @@ package object CourseAPI {
 
   def addStudent2Course(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
     AddStudent2CourseMessage(courseID, studentUsername).send
+
+  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[String] =
+    GetCourseByTeacherUsernameMessage(teacherUsername).send
 }

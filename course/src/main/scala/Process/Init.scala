@@ -16,6 +16,7 @@ object Init {
     for {
       _ <- API.init(config.maximumClientConnection)
       _ <- initSchema("course")
+      _ <- initSchema("classroom")
       _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS course (
@@ -36,6 +37,16 @@ object Init {
         // d = 1, 2, 3, 4, 5, 6, 7 stands for 星期d
         // h = 1, 2, 3, 4, 5, 6 stands for 第h段时间
         // kwargs contain other info
+      )
+      - <- writeDB(
+        s"""
+           |CREATE TABLE IF NOT EXISTS classroom (
+           |  classroomid TEXT PRIMARY KEY,
+           |  classroomname TEXT,
+           |  enrolledcourses JSON
+           |)
+         """.stripMargin, List()
+        // enrolledcourses should be a dict of "courseid: LIST[*coursehour]"
       )
     } yield ()
   }
