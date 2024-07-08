@@ -4,6 +4,7 @@ import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage';
 import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage';
 import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage';
 import { sendUserPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { History } from 'history';
 import Auth from 'Plugins/CommonUtils/AuthState';
 
 export const sendUserRequest = async (messageType: string, usertype: string, username: string, password: string, setFoundPassword?: (password: string) => void) => {
@@ -40,3 +41,10 @@ export const sendUserRequest = async (messageType: string, usertype: string, use
     }
     return '';
 };
+
+export const logout = (history: History) => {
+    Auth.getState().setUsertype('');
+    Auth.getState().setUsername('');
+    Auth.getState().setPassword('');
+    history.push('/')
+}

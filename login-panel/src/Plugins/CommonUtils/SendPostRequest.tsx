@@ -20,6 +20,7 @@ export const sendUserPostRequest = async (message: API) => {
         } else {
             console.error('Unexpected error:', error);
         }
+        return error;
     }
 };
 
@@ -47,5 +48,6 @@ export const sendPostRequest = async (message: API) => {
         } else {
             console.error('Unexpected error:', error);
         }
+        return error;
     }
 };
