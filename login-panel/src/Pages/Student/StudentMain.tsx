@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
+import { logout } from 'Plugins/CommonUtils/UserManager'
 import Auth from 'Plugins/CommonUtils/AuthState';
 import 'Pages/css/Main.css'; // Import the CSS file
 
@@ -28,7 +29,13 @@ export function StudentMain() {
             </header>
             <main className="App-main">
                 <div className="button-group">
+                    <button onClick={() => history.push('/student/course')} className="button">
+                        Go to courses
+                    </button>
                     <button onClick={() => history.push('/')} className="button">
+                        Back to Main
+                    </button>
+                    <button onClick={() => logout(history)} className="button">
                         Log out
                     </button>
                 </div>

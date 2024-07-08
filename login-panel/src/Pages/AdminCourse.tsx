@@ -31,11 +31,11 @@ export function AdminCourse() {
         const { usertype, username, password } = Auth.getState();
 
         if (!usertype || !username || !password) {
-            history.push('/');
+            history.push('/login');
         }
 
         if (usertype !== 'admin') {
-            history.push('/login');
+            history.push('/');
         }
     }, []);
 
