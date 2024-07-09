@@ -32,9 +32,6 @@ package object CourseAPI {
   def getCourse(courseID: Int)(using PlanContext): IO[String] =
     GetCourseMessage(courseID).send
 
-  def getCourseList()(using PlanContext): IO[String] =
-    GetCourseListMessage().send
-
   def updateCourse(
                     courseID: Int,
                     courseName: Option[String],
@@ -61,4 +58,14 @@ package object CourseAPI {
 
   def isStudentEnrolled(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[Boolean] =
     IsStudentEnrolledMessage(courseID, studentUsername).send
+
+  def getCourseList()(using PlanContext): IO[String] =
+    GetCourseListMessage().send
+
+  def getCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+    GetCourseListMessage().send
+
+  def addClassroom(classroomID: Int, classroomName: String, enrolledCoursesJson: String)(using PlanContext): IO[String] =
+    AddClassroomMessage(classroomID, classroomName, enrolledCoursesJson).send
+
 }
