@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
 import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourseListMessage'
 import { logout } from 'Plugins/CommonUtils/UserManager'
@@ -10,16 +9,13 @@ import 'Pages/css/Main.css'; // Import the CSS file
 
 export function StudentCourse() {
     const history = useHistory();
-    const [courseList, setCourseList] = useState([]);
-    const [course, setCourse] = useState('');
+    const [courses, setCourses] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        // Assuming username and password are stored in localStorage
         const { usertype, username, password } = Auth.getState();
 
         if (!usertype || !username || !password) {
-            // Redirect to login page
             history.push('/login');
         }
         else if (usertype !== 'student') {
@@ -28,20 +24,16 @@ export function StudentCourse() {
     }, []);
 
     const getCourseList = async () => {
+        const response = await sendPostRequest(new StudentGetCourseListMessage())
+        if (response.isError) {
+            setErrorMessage(response.error)
+            return
+        }
         try {
-            const response = await sendPostRequest(new StudentGetCourseListMessage())
-            if (isAxiosError(response)) {
-                setErrorMessage(response.response?.data.error)
-                return
-            }
-            setCourse(response.data)
-
+            const parsedCourses = JSON.parse(response.data);
+            setCourses(parsedCourses);
         } catch (error) {
-            if (isAxiosError(error)) {
-                alert(error.response?.data);
-            } else {
-                alert(error);
-            }
+            setErrorMessage('Error parsing course data');
         }
     }
 
@@ -52,7 +44,38 @@ export function StudentCourse() {
             </header>
             <main className="App-main">
                 <div className="button-group">
-                    <p>{course}</p>
+                    {courses.length > 0 ? (
+                        <table className="course-table">
+                            <thead>
+                            <tr>
+                                <th>Course ID</th>
+                                <th>Course Name</th>
+                                <th>Teacher</th>
+                                <th>Capacity</th>
+                                <th>Credits</th>
+                                <th>Info</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {courses.map((course) => (
+                                <tr key={course.courseid}>
+                                    <td>
+                                        <Link to={`/student/course/${course.courseid}`}>
+                                            {course.courseid}
+                                        </Link>
+                                    </td>
+                                    <td>{course.coursename}</td>
+                                    <td>{course.teachername}</td>
+                                    <td>{course.capacity}</td>
+                                    <td>{course.credits}</td>
+                                    <td>{course.info}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>No courses to display. Click 'Get Courses' to load the course list.</p>
+                    )}
                     <p style={{ color: 'red' }}>{errorMessage}</p>
                     <button onClick={() => getCourseList()} className="button">
                         Get Courses

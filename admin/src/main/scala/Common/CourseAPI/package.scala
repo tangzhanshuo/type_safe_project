@@ -32,6 +32,9 @@ package object CourseAPI {
   def getCourse(courseID: Int)(using PlanContext): IO[String] =
     GetCourseMessage(courseID).send
 
+  def getCourseList()(using PlanContext): IO[String] =
+    GetCourseListMessage().send
+
   def updateCourse(
                     courseID: Int,
                     courseName: Option[String],
