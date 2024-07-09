@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
 import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourseListMessage'
 import { logout } from 'Plugins/CommonUtils/UserManager'
@@ -10,16 +9,13 @@ import 'Pages/css/Main.css'; // Import the CSS file
 
 export function StudentCourse() {
     const history = useHistory();
-    const [courseList, setCourseList] = useState([]);
     const [courses, setCourses] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        // Assuming username and password are stored in localStorage
         const { usertype, username, password } = Auth.getState();
 
         if (!usertype || !username || !password) {
-            // Redirect to login page
             history.push('/login');
         }
         else if (usertype !== 'student') {
@@ -49,18 +45,34 @@ export function StudentCourse() {
             <main className="App-main">
                 <div className="button-group">
                     {courses.length > 0 ? (
-                        <ul className="course-list">
+                        <table className="course-table">
+                            <thead>
+                            <tr>
+                                <th>Course ID</th>
+                                <th>Course Name</th>
+                                <th>Teacher</th>
+                                <th>Capacity</th>
+                                <th>Credits</th>
+                                <th>Info</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             {courses.map((course) => (
-                                <li key={course.courseid} className="course-item">
-                                    <h3>{course.coursename}</h3>
-                                    <p>Teacher: {course.teachername}</p>
-                                    <p>Course ID: {course.courseid}</p>
-                                    <p>Capacity: {course.capacity}</p>
-                                    <p>Credits: {course.credits}</p>
-                                    <p>Info: {course.info}</p>
-                                </li>
+                                <tr key={course.courseid}>
+                                    <td>
+                                        <Link to={`/student/course/${course.courseid}`}>
+                                            {course.courseid}
+                                        </Link>
+                                    </td>
+                                    <td>{course.coursename}</td>
+                                    <td>{course.teachername}</td>
+                                    <td>{course.capacity}</td>
+                                    <td>{course.credits}</td>
+                                    <td>{course.info}</td>
+                                </tr>
                             ))}
-                        </ul>
+                            </tbody>
+                        </table>
                     ) : (
                         <p>No courses to display. Click 'Get Courses' to load the course list.</p>
                     )}
