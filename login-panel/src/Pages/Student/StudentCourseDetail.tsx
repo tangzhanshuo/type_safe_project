@@ -3,6 +3,7 @@ import { API } from 'Plugins/CommonUtils/API';
 import { useParams, useHistory, Link } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
 import { StudentGetCourseMessage } from 'Plugins/StudentAPI/StudentGetCourseMessage'
+import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage'
 import { logout } from 'Plugins/CommonUtils/UserManager'
 import Auth from 'Plugins/CommonUtils/AuthState';
 import 'Pages/css/Main.css'; // Import the CSS file
@@ -11,6 +12,7 @@ export function StudentCourseDetail() {
     const history = useHistory();
     const { courseid } = useParams<{ courseid: string }>();
     const [errorMessage, setErrorMessage] = useState('');
+    const [addCourseResponse, setAddCourseResponse] = useState('');
     const [course, setCourse] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -44,6 +46,20 @@ export function StudentCourseDetail() {
         } catch (error) {
             setErrorMessage('Error parsing course data');
         }
+    }
+
+    const addCourse = async () => {
+        const id = parseInt(courseid, 10);
+        if (isNaN(id)) {
+            setAddCourseResponse('Invalid course ID');
+            return;
+        }
+        const response = await sendPostRequest(new StudentAddCourseMessage(id))
+        if (response.isError) {
+            setAddCourseResponse(response.error)
+            return
+        }
+        setAddCourseResponse('Course added successfully')
     }
 
     return (
@@ -94,11 +110,15 @@ export function StudentCourseDetail() {
                                 </tr>
                                 </tbody>
                             </table>
+                            {addCourseResponse && <p>{addCourseResponse}</p>}
                         </>
                     ) : (
                         <p>No course data available.</p>
                     )}
                     <div className="button-group">
+                        <button onClick={() => addCourse()} className="button">
+                            Register for Course
+                        </button>
                         <button onClick={() => history.push('/student/course')} className="button">
                             Back to Course List
                         </button>
