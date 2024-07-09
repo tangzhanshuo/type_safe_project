@@ -70,4 +70,10 @@ package object CourseAPI {
 
   def deleteClassroom(classroomID: Int)(using PlanContext): IO[String] =
     DeleteClassroomMessage(classroomID).send
+
+  def getClassroomList()(using PlanContext): IO[String] =
+    GetClassroomListMessage().send
+
+  def getClassroom(classroomID: Int)(using PlanContext): IO[String] =
+    GetClassroomMessage(classroomID).send
 }
