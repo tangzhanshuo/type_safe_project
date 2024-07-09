@@ -26,7 +26,7 @@ case class DeleteClassroomMessagePlanner(
       val updateCourseClassroomQuery = s"UPDATE course SET classroomid = ? WHERE courseid = ?"
 
       def getClassroomEnrolledCourses(classroomID: Int): IO[Json] = readDBString(getEnrolledCoursesQuery,
-        getEnrolledCoursesParams).flatMap { enrolledCoursesJsonString =>
+        List(SqlParameter("int", classroomID.toString))).flatMap { enrolledCoursesJsonString =>
         IO.fromEither(parse(enrolledCoursesJsonString).left.map(e => new Exception(s"Invalid JSON for enrolledCourses: ${e.getMessage}")))
       }
 
@@ -40,8 +40,8 @@ case class DeleteClassroomMessagePlanner(
         IO.parSequenceN(1)(updateTasks).map(_ => ())
       }
 
-      def updateClassroomEnrolledCourses: IO[Unit] = getClassroomEnrolledCourses(-1).flatMap { existingCourses =>
-        val updatedCourses = existingCourses.deepMerge(Json.obj(classroomID.toString -> parse("[]").getOrElse(Json.arr())))
+      def updateClassroomEnrolledCourses(existingCourses: Json): IO[Unit] = getClassroomEnrolledCourses(-1).flatMap { existingCoursesForMinusOne =>
+        val updatedCourses = existingCoursesForMinusOne.deepMerge(existingCourses)
         writeDB(s"UPDATE classroom SET enrolledcourses = ? WHERE classroomid = ?",
           List(SqlParameter("jsonb", updatedCourses.noSpaces), SqlParameter("int", "-1"))
         ).map(_ => ())
@@ -50,7 +50,7 @@ case class DeleteClassroomMessagePlanner(
       getClassroomEnrolledCourses(classroomID).flatMap { existingCourses =>
         for {
           _ <- updateCoursesToNewClassroom(existingCourses)
-          _ <- updateClassroomEnrolledCourses
+          _ <- updateClassroomEnrolledCourses(existingCourses)
           _ <- writeDB(deleteClassroomQuery, deleteClassroomParams)
         } yield s"Classroom with ID $classroomID successfully deleted and courses moved to classroom with ID -1"
       }

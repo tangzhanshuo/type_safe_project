@@ -62,12 +62,12 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
-      case "AddClassroom" =>
+      case "AddClassroomMessage" =>
         IO(decode[AddClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for IsStudentEnrolledMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
-      case "DeleteClassroom" =>
+      case "DeleteClassroomMessage" =>
         IO(decode[DeleteClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for IsStudentEnrolledMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
