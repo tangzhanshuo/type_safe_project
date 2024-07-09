@@ -10,7 +10,7 @@ import io.circe.syntax.*
 
 case class GetClassroomListMessagePlanner(override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    val query = "SELECT * FROM classroom"
+    val query = "SELECT * FROM classroom ORDER BY classroomid"
     readDBRows(query, List()).map { rows =>
       if (rows.isEmpty) throw new NoSuchElementException(s"No classrooms found")
       else rows.asJson.noSpaces

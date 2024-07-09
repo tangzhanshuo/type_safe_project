@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { AdminAddCourseMessage } from 'Plugins/AdminAPI/AdminAddCourseMessage';
 import { AdminGetCourseMessage } from 'Plugins/AdminAPI/AdminGetCourseMessage';
 import { AdminUpdateCourseMessage } from 'Plugins/AdminAPI/AdminUpdateCourseMessage';
 import { AdminDeleteCourseMessage } from 'Plugins/AdminAPI/AdminDeleteCourseMessage';
+import { AdminGetAvailableClassroomByCapacityHourMessage } from 'Plugins/AdminAPI/AdminGetAvailableClassroomByCapacityHourMessage';
 
 interface Props {
-    setErrorMessage: (msg: string) => void;
-    setSuccessMessage: (msg: string) => void;
-    setCourseDetails: (details: any) => void;
+    setErrorMessage: Dispatch<SetStateAction<string>>;
+    setSuccessMessage: Dispatch<SetStateAction<string>>;
+    setCourseDetails: Dispatch<SetStateAction<any>>;
+    setAvailableClassrooms: Dispatch<SetStateAction<any[]>>; // Add this line
 }
 
-export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccessMessage, setCourseDetails }) => {
+export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccessMessage, setCourseDetails, setAvailableClassrooms }) => {
     const [courseID, setCourseID] = useState('');
     const [courseName, setCourseName] = useState('');
     const [teacherUsername, setTeacherUsername] = useState('');
@@ -137,6 +139,33 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
             }
         } catch (error) {
             setErrorMessage('Error occurred while deleting course');
+            setSuccessMessage('');
+        }
+    };
+
+    const handleGetAvailableClassrooms = async () => {
+        if (!capacity || !courseHourJson) {
+            setErrorMessage('Capacity and Course Hour are required');
+            return;
+        }
+
+        const message = new AdminGetAvailableClassroomByCapacityHourMessage(
+            parseInt(capacity, 10),
+            courseHourJson
+        );
+
+        try {
+            const response = await sendPostRequest(message);
+            if (!response.isError) {
+                setAvailableClassrooms(response.data);
+                setSuccessMessage('Available classrooms retrieved successfully');
+                setErrorMessage('');
+            } else {
+                setErrorMessage('Failed to retrieve available classrooms');
+                setSuccessMessage('');
+            }
+        } catch (error) {
+            setErrorMessage('Error occurred while retrieving available classrooms');
             setSuccessMessage('');
         }
     };
@@ -268,6 +297,9 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
                 </button>
                 <button onClick={handleDeleteCourse} className="button">
                     Delete Course
+                </button>
+                <button onClick={handleGetAvailableClassrooms} className="button"> {/* Add this button */}
+                    Get Available Classrooms
                 </button>
             </div>
         </section>

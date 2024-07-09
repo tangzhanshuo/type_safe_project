@@ -13,6 +13,7 @@ interface Props {
 export const ClassroomInformation: React.FC<Props> = ({ setErrorMessage, setSuccessMessage, setClassroomDetails }) => {
     const [classroomID, setClassroomID] = useState('');
     const [classroomName, setClassroomName] = useState('');
+    const [capacity, setCapacity] = useState('');
     const [enrolledCoursesJson, setEnrolledCoursesJson] = useState('');
 
     const handleAddClassroom = async () => {
@@ -24,6 +25,7 @@ export const ClassroomInformation: React.FC<Props> = ({ setErrorMessage, setSucc
         const message = new AdminAddClassroomMessage(
             parseInt(classroomID, 10),
             classroomName,
+            parseInt(capacity, 10),  // Ensure capacity is properly parsed
             enrolledCoursesJson
         );
 
@@ -116,12 +118,22 @@ export const ClassroomInformation: React.FC<Props> = ({ setErrorMessage, setSucc
                 <div className="input-container">
                     <input
                         type="text"
-                        placeholder="Enrolled Courses (JSON List[Number])"
+                        placeholder="Capacity (Number)"
+                        value={capacity}
+                        onChange={(e) => setCapacity(e.target.value)}
+                        className="input-field"
+                    />
+                    <label>Capacity (Number)</label>
+                </div>
+                <div className="input-container">
+                    <input
+                        type="text"
+                        placeholder="Enrolled Courses (JSON Dict[List[Number]])"
                         value={enrolledCoursesJson}
                         onChange={(e) => setEnrolledCoursesJson(e.target.value)}
                         className="input-field"
                     />
-                    <label>Enrolled Courses (JSON List[Number])</label>
+                    <label>Enrolled Courses (JSON Dict[List[Number]])</label>
                 </div>
             </div>
             <div className="button-group">

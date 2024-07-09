@@ -17,6 +17,7 @@ export const RetrievedClassroomInformation: React.FC<Props> = ({ classroomDetail
                             <tr>
                                 <th>Classroom ID</th>
                                 <th>Classroom Name</th>
+                                <th>Capacity</th>
                                 <th className="long-text">Enrolled Courses</th>
                             </tr>
                             </thead>
@@ -24,6 +25,7 @@ export const RetrievedClassroomInformation: React.FC<Props> = ({ classroomDetail
                             <tr>
                                 <td>{classroomDetails.classroomid}</td>
                                 <td>{classroomDetails.classroomname}</td>
+                                <td>{classroomDetails.capacity}</td>
                                 <td className="long-text">{classroomDetails.enrolledcourses}</td>
                             </tr>
                             </tbody>
@@ -40,6 +42,7 @@ export const RetrievedClassroomInformation: React.FC<Props> = ({ classroomDetail
                             <tr>
                                 <th>Classroom ID</th>
                                 <th>Classroom Name</th>
+                                <th>Capacity</th>
                                 <th className="long-text">Enrolled Courses</th>
                             </tr>
                             </thead>
@@ -48,6 +51,7 @@ export const RetrievedClassroomInformation: React.FC<Props> = ({ classroomDetail
                                 <tr key={index}>
                                     <td>{classroom.classroomid}</td>
                                     <td>{classroom.classroomname}</td>
+                                    <td>{classroom.capacity}</td>
                                     <td className="long-text">{classroom.enrolledcourses}</td>
                                 </tr>
                             ))}

@@ -63,6 +63,7 @@ object Init {
            |CREATE TABLE IF NOT EXISTS classroom (
            |  classroomid INT PRIMARY KEY,
            |  classroomname TEXT,
+           |  capacity INT,
            |  enrolledcourses JSONB
            |)
          """.stripMargin, List()
@@ -72,8 +73,8 @@ object Init {
       // Initialize a default classroom
       _ <- writeDB(
         s"""
-           |INSERT INTO classroom (classroomid, classroomname, enrolledcourses)
-           |VALUES (-1, 'No room', '{"-1":[1]}')
+           |INSERT INTO classroom (classroomid, classroomname, capacity, enrolledcourses)
+           |VALUES (-1, 'No room', '-1', '{"-1":[1]}')
            |ON CONFLICT (classroomid) DO NOTHING
          """.stripMargin, List()
       )

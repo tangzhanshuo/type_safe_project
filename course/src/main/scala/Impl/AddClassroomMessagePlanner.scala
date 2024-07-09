@@ -11,6 +11,7 @@ import Common.Object.SqlParameter
 case class AddClassroomMessagePlanner(
                                        classroomID: Int,
                                        classroomName: String,
+                                       capacity: Int, // 新增的capacity字段
                                        enrolledCoursesJson: String, // JSON represented as String
                                        override val planContext: PlanContext
                                      ) extends Planner[String] {
@@ -30,15 +31,16 @@ case class AddClassroomMessagePlanner(
           case Right(_) =>
             writeDB(s"""
                        |INSERT INTO classroom (
-                       |  classroomid, classroomname, enrolledcourses
-                       |) VALUES (?, ?, ?)
+                       |  classroomid, classroomname, capacity, enrolledcourses
+                       |) VALUES (?, ?, ?, ?)
             """.stripMargin,
               List(
                 SqlParameter("int", classroomID.toString),
                 SqlParameter("string", classroomName),
+                SqlParameter("int", capacity.toString), // 插入新的capacity字段
                 SqlParameter("jsonb", enrolledCoursesJson)
               )
-            ).map(_ => s"Classroom $classroomName with ID $classroomID successfully added")
+            ).map(_ => s"Classroom $classroomName with ID $classroomID and capacity $capacity successfully added")
 
           case Left(error) => IO.raiseError(error)
         }

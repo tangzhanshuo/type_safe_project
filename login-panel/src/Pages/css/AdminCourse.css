@@ -202,13 +202,13 @@ pre {
 }
 
 .course-table td.long-text {
-    width: 20%; /* 设置info和enrolled students列的宽度为20% */
+    width: 15%; /* 设置info和enrolled students列的宽度为20% */
     white-space: nowrap;
     overflow: auto;
 }
 
 .course-table th.long-text {
-    width: 20%; /* 设置info和enrolled students列的宽度为20% */
+    width: 15%; /* 设置info和enrolled students列的宽度为20% */
 }
 
 /* Classroom Table Styles */

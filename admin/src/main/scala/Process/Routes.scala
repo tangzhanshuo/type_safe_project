@@ -93,6 +93,16 @@ object Routes:
               }
             }
           }
+      case "AdminGetAvailableClassroomByCapacityHourMessage" =>
+        IO(decode[AdminGetAvailableClassroomByCapacityHourMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetAvailableClassroomByCapacityHourMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces)
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

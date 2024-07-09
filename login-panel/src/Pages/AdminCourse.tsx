@@ -20,6 +20,7 @@ export function AdminCourse() {
     const [courseList, setCourseList] = useState<any[]>([]);
     const [classroomDetails, setClassroomDetails] = useState<any>(null);
     const [classroomList, setClassroomList] = useState<any[]>([]);
+    const [availableClassrooms, setAvailableClassrooms] = useState<any[]>([]); // Add state for available classrooms
 
     useEffect(() => {
         const { usertype, username, password } = Auth.getState();
@@ -102,6 +103,7 @@ export function AdminCourse() {
                         setErrorMessage={setErrorMessage}
                         setSuccessMessage={setSuccessMessage}
                         setCourseDetails={setCourseDetails}
+                        setAvailableClassrooms={setAvailableClassrooms} // Pass the function
                     />
                 )}
                 {activeSection === 'student' && (
@@ -121,6 +123,7 @@ export function AdminCourse() {
                 {successMessage && <p className="success">{successMessage}</p>}
                 <RetrievedCourseInformation courseDetails={courseDetails} courseList={courseList} />
                 <RetrievedClassroomInformation classroomDetails={classroomDetails} classroomList={classroomList} />
+                <RetrievedClassroomInformation classroomDetails={null} classroomList={availableClassrooms} /> {/* Display available classrooms */}
             </main>
         </div>
     );
