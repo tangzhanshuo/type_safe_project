@@ -28,9 +28,10 @@ export const sendUnverifiedPostRequest = async (message: API) => {
         if (isAxiosError(error)) {
             if (error.response && error.response.data) {
                 const errorMessage = error.response.data.error;
-                const index = errorMessage.indexOf("Body:");
-                const errorString = index !== -1 ? errorMessage.substring(index + 5).trim() : "";
-                console.error('Error sending request:', errorString);
+                const index = errorMessage.toLowerCase().lastIndexOf("body:");
+                const errorString = index !== -1 ? errorMessage.substring(index + 5).trim() : errorMessage;
+                console.error('Error sending request:', errorMessage);
+                console.error('Error string:', errorString);
                 returnResponse.error = errorString
             } else {
                 console.error('Error sending request:', error.message);

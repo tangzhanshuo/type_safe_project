@@ -11,7 +11,7 @@ import 'Pages/css/Main.css'; // Import the CSS file
 export function StudentCourse() {
     const history = useHistory();
     const [courseList, setCourseList] = useState([]);
-    const [course, setCourse] = useState('');
+    const [courses, setCourses] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
@@ -28,20 +28,16 @@ export function StudentCourse() {
     }, []);
 
     const getCourseList = async () => {
+        const response = await sendPostRequest(new StudentGetCourseListMessage())
+        if (response.isError) {
+            setErrorMessage(response.error)
+            return
+        }
         try {
-            const response = await sendPostRequest(new StudentGetCourseListMessage())
-            if (response.isError) {
-                setErrorMessage(response.error)
-                return
-            }
-            setCourse(response.data)
-
+            const parsedCourses = JSON.parse(response.data);
+            setCourses(parsedCourses);
         } catch (error) {
-            if (isAxiosError(error)) {
-                alert(error.response?.data);
-            } else {
-                alert(error);
-            }
+            setErrorMessage('Error parsing course data');
         }
     }
 
@@ -52,7 +48,22 @@ export function StudentCourse() {
             </header>
             <main className="App-main">
                 <div className="button-group">
-                    <p>{course}</p>
+                    {courses.length > 0 ? (
+                        <ul className="course-list">
+                            {courses.map((course) => (
+                                <li key={course.courseid} className="course-item">
+                                    <h3>{course.coursename}</h3>
+                                    <p>Teacher: {course.teachername}</p>
+                                    <p>Course ID: {course.courseid}</p>
+                                    <p>Capacity: {course.capacity}</p>
+                                    <p>Credits: {course.credits}</p>
+                                    <p>Info: {course.info}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No courses to display. Click 'Get Courses' to load the course list.</p>
+                    )}
                     <p style={{ color: 'red' }}>{errorMessage}</p>
                     <button onClick={() => getCourseList()} className="button">
                         Get Courses
