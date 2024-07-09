@@ -63,14 +63,24 @@ object Routes:
             m.fullPlan.map(_.asJson.noSpaces)
           }
       case "AddClassroomMessage" =>
-        IO(decode[AddClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for IsStudentEnrolledMessage")))
+        IO(decode[AddClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddClassroomMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
       case "DeleteClassroomMessage" =>
-        IO(decode[DeleteClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for IsStudentEnrolledMessage")))
+        IO(decode[DeleteClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for DeleteClassroomMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "GetClassroomMessage" =>
+        IO(decode[GetClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetClassroomMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "GetClassroomListMessage" =>
+        IO(decode[GetClassroomListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetClassroomListMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
           }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
