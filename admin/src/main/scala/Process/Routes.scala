@@ -73,15 +73,35 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+      case "AdminGetClassroomMessage" =>
+        IO(decode[AdminGetClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetClassroomMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces)
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
+          }
+      case "AdminGetClassroomListMessage" =>
+        IO(decode[AdminGetClassroomListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetClassroomListMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces)
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
 
   val service: HttpRoutes[IO] = HttpRoutes.of[IO]:
     case req @ POST -> Root / "api" / name =>
-        println("request received")
-        req.as[String].flatMap{executePlan(name, _)}.flatMap(Ok(_))
-        .handleErrorWith{e =>
+      println("request received")
+      req.as[String].flatMap { executePlan(name, _) }.flatMap(Ok(_))
+        .handleErrorWith { e =>
           println(e)
           BadRequest(e.getMessage)
         }
