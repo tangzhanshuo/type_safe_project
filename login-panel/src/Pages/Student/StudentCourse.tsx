@@ -30,8 +30,8 @@ export function StudentCourse() {
     const getCourseList = async () => {
         try {
             const response = await sendPostRequest(new StudentGetCourseListMessage())
-            if (isAxiosError(response)) {
-                setErrorMessage(response.response?.data.error)
+            if (response.isError) {
+                setErrorMessage(response.error)
                 return
             }
             setCourse(response.data)

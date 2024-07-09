@@ -2,52 +2,54 @@ import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import Auth from 'Plugins/CommonUtils/AuthState';
 
-export const sendUserPostRequest = async (message: API) => {
+class Response {
+    isError: boolean;
+    error: any;
+    data: any;
+
+    constructor() {
+        this.isError = false;
+        this.error = null;
+        this.data = null;
+    }
+}
+
+export const sendUnverifiedPostRequest = async (message: API) => {
+    const returnResponse = new Response()
     try {
         const response = await axios.post(message.getURL(), JSON.stringify(message), {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log('Response status:', response.status);
         console.log('Response body:', response.data);
-        return response;
+        returnResponse.data = response.data
     } catch (error) {
+        returnResponse.isError = true;
         if (isAxiosError(error)) {
             if (error.response && error.response.data) {
-                console.error('Error sending request:', error.response.data);
+                const errorMessage = error.response.data.error;
+                const index = errorMessage.indexOf("Body:");
+                const errorString = index !== -1 ? errorMessage.substring(index + 5).trim() : "";
+                console.error('Error sending request:', errorString);
+                returnResponse.error = errorString
             } else {
                 console.error('Error sending request:', error.message);
+                returnResponse.error = error.message
             }
         } else {
             console.error('Unexpected error:', error);
         }
-        return error;
     }
+    return returnResponse
 };
 
 export const sendPostRequest = async (message: API) => {
-    try {
-        const response = await axios.post(message.getURL(), JSON.stringify(message), {
-            headers: { 'Content-Type': 'application/json' },
-        });
-        console.log('Response status:', response.status);
-        console.log('Response body:', response.data);
-        return response;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            if (error.response && error.response.data) {
-                if (error.response.data.error === 'Invalid user') {
-                    const { setUsertype, setUsername, setPassword } = Auth.getState();
-                    setUsertype('');
-                    setUsername('');
-                    setPassword('');
-                }
-                console.error('Error sending request:', error.response.data);
-            } else {
-                console.error('Error sending request:', error.message);
-            }
-        } else {
-            console.error('Unexpected error:', error);
-        }
-        return error;
+    const response = await sendUnverifiedPostRequest(message)
+    if (response.isError && response.error === 'Invalid user') {
+        const { setUsertype, setUsername, setPassword } = Auth.getState();
+        setUsertype('');
+        setUsername('');
+        setPassword('');
     }
+    return response
 };

@@ -62,7 +62,7 @@ export function AdminCourse() {
 
         try {
             const response = await sendPostRequest(message);
-            if (response.status === 200) {
+            if (!response.isError) {
                 setSuccessMessage('Course added successfully');
                 setErrorMessage('');
             } else {
@@ -86,7 +86,7 @@ export function AdminCourse() {
 
         try {
             const response = await sendPostRequest(message);
-            if (response.status === 200) {
+            if (!response.isError) {
                 setCourseDetails(response.data);
                 setSuccessMessage('Course details retrieved successfully');
                 setErrorMessage('');
@@ -110,7 +110,7 @@ export function AdminCourse() {
 
         try {
             const response = await sendPostRequest(message);
-            if (response.status === 200) {
+            if (!response.isError) {
                 setSuccessMessage('Course deleted successfully');
                 setErrorMessage('');
             } else {
@@ -145,7 +145,7 @@ export function AdminCourse() {
 
         try {
             const response = await sendPostRequest(message);
-            if (response.status === 200) {
+            if (!response.isError) {
                 setSuccessMessage('Course updated successfully');
                 setErrorMessage('');
             } else {
@@ -172,7 +172,7 @@ export function AdminCourse() {
 
         try {
             const response = await sendPostRequest(message);
-            if (response.status === 200) {
+            if (!response.isError) {
                 setSuccessMessage('Student added to course successfully');
                 setErrorMessage('');
             } else {
