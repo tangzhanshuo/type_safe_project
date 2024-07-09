@@ -20,7 +20,7 @@ export function AdminCourse() {
     const [courseList, setCourseList] = useState<any[]>([]);
     const [classroomDetails, setClassroomDetails] = useState<any>(null);
     const [classroomList, setClassroomList] = useState<any[]>([]);
-    const [availableClassrooms, setAvailableClassrooms] = useState<any[]>([]); // Add state for available classrooms
+    const [availableClassrooms, setAvailableClassrooms] = useState<any[]>([]);
 
     useEffect(() => {
         const { usertype, username, password } = Auth.getState();
@@ -103,7 +103,7 @@ export function AdminCourse() {
                         setErrorMessage={setErrorMessage}
                         setSuccessMessage={setSuccessMessage}
                         setCourseDetails={setCourseDetails}
-                        setAvailableClassrooms={setAvailableClassrooms} // Pass the function
+                        setAvailableClassrooms={setAvailableClassrooms} // 传递 setAvailableClassrooms 函数
                     />
                 )}
                 {activeSection === 'student' && (
@@ -121,9 +121,15 @@ export function AdminCourse() {
                 )}
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 {successMessage && <p className="success">{successMessage}</p>}
-                <RetrievedCourseInformation courseDetails={courseDetails} courseList={courseList} />
-                <RetrievedClassroomInformation classroomDetails={classroomDetails} classroomList={classroomList} />
-                <RetrievedClassroomInformation classroomDetails={null} classroomList={availableClassrooms} /> {/* Display available classrooms */}
+                <div className="retrieved-course-container">
+                    <RetrievedCourseInformation courseDetails={courseDetails} title="Retrieved Course" />
+                    <RetrievedCourseInformation courseList={courseList} title="All Courses" />
+                </div>
+                <div className="retrieved-classroom-container">
+                    <RetrievedClassroomInformation classroomDetails={classroomDetails} title="Retrieved Classroom" />
+                    <RetrievedClassroomInformation classroomList={classroomList} title="All Classrooms" />
+                    <RetrievedClassroomInformation classroomList={availableClassrooms} title="Available Classrooms" />
+                </div>
             </main>
         </div>
     );

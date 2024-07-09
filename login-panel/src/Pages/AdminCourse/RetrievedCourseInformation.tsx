@@ -1,16 +1,17 @@
 import React from 'react';
 
 interface Props {
-    courseDetails: any;
-    courseList: any[];
+    courseDetails?: any;
+    courseList?: any[];
+    title: string;
 }
 
-export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, courseList }) => {
+export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, courseList, title }) => {
     return (
         <>
             {courseDetails && (
                 <div className="course-details">
-                    <h2>Course Details</h2>
+                    <h2>{title}</h2>
                     <div className="table-container">
                         <table className="course-table">
                             <thead>
@@ -47,9 +48,9 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                     </div>
                 </div>
             )}
-            {courseList.length > 0 && (
+            {courseList && courseList.length > 0 && (
                 <div className="course-list">
-                    <h2>Course List</h2>
+                    <h2>{title}</h2>
                     <div className="table-container">
                         <table className="course-table">
                             <thead>
