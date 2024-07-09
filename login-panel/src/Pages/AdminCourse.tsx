@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { AdminAddCourseMessage } from 'Plugins/AdminAPI/AdminAddCourseMessage';
 import { AdminGetCourseMessage } from 'Plugins/AdminAPI/AdminGetCourseMessage';
+import { AdminGetCourseListMessage } from 'Plugins/AdminAPI/AdminGetCourseListMessage';
 import { AdminDeleteCourseMessage } from 'Plugins/AdminAPI/AdminDeleteCourseMessage';
 import { AdminUpdateCourseMessage } from 'Plugins/AdminAPI/AdminUpdateCourseMessage';
 import { AdminAddStudent2CourseMessage } from 'Plugins/AdminAPI/AdminAddStudent2CourseMessage';
+import { AdminDeleteStudentFromCourseMessage } from 'Plugins/AdminAPI/AdminDeleteStudentFromCourseMessage';
 import { AdminAddClassroomMessage } from 'Plugins/AdminAPI/AdminAddClassroomMessage';
 import { AdminDeleteClassroomMessage } from 'Plugins/AdminAPI/AdminDeleteClassroomMessage';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
@@ -25,10 +27,12 @@ export function AdminCourse() {
     const [credits, setCredits] = useState('');
     const [enrolledStudentsJson, setEnrolledStudentsJson] = useState('');
     const [kwargsJson, setKwargsJson] = useState('');
+    const [studentCourseID, setStudentCourseID] = useState('');
     const [studentUsername, setStudentUsername] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [courseDetails, setCourseDetails] = useState<any>(null);
+    const [courseList, setCourseList] = useState<any[]>([]);
 
     const [classroomName, setClassroomName] = useState('');
     const [enrolledCoursesJson, setEnrolledCoursesJson] = useState('');
@@ -44,6 +48,28 @@ export function AdminCourse() {
             history.push('/');
         }
     }, [history]);
+
+    useEffect(() => {
+        const fetchCourseList = async () => {
+            try {
+                const message = new AdminGetCourseListMessage();
+                const response = await sendPostRequest(message);
+                if (!response.isError) {
+                    setCourseList(response.data);
+                } else {
+                    setErrorMessage('Failed to retrieve course list');
+                }
+            } catch (error) {
+                setErrorMessage('Error occurred while retrieving course list');
+            }
+        };
+
+        fetchCourseList(); // Initial fetch
+
+        const intervalId = setInterval(fetchCourseList, 5000); // Fetch every 5 seconds
+
+        return () => clearInterval(intervalId); // Cleanup on unmount
+    }, []);
 
     const handleAddCourse = async () => {
         if (!courseID || !courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHourJson || !classroomID || !credits || !enrolledStudentsJson || !kwargsJson) {
@@ -163,13 +189,13 @@ export function AdminCourse() {
     };
 
     const handleAddStudent2Course = async () => {
-        if (!courseID || !studentUsername) {
+        if (!studentCourseID || !studentUsername) {
             setErrorMessage('Course ID and Student Username are required');
             return;
         }
 
         const message = new AdminAddStudent2CourseMessage(
-            parseInt(courseID, 10),
+            parseInt(studentCourseID, 10),
             studentUsername
         );
 
@@ -187,6 +213,33 @@ export function AdminCourse() {
             setSuccessMessage('');
         }
     };
+
+    const handleDeleteStudentFromCourse = async () => {
+        if (!studentCourseID || !studentUsername) {
+            setErrorMessage('Course ID and Student Username are required');
+            return;
+        }
+
+        const message = new AdminDeleteStudentFromCourseMessage(
+            parseInt(studentCourseID, 10),
+            studentUsername
+        );
+
+        try {
+            const response = await sendPostRequest(message);
+            if (!response.isError) {
+                setSuccessMessage('Student deleted from course successfully');
+                setErrorMessage('');
+            } else {
+                setErrorMessage('Failed to delete student from course');
+                setSuccessMessage('');
+            }
+        } catch (error) {
+            setErrorMessage('Error occurred while deleting student from course');
+            setSuccessMessage('');
+        }
+    };
+
 
     const handleAddClassroom = async () => {
         if (!classroomID || !classroomName || !enrolledCoursesJson) {
@@ -396,20 +449,34 @@ export function AdminCourse() {
                             <div className="input-container">
                                 <input
                                     type="text"
-                                    placeholder="Student Username"
+                                    placeholder="Course ID (Number)"
+                                    value={studentCourseID}
+                                    onChange={(e) => setStudentCourseID(e.target.value)}
+                                    className="input-field"
+                                />
+                                <label>Course ID (Number)</label>
+                            </div>
+                            <div className="input-container">
+                                <input
+                                    type="text"
+                                    placeholder="Student Username (Text)"
                                     value={studentUsername}
                                     onChange={(e) => setStudentUsername(e.target.value)}
                                     className="input-field"
                                 />
-                                <label>Student Username</label>
+                                <label>Student Username (Text)</label>
                             </div>
                         </div>
                         <div className="button-group">
                             <button onClick={handleAddStudent2Course} className="button">
                                 Add Student to Course
                             </button>
+                            <button onClick={handleDeleteStudentFromCourse} className="button">
+                                Delete Student from Course
+                            </button>
                         </div>
                     </section>
+
                 )}
                 {activeSection === 'classroom' && (
                     <section className="classroom-info">
@@ -461,6 +528,47 @@ export function AdminCourse() {
                 {courseDetails && (
                     <div className="course-details">
                         <pre>{JSON.stringify(courseDetails, null, 2)}</pre>
+                    </div>
+                )}
+                {courseList.length > 0 && (
+                    <div className="course-list">
+                        <h2>Course List</h2>
+                        <div className="table-container">
+                            <table className="course-table">
+                                <thead>
+                                <tr>
+                                    <th>Course ID</th>
+                                    <th>Course Name</th>
+                                    <th>Teacher Username</th>
+                                    <th>Teacher Name</th>
+                                    <th>Capacity</th>
+                                    <th className="long-text">Info</th>
+                                    <th>Course Hour</th>
+                                    <th>Classroom ID</th>
+                                    <th>Credits</th>
+                                    <th className="long-text">Enrolled Students</th>
+                                    <th>Kwargs</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {courseList.map((course, index) => (
+                                    <tr key={index}>
+                                        <td>{course.courseid}</td>
+                                        <td>{course.coursename}</td>
+                                        <td>{course.teacherusername}</td>
+                                        <td>{course.teachername}</td>
+                                        <td>{course.capacity}</td>
+                                        <td className="long-text">{course.info}</td>
+                                        <td>{course.coursehour}</td>
+                                        <td>{course.classroomid}</td>
+                                        <td>{course.credits}</td>
+                                        <td className="long-text">{course.enrolledstudents}</td>
+                                        <td>{course.kwargs}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </main>

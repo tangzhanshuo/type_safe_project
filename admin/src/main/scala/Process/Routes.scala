@@ -33,6 +33,16 @@ object Routes:
               }
             }
           }
+      case "AdminGetCourseListMessage" =>
+        IO(decode[AdminGetCourseListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
+          }
       case "AdminDeleteCourseMessage" =>
         IO(decode[AdminDeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
           .flatMap { m =>
@@ -45,6 +55,11 @@ object Routes:
           }
       case "AdminAddStudent2CourseMessage" =>
         IO(decode[AdminAddStudent2CourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminDeleteStudentFromCourseMessage" =>
+        IO(decode[AdminDeleteStudentFromCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
