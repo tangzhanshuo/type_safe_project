@@ -68,4 +68,6 @@ package object CourseAPI {
   def addClassroom(classroomID: Int, classroomName: String, enrolledCoursesJson: String)(using PlanContext): IO[String] =
     AddClassroomMessage(classroomID, classroomName, enrolledCoursesJson).send
 
+  def deleteClassroom(classroomID: Int)(using PlanContext): IO[String] =
+    DeleteClassroomMessage(classroomID).send
 }

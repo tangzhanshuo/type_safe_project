@@ -198,102 +198,102 @@ export function AdminCourse() {
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Course ID"
+                                placeholder="Course ID (Number)"
                                 value={courseID}
                                 onChange={(e) => setCourseID(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Course ID</label>
+                            <label>Course ID (Number)</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Course Name"
+                                placeholder="Course Name (Text)"
                                 value={courseName}
                                 onChange={(e) => setCourseName(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Course Name</label>
+                            <label>Course Name (Text)</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Teacher Username"
+                                placeholder="Teacher Username (Text)"
                                 value={teacherUsername}
                                 onChange={(e) => setTeacherUsername(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Teacher Username</label>
+                            <label>Teacher Username (Text)</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Teacher Name"
+                                placeholder="Teacher Name (Text)"
                                 value={teacherName}
                                 onChange={(e) => setTeacherName(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Teacher Name</label>
+                            <label>Teacher Name (Text)</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Capacity"
+                                placeholder="Capacity (Number)"
                                 value={capacity}
                                 onChange={(e) => setCapacity(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Capacity</label>
+                            <label>Capacity (Number)</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Info"
+                                placeholder="Info (Text)"
                                 value={info}
                                 onChange={(e) => setInfo(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Info</label>
+                            <label>Info (Text)</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Course Hour (JSON)"
+                                placeholder="Course Hour (JSON List[Number])"
                                 value={courseHourJson}
                                 onChange={(e) => setCourseHourJson(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Course Hour (JSON)</label>
+                            <label>Course Hour (JSON List[Number])</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Classroom ID"
+                                placeholder="Classroom ID (Number)"
                                 value={classroomID}
                                 onChange={(e) => setClassroomID(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Classroom ID</label>
+                            <label>Classroom ID (Number)</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Credits"
+                                placeholder="Credits (Number)"
                                 value={credits}
                                 onChange={(e) => setCredits(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Credits</label>
+                            <label>Credits (Number)</label>
                         </div>
                         <div className="input-container">
                             <input
                                 type="text"
-                                placeholder="Enrolled Students (JSON)"
+                                placeholder="Enrolled Students (JSON List[Text])"
                                 value={enrolledStudentsJson}
                                 onChange={(e) => setEnrolledStudentsJson(e.target.value)}
                                 className="input-field"
                             />
-                            <label>Enrolled Students (JSON)</label>
+                            <label>Enrolled Students (JSON List[Text])</label>
                         </div>
                         <div className="input-container">
                             <input
