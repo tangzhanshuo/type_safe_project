@@ -8,7 +8,7 @@ import { AdminAddStudent2CourseMessage } from 'Plugins/AdminAPI/AdminAddStudent2
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import 'Pages/css/Main.css';
-import Auth from 'Plugins/CommonUtils/AuthState'; // Import the CSS file
+import Auth from 'Plugins/CommonUtils/AuthState';
 
 export function AdminCourse() {
     const history = useHistory();
@@ -54,7 +54,7 @@ export function AdminCourse() {
             parseInt(capacity, 10),
             info,
             courseHourJson,
-            parseInt(classroomID, 10), // Added classroomID
+            parseInt(classroomID, 10),
             parseInt(credits, 10),
             enrolledStudentsJson,
             kwargsJson
@@ -74,7 +74,6 @@ export function AdminCourse() {
             setSuccessMessage('');
         }
     };
-
 
     const handleGetCourse = async () => {
         if (!courseID) {
@@ -137,7 +136,7 @@ export function AdminCourse() {
             capacity ? parseInt(capacity, 10) : undefined,
             info || undefined,
             courseHourJson || undefined,
-            classroomID ? parseInt(classroomID, 10) : undefined, // Added classroomID
+            classroomID ? parseInt(classroomID, 10) : undefined,
             credits ? parseInt(credits, 10) : undefined,
             enrolledStudentsJson || undefined,
             kwargsJson || undefined
@@ -157,7 +156,6 @@ export function AdminCourse() {
             setSuccessMessage('');
         }
     };
-
 
     const handleAddStudent2Course = async () => {
         if (!courseID || !studentUsername) {
@@ -187,118 +185,164 @@ export function AdminCourse() {
 
     return (
         <div className="App">
+            <button onClick={() => history.push('/')} className="back-to-main">
+                Back to main
+            </button>
             <header className="App-header">
                 <h1>Admin Course Management</h1>
             </header>
             <main className="App-main">
-                <div className="input-group">
-                    <input
-                        type="text"
-                        placeholder="Course ID"
-                        value={courseID}
-                        onChange={(e) => setCourseID(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Course Name"
-                        value={courseName}
-                        onChange={(e) => setCourseName(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Teacher Username"
-                        value={teacherUsername}
-                        onChange={(e) => setTeacherUsername(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Teacher Name"
-                        value={teacherName}
-                        onChange={(e) => setTeacherName(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Capacity"
-                        value={capacity}
-                        onChange={(e) => setCapacity(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Info"
-                        value={info}
-                        onChange={(e) => setInfo(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Course Hour (JSON)"
-                        value={courseHourJson}
-                        onChange={(e) => setCourseHourJson(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Classroom ID"
-                        value={classroomID}
-                        onChange={(e) => setClassroomID(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Credits"
-                        value={credits}
-                        onChange={(e) => setCredits(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Enrolled Students (JSON)"
-                        value={enrolledStudentsJson}
-                        onChange={(e) => setEnrolledStudentsJson(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Kwargs (JSON)"
-                        value={kwargsJson}
-                        onChange={(e) => setKwargsJson(e.target.value)}
-                        className="input-field"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Student Username"
-                        value={studentUsername}
-                        onChange={(e) => setStudentUsername(e.target.value)}
-                        className="input-field"
-                    />
-                </div>
+                <section className="course-info">
+                    <h2>Course Information</h2>
+                    <div className="input-group">
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Course ID"
+                                value={courseID}
+                                onChange={(e) => setCourseID(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Course ID</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Course Name"
+                                value={courseName}
+                                onChange={(e) => setCourseName(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Course Name</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Teacher Username"
+                                value={teacherUsername}
+                                onChange={(e) => setTeacherUsername(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Teacher Username</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Teacher Name"
+                                value={teacherName}
+                                onChange={(e) => setTeacherName(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Teacher Name</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Capacity"
+                                value={capacity}
+                                onChange={(e) => setCapacity(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Capacity</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Info"
+                                value={info}
+                                onChange={(e) => setInfo(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Info</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Course Hour (JSON)"
+                                value={courseHourJson}
+                                onChange={(e) => setCourseHourJson(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Course Hour (JSON)</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Classroom ID"
+                                value={classroomID}
+                                onChange={(e) => setClassroomID(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Classroom ID</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Credits"
+                                value={credits}
+                                onChange={(e) => setCredits(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Credits</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Enrolled Students (JSON)"
+                                value={enrolledStudentsJson}
+                                onChange={(e) => setEnrolledStudentsJson(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Enrolled Students (JSON)</label>
+                        </div>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Kwargs (JSON)"
+                                value={kwargsJson}
+                                onChange={(e) => setKwargsJson(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Kwargs (JSON)</label>
+                        </div>
+                    </div>
+                    <div className="button-group">
+                        <button onClick={handleAddCourse} className="button">
+                            Add Course
+                        </button>
+                        <button onClick={handleGetCourse} className="button">
+                            Get Course Details
+                        </button>
+                        <button onClick={handleUpdateCourse} className="button">
+                            Update Course
+                        </button>
+                        <button onClick={handleDeleteCourse} className="button">
+                            Delete Course
+                        </button>
+                    </div>
+                </section>
+                <section className="student-info">
+                    <h2>Student Information</h2>
+                    <div className="input-group">
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                placeholder="Student Username"
+                                value={studentUsername}
+                                onChange={(e) => setStudentUsername(e.target.value)}
+                                className="input-field"
+                            />
+                            <label>Student Username</label>
+                        </div>
+                    </div>
+                    <div className="button-group">
+                        <button onClick={handleAddStudent2Course} className="button">
+                            Add Student to Course
+                        </button>
+                    </div>
+                </section>
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 {successMessage && <p className="success">{successMessage}</p>}
-                <div className="button-group">
-                    <button onClick={handleAddCourse} className="button">
-                        Add Course
-                    </button>
-                    <button onClick={handleGetCourse} className="button">
-                        Get Course Details
-                    </button>
-                    <button onClick={handleUpdateCourse} className="button">
-                        Update Course
-                    </button>
-                    <button onClick={handleDeleteCourse} className="button">
-                        Delete Course
-                    </button>
-                    <button onClick={handleAddStudent2Course} className="button">
-                        Add Student to Course
-                    </button>
-                    <button onClick={() => history.push('/')} className="button">
-                        Back to main
-                    </button>
-                </div>
                 {courseDetails && (
                     <div className="course-details">
                         <pre>{JSON.stringify(courseDetails, null, 2)}</pre>

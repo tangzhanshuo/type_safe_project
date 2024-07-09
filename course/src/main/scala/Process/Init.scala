@@ -39,15 +39,24 @@ object Init {
         // h = 1, 2, 3, 4, 5, 6 stands for 第h段时间
         // kwargs contain other info
       )
-      - <- writeDB(
+      _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS classroom (
-           |  classroomid TEXT PRIMARY KEY,
+           |  classroomid INT PRIMARY KEY,
            |  classroomname TEXT,
            |  enrolledcourses JSONB
            |)
          """.stripMargin, List()
         // enrolledcourses should be a dict of "courseid: LIST[*coursehour]"
+        // If id < 0, then no conflict checking within enrolledcourses.
+      )
+      // Initialize a default classroom
+      _ <- writeDB(
+        s"""
+           |INSERT INTO classroom (classroomid, classroomname, enrolledcourses)
+           |VALUES (-1, 'No room', '{}')
+           |ON CONFLICT (classroomid) DO NOTHING
+         """.stripMargin, List()
       )
     } yield ()
   }
