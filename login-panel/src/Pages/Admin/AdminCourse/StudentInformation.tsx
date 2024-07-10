@@ -11,7 +11,7 @@ interface Props {
 export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSuccessMessage }) => {
     const [studentCourseID, setStudentCourseID] = useState('');
     const [studentUsername, setStudentUsername] = useState('');
-
+    const [studentPriority, setStudentPriority] = useState('');
     const handleAddStudent2Course = async () => {
         if (!studentCourseID || !studentUsername) {
             setErrorMessage('Course ID and Student Username are required');
@@ -20,7 +20,8 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
 
         const message = new AdminAddStudent2CourseMessage(
             parseInt(studentCourseID, 10),
-            studentUsername
+            studentUsername,
+            parseInt(studentPriority, 10)
         );
 
         try {
@@ -87,6 +88,16 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
                         className="input-field"
                     />
                     <label>Student Username (Text)</label>
+                </div>
+                <div className="input-container">
+                    <input
+                        type="number"
+                        placeholder="Student Priority (Number)"
+                        value={studentPriority}
+                        onChange={(e) => setStudentPriority(e.target.value)}
+                        className="input-field"
+                    />
+                    <label>Student Priority (Number)</label>
                 </div>
             </div>
             <div className="button-group">

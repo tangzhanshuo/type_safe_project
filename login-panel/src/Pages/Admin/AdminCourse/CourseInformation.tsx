@@ -24,10 +24,10 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
     const [classroomID, setClassroomID] = useState('');
     const [credits, setCredits] = useState('');
     const [enrolledStudentsJson, setEnrolledStudentsJson] = useState('');
-    const [kwargsJson, setKwargsJson] = useState('');
+    const [allStudentsJson, setAllStudentsJson] = useState('');
 
     const handleAddCourse = async () => {
-        if (!courseID || !courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHourJson || !classroomID || !credits || !enrolledStudentsJson || !kwargsJson) {
+        if (!courseID || !courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHourJson || !classroomID || !credits || !enrolledStudentsJson || !allStudentsJson) {
             setErrorMessage('All fields are required');
             return;
         }
@@ -43,7 +43,7 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
             parseInt(classroomID, 10),
             parseInt(credits, 10),
             enrolledStudentsJson,
-            kwargsJson
+            allStudentsJson
         );
 
         try {
@@ -102,7 +102,7 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
             classroomID ? parseInt(classroomID, 10) : undefined,
             credits ? parseInt(credits, 10) : undefined,
             enrolledStudentsJson || undefined,
-            kwargsJson || undefined
+            allStudentsJson || undefined
         );
 
         try {
@@ -277,12 +277,12 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
                 <div className="input-container">
                     <input
                         type="text"
-                        placeholder="Kwargs (JSON)"
-                        value={kwargsJson}
-                        onChange={(e) => setKwargsJson(e.target.value)}
+                        placeholder="AllStudents (JSON)"
+                        value={allStudentsJson}
+                        onChange={(e) => setAllStudentsJson(e.target.value)}
                         className="input-field"
                     />
-                    <label>Kwargs (JSON)</label>
+                    <label>AllStudents (JSON)</label>
                 </div>
             </div>
             <div className="button-group">
