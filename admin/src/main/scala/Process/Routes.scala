@@ -102,6 +102,7 @@ object Routes:
                 case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
               }
             }
+          }
       case "AdminAddApplicationMessage" =>
         IO(decode[AdminAddApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddApplicationMessage")))
           .flatMap { m =>
