@@ -15,6 +15,7 @@ object ServiceCenter {
   val teacherServiceCode   = "A000005"
   val adminServiceCode     = "A000006"
   val courseServiceCode    = "A000007"
+  val applicationServiceCode = "A000008"
 
   val fullNameMap: Map[String, String] = Map(
     dbManagerServiceCode ->  "DB_Manager",
@@ -23,7 +24,8 @@ object ServiceCenter {
     studentServiceCode   ->  "Student",
     teacherServiceCode   ->  "Teacher",
     adminServiceCode     ->  "Admin",
-    courseServiceCode    ->  "Course"
+    courseServiceCode    ->  "Course",
+    applicationServiceCode -> "Application"
   )
 
   val address: Map[String, String] = Map(
@@ -33,38 +35,7 @@ object ServiceCenter {
     "Student" ->        "127.0.0.1:10004",
     "Teacher" ->        "127.0.0.1:10005",
     "Admin" ->          "127.0.0.1:10006",
-    "Course" ->         "127.0.0.1:10007"
+    "Course" ->         "127.0.0.1:10007",
+    "Application" ->    "127.0.0.1:10008"
   )
-
-  /*
-    def getURI(serviceCode: String): IO[Uri] =
-      IO.fromEither(Uri.fromString(
-        "http://localhost:" + getPort(serviceCode).value.toString + "/"
-      ))
-
-    def getPort(serviceCode: String): Port =
-      Port.fromInt(portMap(serviceCode)).getOrElse(
-        throw new IllegalArgumentException(s"Invalid port for serviceCode: $serviceCode")
-      )
-
-
-    def serviceName(serviceCode: String): String = {
-      val fullName = fullNameMap(serviceCode)
-      val start = fullName.indexOf("（")
-      val end = fullName.indexOf("）")
-      fullNameMap(serviceCode).substring(start + 1, end).toLowerCase
-    }
-
-    def portMap(serviceCode: String): Int = {
-      serviceCode.drop(1).toInt +
-        (if (serviceCode.head == 'A') 10000 else if (serviceCode.head == 'D') 20000 else 30000)
-    }
-
-
-    lazy val servicePort: Int = portMap(serviceCode)
-    lazy val serviceFullName: String = fullNameMap(serviceCode)
-    lazy val serviceShortName: String = serviceName(serviceCode)
-    lazy val schemaName: String = serviceName(serviceCode)
-
-   */
 }

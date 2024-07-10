@@ -9,6 +9,7 @@ import { StudentCourseDetail } from 'Pages/Student/StudentCourseDetail'
 import { TeacherMain } from 'Pages/TeacherMain'
 import { AdminMain } from 'Pages/AdminMain'
 import { AdminCourse } from 'Pages/AdminCourse'
+import { AdminApplicationTest } from 'Pages/AdminApplicationTest'
 
 const Layout = () => {
     return (
@@ -22,6 +23,7 @@ const Layout = () => {
                 <Route path="/teacher" exact component={TeacherMain} />
                 <Route path="/admin" exact component={AdminMain} />
                 <Route path="/admin/course" exact component={AdminCourse} />
+                <Route path="/admin/apptest" exact component={AdminApplicationTest} />
             </Switch>
         </HashRouter>
     )

@@ -48,6 +48,41 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+      case "AdminAddApplicationMessage" =>
+        IO(decode[AdminAddApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddApplicationMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
+      case "AdminDeleteApplicationMessage" =>
+        IO(decode[AdminDeleteApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminDeleteApplicationMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
+      case "AdminGetApplicationFromIDMessage" =>
+        IO(decode[AdminGetApplicationFromIDMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetApplicationFromIDMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
+      case "AdminGetApplicationFromApplicantMessage" =>
+        IO(decode[AdminGetApplicationFromApplicantMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetApplicationFromApplicantMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
+      case "AdminGetApplicationFromApproverMessage" =>
+        IO(decode[AdminGetApplicationFromApproverMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetApplicationFromApproverMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
+      case "AdminApproveApplicationMessage" =>
+        IO(decode[AdminApproveApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminApproveApplication")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
