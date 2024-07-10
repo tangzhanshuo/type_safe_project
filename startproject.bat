@@ -1,48 +1,23 @@
+@echo off
 setlocal enabledelayedexpansion
 
-cd db-manager
-start cmd /c "java -jar .\out\artifacts\DB_Manager_jar\DB-Manager.jar"
-if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
-cd..
+:: Set the absolute path for the SBT_JAR variable
+set SBT_JAR=C:\Users\13552\AppData\Roaming\JetBrains\IntelliJIdea2024.1\plugins\Scala\launcher\sbt-launch.jar
 
-timeout /t 5
+start cmd /k "cd db-manager && java -jar "!SBT_JAR!" clean run || echo Error running sbt-launch.jar in db-manager"
 
-cd admin
-start cmd /c "java -jar .\out\artifacts\Admin_jar\Admin.jar"
-if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
-cd..
+timeout /t 20
 
-cd student
-start cmd /c "java -jar .\out\artifacts\Student_jar\Student.jar"
-if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
-cd..
+set FOLDERS=student admin course teacher tw-portal user request
 
-cd course
-start cmd /c "java -jar .\out\artifacts\Course_jar\Course.jar"
-if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
-cd..
-
-cd teacher
-start cmd /c "java -jar .\out\artifacts\Teacher_jar\Teacher.jar"
-if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
-cd..
-
-cd tw-portal
-start cmd /c "java -jar .\out\artifacts\Portal_jar\Portal.jar"
-if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
-cd..
-
-cd user
-start cmd /c "java -jar .\out\artifacts\User_jar\User.jar"
-if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
-cd..
+for %%d in (%FOLDERS%) do (
+    start cmd /k "cd %%d && java -jar "!SBT_JAR!" clean run || echo Error running sbt-launch.jar in %%d"
+)
 
 :: 等待后端服务启动
-timeout /t 5
+timeout /t 70
 
 :: 启动前端项目
-cd login-panel
-start cmd /c "yarn start"
-if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
+start cmd /k "cd login-panel && yarn start"
 
 endlocal

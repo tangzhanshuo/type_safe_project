@@ -1,0 +1,15 @@
+.fade-out {
+    animation: fadeOut 20000000s forwards;
+    display: flex;
+    justify-content: center;
+    /*text-align: center; Adjust 2s to control the speed of the fade */
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
