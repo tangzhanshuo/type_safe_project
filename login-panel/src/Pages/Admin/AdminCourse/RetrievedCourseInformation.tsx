@@ -26,7 +26,7 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                                 <th>Classroom ID</th>
                                 <th>Credits</th>
                                 <th className="long-text">Enrolled Students</th>
-                                <th>Kwargs</th>
+                                <th className="long-text">All Students</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -41,7 +41,7 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                                 <td>{courseDetails.classroomid}</td>
                                 <td>{courseDetails.credits}</td>
                                 <td className="long-text">{courseDetails.enrolledstudents}</td>
-                                <td>{courseDetails.kwargs}</td>
+                                <td className="long-text">{courseDetails.allstudents}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -65,7 +65,7 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                                 <th>Classroom ID</th>
                                 <th>Credits</th>
                                 <th className="long-text">Enrolled Students</th>
-                                <th>Kwargs</th>
+                                <th className="long-text">All Students</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -81,7 +81,7 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                                     <td>{course.classroomid}</td>
                                     <td>{course.credits}</td>
                                     <td className="long-text">{course.enrolledstudents}</td>
-                                    <td>{course.kwargs}</td>
+                                    <td className="long-text">{course.allstudents}</td>
                                 </tr>
                             ))}
                             </tbody>

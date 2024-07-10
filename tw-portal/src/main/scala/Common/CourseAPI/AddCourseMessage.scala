@@ -14,5 +14,5 @@ case class AddCourseMessage(
                              classroomID: Int,
                              credits: Int,
                              enrolledStudentsJson: String, // JSON represented as String
-                             kwargsJson: String // JSON represented as String
+                             allStudentsJson: String // JSON represented as String
                            ) extends API[String](courseServiceCode)

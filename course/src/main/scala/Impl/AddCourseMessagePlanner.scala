@@ -20,7 +20,7 @@ case class AddCourseMessagePlanner(
                                     classroomID: Int,
                                     credits: Int,
                                     enrolledStudentsJson: String, // JSON represented as String
-                                    kwargsJson: String, // JSON represented as String
+                                    allStudentsJson: String, // JSON represented as String
                                     override val planContext: PlanContext
                                   ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
@@ -68,7 +68,7 @@ case class AddCourseMessagePlanner(
         SqlParameter("int", classroomID.toString),
         SqlParameter("int", credits.toString),
         SqlParameter("jsonb", enrolledStudentsJson),
-        SqlParameter("jsonb", kwargsJson)
+        SqlParameter("jsonb", allStudentsJson)
       )
     ).map(_ => s"Course $courseName with ID $courseID successfully added")
 
@@ -89,7 +89,7 @@ case class AddCourseMessagePlanner(
           } else {
             val courseHourValidation = parse(courseHourJson).left.map(e => new Exception(s"Invalid JSON for courseHour: ${e.getMessage}"))
             val enrolledStudentsValidation = parse(enrolledStudentsJson).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
-            val kwargsValidation = parse(kwargsJson).left.map(e => new Exception(s"Invalid JSON for kwargs: ${e.getMessage}"))
+            val kwargsValidation = parse(allStudentsJson).left.map(e => new Exception(s"Invalid JSON for kwargs: ${e.getMessage}"))
 
             (courseHourValidation, enrolledStudentsValidation, kwargsValidation) match {
               case (Right(_), Right(_), Right(_)) =>

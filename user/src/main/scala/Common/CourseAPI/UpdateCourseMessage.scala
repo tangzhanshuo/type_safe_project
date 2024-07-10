@@ -14,5 +14,5 @@ case class UpdateCourseMessage(
                                 classroomID: Option[Int],
                                 credits: Option[Int],
                                 enrolledStudentsJson: Option[String], // JSON represented as String
-                                kwargsJson: Option[String] // JSON represented as String
+                                allStudentsJson: Option[String] // JSON represented as String
                               ) extends API[String](courseServiceCode)

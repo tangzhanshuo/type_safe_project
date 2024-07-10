@@ -20,7 +20,7 @@ case class UpdateCourseMessagePlanner(
                                        classroomID: Option[Int],
                                        credits: Option[Int],
                                        enrolledStudentsJson: Option[String], // JSON represented as String
-                                       kwargsJson: Option[String], // JSON represented as String
+                                       allStudentsJson: Option[String], // JSON represented as String
                                        override val planContext: PlanContext
                                      ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
@@ -77,7 +77,7 @@ case class UpdateCourseMessagePlanner(
           val updatedClassroomID = classroomID.orElse(existingCourse.get[Int]("classroomid").toOption).getOrElse(0)
           val updatedCredits = credits.orElse(existingCourse.get[Int]("credits").toOption).getOrElse(0)
           val updatedEnrolledStudentsJson = enrolledStudentsJson.orElse(existingCourse.get[String]("enrolledstudents").toOption).getOrElse("[]")
-          val updatedKwargsJson = kwargsJson.orElse(existingCourse.get[String]("kwargs").toOption).getOrElse("{}")
+          val updatedKwargsJson = allStudentsJson.orElse(existingCourse.get[String]("kwargs").toOption).getOrElse("{}")
 
           // Validate the JSON strings by parsing them
           val courseHourValidation = parse(updatedCourseHourJson).left.map(e => new Exception(s"Invalid JSON for courseHour: ${e.getMessage}"))
