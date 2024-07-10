@@ -7,11 +7,11 @@ import { StudentMain } from 'Pages/Student/StudentMain'
 import { StudentCourse } from 'Pages/Student/StudentCourse'
 import { StudentCourseDetail } from 'Pages/Student/StudentCourseDetail'
 import { TeacherMain } from 'Pages/Teacher/TeacherMain'
-import { AdminMain } from 'Pages/AdminMain'
-import { AdminCourse } from 'Pages/AdminCourse'
+import { AdminMain } from 'Pages/Admin/AdminMain'
+import { AdminCourse } from 'Pages/Admin/AdminCourse'
 import {TeacherCourseDetail} from "Pages/Teacher/TeacherCourseDetail";
 import {TeacherCourseManage} from "Pages/Teacher/TeacherCourseManage";
-import { AdminApplicationTest } from 'Pages/AdminApplicationTest'
+import { AdminApplicationTest } from 'Pages/Admin/AdminApplicationTest'
 
 const Layout = () => {
     return (

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { CourseInformation } from './AdminCourse/CourseInformation';
-import { StudentInformation } from './AdminCourse/StudentInformation';
-import { ClassroomInformation } from './AdminCourse/ClassroomInformation';
-import { RetrievedCourseInformation } from './AdminCourse/RetrievedCourseInformation';
-import { RetrievedClassroomInformation } from './AdminCourse/RetrievedClassroomInformation';
+import { CourseInformation } from 'Pages/Admin/AdminCourse/CourseInformation';
+import { StudentInformation } from 'Pages/Admin/AdminCourse/StudentInformation';
+import { ClassroomInformation } from 'Pages/Admin/AdminCourse/ClassroomInformation';
+import { RetrievedCourseInformation } from 'Pages/Admin/AdminCourse/RetrievedCourseInformation';
+import { RetrievedClassroomInformation } from 'Pages/Admin/AdminCourse/RetrievedClassroomInformation';
 import { AdminGetCourseListMessage } from 'Plugins/AdminAPI/AdminGetCourseListMessage';
 import { AdminGetClassroomListMessage } from 'Plugins/AdminAPI/AdminGetClassroomListMessage';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
