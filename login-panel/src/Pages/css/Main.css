@@ -43,7 +43,7 @@ body {
     position: relative;
     margin: 30px 30px 30px 30px;
     display: inline-block;
-    width: calc(40% - 10px);
+    width: calc(20% - 10px);
 }
 
 .input-field {
@@ -153,3 +153,4 @@ pre {
 .back-to-main:hover {
     background-color: #21a1f1;
 }
+

@@ -17,6 +17,7 @@ case class TeacherAddCourseMessagePlanner(usertype: String,
                                           capacity: Int,
                                           info: String,
                                           courseHourJson: String,
+                                          classroomID: Int,
                                           credits: Int,
                                           enrolledStudentsJson: String,
                                           kwargsJson: String,
@@ -26,7 +27,7 @@ case class TeacherAddCourseMessagePlanner(usertype: String,
       IO.pure("No permission")
     }
     else {
-      addCourse(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, credits, enrolledStudentsJson, kwargsJson)
+      addCourse(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, kwargsJson)
     }
   }
 }

@@ -33,6 +33,16 @@ object Routes:
               }
             }
           }
+      case "AdminGetCourseListMessage" =>
+        IO(decode[AdminGetCourseListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
+          }
       case "AdminDeleteCourseMessage" =>
         IO(decode[AdminDeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
           .flatMap { m =>
@@ -48,6 +58,50 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+      case "AdminDeleteStudentFromCourseMessage" =>
+        IO(decode[AdminDeleteStudentFromCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminAddClassroomMessage" =>
+        IO(decode[AdminAddClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminDeleteClassroomMessage" =>
+        IO(decode[AdminDeleteClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminGetClassroomMessage" =>
+        IO(decode[AdminGetClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetClassroomMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces)
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
+          }
+      case "AdminGetClassroomListMessage" =>
+        IO(decode[AdminGetClassroomListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetClassroomListMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces)
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
+          }
+      case "AdminGetAvailableClassroomByCapacityHourMessage" =>
+        IO(decode[AdminGetAvailableClassroomByCapacityHourMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetAvailableClassroomByCapacityHourMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces)
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
       case "AdminAddApplicationMessage" =>
         IO(decode[AdminAddApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddApplicationMessage")))
           .flatMap { m =>
@@ -89,9 +143,9 @@ object Routes:
 
   val service: HttpRoutes[IO] = HttpRoutes.of[IO]:
     case req @ POST -> Root / "api" / name =>
-        println("request received")
-        req.as[String].flatMap{executePlan(name, _)}.flatMap(Ok(_))
-        .handleErrorWith{e =>
+      println("request received")
+      req.as[String].flatMap { executePlan(name, _) }.flatMap(Ok(_))
+        .handleErrorWith { e =>
           println(e)
           BadRequest(e.getMessage)
         }

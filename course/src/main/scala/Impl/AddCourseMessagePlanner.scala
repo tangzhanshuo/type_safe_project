@@ -38,6 +38,10 @@ case class AddCourseMessagePlanner(
       IO.fromEither(parse(enrolledCoursesJsonString).left.map(e => new Exception(s"Invalid JSON for enrolledCourses: ${e.getMessage}")))
     }
 
+    def getClassroomCapacity(classroomID: Int): IO[Int] = readDBInt(s"SELECT capacity FROM classroom WHERE classroomid = ?",
+      List(SqlParameter("int", classroomID.toString))
+    )
+
     def checkCourseHourConflict(existingCourses: Json): Boolean = {
       val courseHours = parse(courseHourJson).getOrElse(Json.arr()).as[List[Int]].getOrElse(Nil)
       existingCourses.asObject.exists { obj =>
@@ -89,13 +93,15 @@ case class AddCourseMessagePlanner(
 
             (courseHourValidation, enrolledStudentsValidation, kwargsValidation) match {
               case (Right(_), Right(_), Right(_)) =>
-                val checkConflictIO = for {
+                val checkConflictAndCapacityIO = for {
                   existingCourses <- getClassroomEnrolledCourses(classroomID)
                   conflict = checkCourseHourConflict(existingCourses)
+                  classroomCapacity <- getClassroomCapacity(classroomID)
                   _ <- if (classroomID >= 0 && conflict) IO.raiseError(new Exception("Course hour conflict detected for the given classroom")) else IO.unit
+                  _ <- if (classroomCapacity > 0 && capacity > classroomCapacity) IO.raiseError(new Exception("Classroom capacity exceeded")) else IO.unit
                 } yield existingCourses
 
-                checkConflictIO.flatMap { existingCourses =>
+                checkConflictAndCapacityIO.flatMap { existingCourses =>
                   addCourseToDB.flatMap { result =>
                     updateClassroomEnrolledCourses(classroomID, existingCourses).map(_ => result)
                   }

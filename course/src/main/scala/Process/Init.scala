@@ -41,9 +41,29 @@ object Init {
       )
       _ <- writeDB(
         s"""
+           |INSERT INTO course (
+           |  courseid,
+           |  coursename,
+           |  teacherusername,
+           |  teachername,
+           |  capacity,
+           |  info,
+           |  coursehour,
+           |  classroomid,
+           |  credits,
+           |  enrolledstudents,
+           |  kwargs
+           |)
+           |VALUES (-1, '入学', 't', 't', '1', '抢不到就等着退学吧', '[1]', -1, 0, '[]', '[]')
+           |ON CONFLICT (courseid) DO NOTHING
+         """.stripMargin, List()
+      )
+      _ <- writeDB(
+        s"""
            |CREATE TABLE IF NOT EXISTS classroom (
            |  classroomid INT PRIMARY KEY,
            |  classroomname TEXT,
+           |  capacity INT,
            |  enrolledcourses JSONB
            |)
          """.stripMargin, List()
@@ -53,8 +73,8 @@ object Init {
       // Initialize a default classroom
       _ <- writeDB(
         s"""
-           |INSERT INTO classroom (classroomid, classroomname, enrolledcourses)
-           |VALUES (-1, 'No room', '{}')
+           |INSERT INTO classroom (classroomid, classroomname, capacity, enrolledcourses)
+           |VALUES (-1, 'No room', '-1', '{"-1":[1]}')
            |ON CONFLICT (classroomid) DO NOTHING
          """.stripMargin, List()
       )

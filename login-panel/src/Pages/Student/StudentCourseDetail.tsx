@@ -4,6 +4,7 @@ import { useParams, useHistory, Link } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
 import { StudentGetCourseMessage } from 'Plugins/StudentAPI/StudentGetCourseMessage'
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage'
+import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage'
 import { logout } from 'Plugins/CommonUtils/UserManager'
 import Auth from 'Plugins/CommonUtils/AuthState';
 import 'Pages/css/Main.css'; // Import the CSS file
@@ -13,6 +14,7 @@ export function StudentCourseDetail() {
     const { courseid } = useParams<{ courseid: string }>();
     const [errorMessage, setErrorMessage] = useState('');
     const [addCourseResponse, setAddCourseResponse] = useState('');
+    const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
     const [course, setCourse] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -60,6 +62,20 @@ export function StudentCourseDetail() {
             return
         }
         setAddCourseResponse('Course added successfully')
+    }
+
+    const deleteCourse = async () => {
+        const id = parseInt(courseid, 10);
+        if (isNaN(id)) {
+            setDeleteCourseResponse('Invalid course ID');
+            return;
+        }
+        const response = await sendPostRequest(new StudentDeleteCourseMessage(id))
+        if (response.isError) {
+            setDeleteCourseResponse(response.error)
+            return
+        }
+        setDeleteCourseResponse('Course added successfully')
     }
 
     return (
