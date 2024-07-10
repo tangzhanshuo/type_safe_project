@@ -25,6 +25,7 @@ case class AddApplicationMessagePlanner(
       case (Right(_), Right(_)) =>
         // Proceed with DB operation if both JSON strings are valid
         val applicationID = UUID.randomUUID().toString
+        println(approver)
         writeDB(
           s"""
              |INSERT INTO application (
