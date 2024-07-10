@@ -63,7 +63,7 @@ package object CourseAPI {
     GetCourseListMessage().send
 
   def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
-    GetCoursesByStudentUsernameMessage(studentUsername).send
+    GetCourseByStudentUsernameMessage(studentUsername).send
 
   def getWaitingCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetWaitingCoursesByStudentUsernameMessage(studentUsername).send
