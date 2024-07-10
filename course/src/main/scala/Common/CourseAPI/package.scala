@@ -65,6 +65,9 @@ package object CourseAPI {
   def getCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetCourseListMessage().send
 
+  def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+    GetWaitingCourseListMessage().send  
+
   def addClassroom(classroomID: Int, classroomName: String, capacity: Int, enrolledCoursesJson: String)(using PlanContext): IO[String] =
     AddClassroomMessage(classroomID, classroomName, capacity, enrolledCoursesJson).send
 
