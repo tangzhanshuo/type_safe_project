@@ -30,7 +30,7 @@ case class IsStudentEnrolledMessagePlanner(courseID: Int, studentUsername: Optio
           case Some(row) =>
             val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledstudents").toOption.orElse(Some("[]")).get
             val enrolledStudentsJson = parse(enrolledStudentsJsonString).getOrElse(Json.arr())
-            val enrolledStudents = enrolledStudentsJson.as[List[String]].getOrElse(Nil)
+            val enrolledStudents = enrolledStudentsJson.as[List[Map[String, Json]]].getOrElse(Nil)
             IO.pure(enrolledStudents)
           case None => IO.raiseError(new Exception(s"Course with ID $courseID not found"))
         }
@@ -41,7 +41,7 @@ case class IsStudentEnrolledMessagePlanner(courseID: Int, studentUsername: Optio
       enrolledStudentsIO.flatMap { enrolledStudents =>
         studentUsername match {
           case Some(username) =>
-            IO.pure(enrolledStudents.contains(username))
+            IO.pure(enrolledStudents.exists(_("studentusername").as[String].contains(username)))
           case None => IO.raiseError(new Exception("Student username must be provided"))
         }
       }

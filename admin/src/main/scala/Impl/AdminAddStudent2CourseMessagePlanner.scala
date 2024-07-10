@@ -7,9 +7,10 @@ import Common.CourseAPI.addStudent2Course
 case class AdminAddStudent2CourseMessagePlanner(
                                                  courseID: Int,
                                                  studentUsername: String,
+                                                 priority: Int,
                                                  override val planContext: PlanContext
                                                ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    addStudent2Course(courseID, Some(studentUsername))
+    addStudent2Course(courseID, Some(studentUsername), Some(priority))
   }
 }

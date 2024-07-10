@@ -30,7 +30,7 @@ object Init {
            |  classroomid INT,
            |  credits INT,
            |  enrolledstudents JSONB,
-           |  kwargs JSONB
+           |  allstudents JSONB
            |)
          """.stripMargin, List()
         // The course_hour should be a list of Ints with value 42*w + 6*d + h where
@@ -52,7 +52,7 @@ object Init {
            |  classroomid,
            |  credits,
            |  enrolledstudents,
-           |  kwargs
+           |  allstudents
            |)
            |VALUES (-1, '入学', 't', 't', '1', '抢不到就等着退学吧', '[1]', -1, 0, '[]', '[]')
            |ON CONFLICT (courseid) DO NOTHING

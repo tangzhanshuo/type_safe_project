@@ -22,9 +22,9 @@ package object CourseAPI {
                  classroomID: Int,
                  credits: Int,
                  enrolledStudentsJson: String,
-                 kwargsJson: String
+                 allStudentsJson: String
                )(using PlanContext): IO[String] =
-    AddCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, kwargsJson).send
+    AddCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, allStudentsJson).send
 
   def deleteCourse(courseID: Int)(using PlanContext): IO[String] =
     DeleteCourseMessage(courseID).send
@@ -43,12 +43,12 @@ package object CourseAPI {
                     classroomID: Option[Int],
                     credits: Option[Int],
                     enrolledStudentsJson: Option[String],
-                    kwargsJson: Option[String]
+                    allStudentsJson: Option[String]
                   )(using PlanContext): IO[String] =
-    UpdateCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, kwargsJson).send
+    UpdateCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, allStudentsJson).send
 
-  def addStudent2Course(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
-    AddStudent2CourseMessage(courseID, studentUsername).send
+  def addStudent2Course(courseID: Int, studentUsername: Option[String], priority: Option[Int])(using PlanContext): IO[String] =
+    AddStudent2CourseMessage(courseID, studentUsername, priority).send
 
   def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[String] =
     GetCourseByTeacherUsernameMessage(teacherUsername).send
@@ -65,9 +65,18 @@ package object CourseAPI {
   def getCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetCourseListMessage().send
 
-  def addClassroom(classroomID: Int, classroomName: String, enrolledCoursesJson: String)(using PlanContext): IO[String] =
-    AddClassroomMessage(classroomID, classroomName, enrolledCoursesJson).send
+  def addClassroom(classroomID: Int, classroomName: String, capacity: Int, enrolledCoursesJson: String)(using PlanContext): IO[String] =
+    AddClassroomMessage(classroomID, classroomName, capacity, enrolledCoursesJson).send
 
   def deleteClassroom(classroomID: Int)(using PlanContext): IO[String] =
     DeleteClassroomMessage(classroomID).send
+
+  def getClassroomList()(using PlanContext): IO[String] =
+    GetClassroomListMessage().send
+
+  def getClassroom(classroomID: Int)(using PlanContext): IO[String] =
+    GetClassroomMessage(classroomID).send
+
+  def getAvailableClassroomByCapacityHour(capacity: Int, courseHourJson: String)(using PlanContext): IO[String] =
+    GetAvailableClassroomByCapacityHourMessage(capacity, courseHourJson).send
 }
