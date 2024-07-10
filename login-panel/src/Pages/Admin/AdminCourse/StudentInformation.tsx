@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { AdminAddStudent2CourseMessage } from 'Plugins/AdminAPI/AdminAddStudent2CourseMessage';
 import { AdminDeleteStudentFromCourseMessage } from 'Plugins/AdminAPI/AdminDeleteStudentFromCourseMessage';
+import { AdminGetCoursesByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetCoursesByStudentUsernameMessage';
+import { AdminGetWaitingCoursesByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetWaitingCoursesByStudentUsernameMessage';
 
 interface Props {
     setErrorMessage: (msg: string) => void;
@@ -12,6 +14,9 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
     const [studentCourseID, setStudentCourseID] = useState('');
     const [studentUsername, setStudentUsername] = useState('');
     const [studentPriority, setStudentPriority] = useState('');
+    const [enrolledCourses, setEnrolledCourses] = useState<string[]>([]);
+    const [waitingCourses, setWaitingCourses] = useState<{course: string, waitingPosition: number}[]>([]);
+
     const handleAddStudent2Course = async () => {
         if (!studentCourseID || !studentUsername) {
             setErrorMessage('Course ID and Student Username are required');
@@ -65,6 +70,54 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
         }
     };
 
+    const handleGetCoursesByStudentUsername = async () => {
+        if (!studentUsername) {
+            setErrorMessage('Student Username is required');
+            return;
+        }
+
+        const message = new AdminGetCoursesByStudentUsernameMessage(studentUsername);
+
+        try {
+            const response = await sendPostRequest(message);
+            if (!response.isError) {
+                setEnrolledCourses(response.data);
+                setSuccessMessage('Courses retrieved successfully');
+                setErrorMessage('');
+            } else {
+                setErrorMessage('Failed to retrieve courses');
+                setSuccessMessage('');
+            }
+        } catch (error) {
+            setErrorMessage('Error occurred while retrieving courses');
+            setSuccessMessage('');
+        }
+    };
+
+    const handleGetWaitingCoursesByStudentUsername = async () => {
+        if (!studentUsername) {
+            setErrorMessage('Student Username is required');
+            return;
+        }
+
+        const message = new AdminGetWaitingCoursesByStudentUsernameMessage(studentUsername);
+
+        try {
+            const response = await sendPostRequest(message);
+            if (!response.isError) {
+                setWaitingCourses(response.data);
+                setSuccessMessage('Waiting courses retrieved successfully');
+                setErrorMessage('');
+            } else {
+                setErrorMessage('Failed to retrieve waiting courses');
+                setSuccessMessage('');
+            }
+        } catch (error) {
+            setErrorMessage('Error occurred while retrieving waiting courses');
+            setSuccessMessage('');
+        }
+    };
+
     return (
         <section className="student-info">
             <h2>Student Information</h2>
@@ -106,6 +159,12 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
                 </button>
                 <button onClick={handleDeleteStudentFromCourse} className="button">
                     Delete Student from Course
+                </button>
+                <button onClick={handleGetCoursesByStudentUsername} className="button">
+                    Get Enrolled Courses
+                </button>
+                <button onClick={handleGetWaitingCoursesByStudentUsername} className="button">
+                    Get Waiting Courses
                 </button>
             </div>
         </section>

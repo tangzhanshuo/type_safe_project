@@ -63,6 +63,16 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+      case "AdminGetCoursesByStudentUsernameMessage" =>
+        IO(decode[AdminGetCoursesByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "AdminGetWaitingCoursesByStudentUsernameMessage" =>
+        IO(decode[AdminGetWaitingCoursesByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
       case "AdminAddClassroomMessage" =>
         IO(decode[AdminAddClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
           .flatMap { m =>
