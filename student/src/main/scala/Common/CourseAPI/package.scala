@@ -62,11 +62,11 @@ package object CourseAPI {
   def getCourseList()(using PlanContext): IO[String] =
     GetCourseListMessage().send
 
-  def getCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
-    GetCoursesByStudentUsernameMessage(studentUsername).send
+  def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+    GetCourseByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
-    GetWaitingCoursesByStudentUsernameMessage(studentUsername).send
+  def getWaitingCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+    GetWaitingCourseByStudentUsernameMessage(studentUsername).send
 
   def addClassroom(classroomID: Int, classroomName: String, capacity: Int, enrolledCoursesJson: String)(using PlanContext): IO[String] =
     AddClassroomMessage(classroomID, classroomName, capacity, enrolledCoursesJson).send

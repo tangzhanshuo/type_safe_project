@@ -9,15 +9,42 @@ import Auth from 'Plugins/CommonUtils/AuthState';
 import 'Pages/css/Main.css';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage' // Import the CSS file
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage'
+import { StudentGetCourseMessage } from 'Plugins/StudentAPI/StudentGetCourseMessage'
+import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage'
+import './App.css'; // Ensure you have an App.css file in your src directory
+
 
 export function StudentCourse() {
+    const [studentCourseID, setStudentCourseID] = useState('');
+    const [studentUsername, setStudentUsername] = useState('');
     const [course, setCourse] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const history = useHistory();
     const [courses, setCourses] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [addCourseResponse, setAddCourseResponse] = useState('');
-    const [deleteCourseResponse, setDeleteCourseResponse] = useState('')
+    const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
+    const [selectedCourses, setSelectedCourses] = useState([]);
+    
+    useEffect(() => {
+        getCourseList();
+        fetchSelectedCourses();
+    }, []);
+
+    const fetchSelectedCourses = async () => {
+        const response = await sendPostRequest(new StudentGetCourseByUsernameMessage(Auth.getState().username));
+        if (response.isError) {
+            setErrorMessage(response.error);
+            return;
+        }
+        try {
+            const parsedCourses = JSON.parse(response.data);
+            setSelectedCourses(parsedCourses);
+        } catch (error) {
+            setErrorMessage('Error parsing course data');
+        }
+    }
+
     useEffect(() => {
         const { usertype, username, password } = Auth.getState();
 
@@ -95,7 +122,7 @@ export function StudentCourse() {
                                 <th>Capacity</th>
                                 <th>Credits</th>
                                 <th>Info</th>
-                                <th>Select</th>
+                                <th>Options</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -122,16 +149,21 @@ export function StudentCourse() {
                                 </tr>
                             ))}
                             </tbody>
-                            {addCourseResponse && <p>{addCourseResponse}</p>}
-                            {deleteCourseResponse && <p>{deleteCourseResponse}</p>}
                         </table>
                     ) : (
                         <p>No courses to display. Click 'Get Courses' to load the course list.</p>
                     )}
                     <p style={{ color: 'red' }}>{errorMessage}</p>
-                    <button onClick={() => getCourseList()} className="button">
-                        Get Courses
-                    </button>
+                    {addCourseResponse && (
+                        <div className="fade-out">
+                            {addCourseResponse}
+                        </div>
+                    )}
+                    {deleteCourseResponse && (
+                        <div className="fade-out">
+                            {deleteCourseResponse}
+                        </div>
+                    )}
                     <button onClick={() => history.push('/student')} className="button">
                         Back to StudentMain
                     </button>
@@ -139,14 +171,36 @@ export function StudentCourse() {
                         Log out
                     </button>
                 </div>
-                <div className="button-group">
-                    <header>
-                        <h3> Selected courses </h3>
-                    </header>
-
-                    //write a table presenting all selected course of aimed student
-
-
+                <div>
+                    <h2>Selected Courses</h2>
+                    {selectedCourses.length > 0 ? (
+                        <table className="course-table">
+                            <thead>
+                            <tr>
+                                <th>Course ID</th>
+                                <th>Course Name</th>
+                                <th>Teacher</th>
+                                <th>Capacity</th>
+                                <th>Credits</th>
+                                <th>Info</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {selectedCourses.map((course) => (
+                                <tr key={course.courseid}>
+                                    <td>{course.courseid}</td>
+                                    <td>{course.coursename}</td>
+                                    <td>{course.teachername}</td>
+                                    <td>{course.capacity}</td>
+                                    <td>{course.credits}</td>
+                                    <td>{course.info}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>No selected courses.</p>
+                    )}
                 </div>
 
             </main>

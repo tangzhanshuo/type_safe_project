@@ -40,6 +40,12 @@ object Routes:
             m.fullPlan.map(_.asJson.toString)
           }
 
+      case "StudentGetCourseByUsernameMessage" =>
+        IO(decode[StudentGetCourseByUsernameMessage](str).getOrElse(throw new Exception("Invalid JSON for StudentGetCourseByUsernameMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
       case "StudentGetApplicationFromApplicantMessage" =>
         IO(decode[StudentGetApplicationFromApplicantMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentGetApplicationFromApplicantMessage")))
           .flatMap { m =>
