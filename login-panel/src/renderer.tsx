@@ -5,6 +5,7 @@ import { Main } from 'Pages/Main'
 import { Login } from 'Pages/Login'
 import { StudentMain } from 'Pages/Student/StudentMain'
 import { StudentCourse } from 'Pages/Student/StudentCourse'
+import { StudentApplication } from 'Pages/Student/StudentApplication'
 import { StudentCourseDetail } from 'Pages/Student/StudentCourseDetail'
 import { TeacherMain } from 'Pages/Teacher/TeacherMain'
 import { AdminMain } from 'Pages/Admin/AdminMain'
@@ -21,6 +22,7 @@ const Layout = () => {
                 <Route path="/login" exact component={Login} />
                 <Route path="/student" exact component={StudentMain} />
                 <Route path="/student/course" exact component={StudentCourse} />
+                <Route path="/student/application" exact component={StudentApplication} />
                 <Route path="/student/course/:courseid" component={StudentCourseDetail} />
                 <Route path="/teacher" exact component={TeacherMain} />
                 <Route path="/teacher/coursemanage" exact component={TeacherCourseManage} />

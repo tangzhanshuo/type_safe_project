@@ -32,6 +32,9 @@ export function StudentMain() {
                     <button onClick={() => history.push('/student/course')} className="button">
                         Go to courses
                     </button>
+                    <button onClick={() => history.push('/student/application')} className="button">
+                        Go to applications
+                    </button>
                     <button onClick={() => history.push('/')} className="button">
                         Back to Main
                     </button>

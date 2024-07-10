@@ -118,19 +118,34 @@ object Routes:
       case "AdminGetApplicationFromIDMessage" =>
         IO(decode[AdminGetApplicationFromIDMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetApplicationFromIDMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
           }
 
       case "AdminGetApplicationFromApplicantMessage" =>
         IO(decode[AdminGetApplicationFromApplicantMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetApplicationFromApplicantMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
           }
 
       case "AdminGetApplicationFromApproverMessage" =>
         IO(decode[AdminGetApplicationFromApproverMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetApplicationFromApproverMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
           }
 
       case "AdminApproveApplicationMessage" =>

@@ -4,7 +4,7 @@ import Common.API.PlanContext
 import Impl.*
 import cats.effect.*
 import io.circe.generic.auto.*
-import io.circe.parser.decode
+import io.circe.parser.{decode, parse}
 import io.circe.syntax.*
 import org.http4s.*
 import org.http4s.client.Client
@@ -32,6 +32,23 @@ object Routes:
         IO(decode[StudentDeleteCourseMessage](str).getOrElse(throw new Exception("Invalid JSON for StudentDeleteCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
+          }
+
+      case "StudentAddApplicationMessage" =>
+        IO(decode[StudentAddApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentAddApplicationMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
+      case "StudentGetApplicationFromApplicantMessage" =>
+        IO(decode[StudentGetApplicationFromApplicantMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentGetApplicationFromApplicantMessage")))
+          .flatMap { m =>
+            m.fullPlan.flatMap { jsonString =>
+              parse(jsonString) match {
+                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
+                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
+              }
+            }
           }
 
       case _ =>
