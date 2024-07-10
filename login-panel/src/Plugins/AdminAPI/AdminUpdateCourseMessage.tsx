@@ -11,7 +11,7 @@ export class AdminUpdateCourseMessage extends AdminMessage {
     classroomID?: number;
     credits?: number;
     enrolledStudentsJson?: string; // JSON represented as String
-    kwargsJson?: string; // JSON represented as String
+    allStudentsJson?: string; // JSON represented as String
 
     constructor(
         courseID: number,
@@ -24,7 +24,7 @@ export class AdminUpdateCourseMessage extends AdminMessage {
         classroomID?: number,
         credits?: number,
         enrolledStudentsJson?: string,
-        kwargsJson?: string
+        allStudentsJson?: string
     ) {
         super();
         this.courseID = courseID;
@@ -37,6 +37,6 @@ export class AdminUpdateCourseMessage extends AdminMessage {
         this.classroomID = classroomID;
         this.credits = credits;
         this.enrolledStudentsJson = enrolledStudentsJson;
-        this.kwargsJson = kwargsJson;
+        this.allStudentsJson = allStudentsJson;
     }
 }

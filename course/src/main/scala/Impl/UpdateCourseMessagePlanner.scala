@@ -77,14 +77,14 @@ case class UpdateCourseMessagePlanner(
           val updatedClassroomID = classroomID.orElse(existingCourse.get[Int]("classroomid").toOption).getOrElse(0)
           val updatedCredits = credits.orElse(existingCourse.get[Int]("credits").toOption).getOrElse(0)
           val updatedEnrolledStudentsJson = enrolledStudentsJson.orElse(existingCourse.get[String]("enrolledstudents").toOption).getOrElse("[]")
-          val updatedKwargsJson = allStudentsJson.orElse(existingCourse.get[String]("kwargs").toOption).getOrElse("{}")
+          val updatedAllStudentsJson = allStudentsJson.orElse(existingCourse.get[String]("allstudents").toOption).getOrElse("{}")
 
           // Validate the JSON strings by parsing them
           val courseHourValidation = parse(updatedCourseHourJson).left.map(e => new Exception(s"Invalid JSON for courseHour: ${e.getMessage}"))
           val enrolledStudentsValidation = parse(updatedEnrolledStudentsJson).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
-          val kwargsValidation = parse(updatedKwargsJson).left.map(e => new Exception(s"Invalid JSON for kwargs: ${e.getMessage}"))
+          val allStudentsValidation = parse(updatedAllStudentsJson).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
 
-          (courseHourValidation, enrolledStudentsValidation, kwargsValidation) match {
+          (courseHourValidation, enrolledStudentsValidation, allStudentsValidation) match {
             case (Right(_), Right(_), Right(_)) =>
               val checkConflictAndCapacityIO = for {
                 existingCourses <- getClassroomEnrolledCourses(updatedClassroomID)
@@ -105,7 +105,7 @@ case class UpdateCourseMessagePlanner(
                   Some("classroomid = ?"),
                   Some("credits = ?"),
                   Some("enrolledstudents = ?"),
-                  Some("kwargs = ?")
+                  Some("allstudents = ?")
                 ).flatten.mkString(", ")
 
                 val params = List(
@@ -118,7 +118,7 @@ case class UpdateCourseMessagePlanner(
                   SqlParameter("int", updatedClassroomID.toString),
                   SqlParameter("int", updatedCredits.toString),
                   SqlParameter("jsonb", updatedEnrolledStudentsJson),
-                  SqlParameter("jsonb", updatedKwargsJson),
+                  SqlParameter("jsonb", updatedAllStudentsJson),
                   SqlParameter("int", courseID.toString)
                 )
 
@@ -143,7 +143,7 @@ case class UpdateCourseMessagePlanner(
 
             case (Left(courseHourError), _, _) => IO.raiseError(courseHourError)
             case (_, Left(enrolledStudentsError), _) => IO.raiseError(enrolledStudentsError)
-            case (_, _, Left(kwargsError)) => IO.raiseError(kwargsError)
+            case (_, _, Left(allStudentsError)) => IO.raiseError(allStudentsError)
           }
 
         case None => IO.raiseError(new Exception(s"Course with ID $courseID not found"))

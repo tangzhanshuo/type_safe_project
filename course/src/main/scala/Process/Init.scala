@@ -37,7 +37,6 @@ object Init {
         // w = 0, 1 stands for 前八周，后八周
         // d = 1, 2, 3, 4, 5, 6, 7 stands for 星期d
         // h = 1, 2, 3, 4, 5, 6 stands for 第h段时间
-        // kwargs contain other info
       )
       _ <- writeDB(
         s"""

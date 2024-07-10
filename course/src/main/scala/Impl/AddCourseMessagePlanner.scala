@@ -54,7 +54,7 @@ case class AddCourseMessagePlanner(
 
     def addCourseToDB: IO[String] = writeDB(s"""
                                                |INSERT INTO course (
-                                               |  courseid, coursename, teacherusername, teachername, capacity, info, coursehour, classroomid, credits, enrolledstudents, kwargs
+                                               |  courseid, coursename, teacherusername, teachername, capacity, info, coursehour, classroomid, credits, enrolledstudents, allstudents
                                                |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.stripMargin,
       List(
@@ -89,9 +89,9 @@ case class AddCourseMessagePlanner(
           } else {
             val courseHourValidation = parse(courseHourJson).left.map(e => new Exception(s"Invalid JSON for courseHour: ${e.getMessage}"))
             val enrolledStudentsValidation = parse(enrolledStudentsJson).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
-            val kwargsValidation = parse(allStudentsJson).left.map(e => new Exception(s"Invalid JSON for kwargs: ${e.getMessage}"))
+            val allStudentsValidation = parse(allStudentsJson).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
 
-            (courseHourValidation, enrolledStudentsValidation, kwargsValidation) match {
+            (courseHourValidation, enrolledStudentsValidation, allStudentsValidation) match {
               case (Right(_), Right(_), Right(_)) =>
                 val checkConflictAndCapacityIO = for {
                   existingCourses <- getClassroomEnrolledCourses(classroomID)
@@ -109,7 +109,7 @@ case class AddCourseMessagePlanner(
 
               case (Left(courseHourError), _, _) => IO.raiseError(courseHourError)
               case (_, Left(enrolledStudentsError), _) => IO.raiseError(enrolledStudentsError)
-              case (_, _, Left(kwargsError)) => IO.raiseError(kwargsError)
+              case (_, _, Left(allStudentsError)) => IO.raiseError(allStudentsError)
             }
           }
         }
