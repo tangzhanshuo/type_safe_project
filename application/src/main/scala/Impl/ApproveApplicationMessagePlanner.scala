@@ -18,7 +18,7 @@ case class ApproveApplicationMessagePlanner(
                                            ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
     val selectRowQuery = """
-      SELECT approver
+      SELECT approver, completed
       FROM application
       WHERE applicationID = ?
     """
@@ -28,30 +28,47 @@ case class ApproveApplicationMessagePlanner(
         case Some(row) =>
           parse(row.noSpaces).flatMap { json =>
             println(s"Parsed JSON: ${json.noSpaces}")
-            json.hcursor.get[String]("approver").flatMap(parse)
+            for {
+              approverJson <- json.hcursor.get[String]("approver").flatMap(parse)
+              completed <- json.hcursor.get[Boolean]("completed")
+            } yield (approverJson, completed)
           } match {
-            case Right(approverJson) =>
-              updateApprover(approverJson) match {
-                case (updatedApproverJson, true) =>
-                  println(s"Updated JSON: ${updatedApproverJson.noSpaces}")
-                  val updateQuery = """
-                    UPDATE application
-                    SET approver = ?
-                    WHERE applicationID = ?
-                  """
-                  val params = List(
-                    SqlParameter("jsonb", updatedApproverJson.noSpaces),
-                    SqlParameter("string", applicationID)
-                  )
-                  writeDB(updateQuery, params).flatMap { _ =>
-                    if (checkAllApproved(updatedApproverJson)) {
-                      executeApplication(applicationID).map(_ => "Application approved and executed successfully")
-                    } else {
-                      IO.pure("Application approved successfully")
+            case Right((approverJson, completed)) =>
+              if (completed) {
+                IO.pure("Application has already been completed")
+              } else {
+                updateApprover(approverJson) match {
+                  case (updatedApproverJson, true) =>
+                    println(s"Updated JSON: ${updatedApproverJson.noSpaces}")
+                    val updateQuery =
+                      """
+                          UPDATE application
+                          SET approver = ?
+                          WHERE applicationID = ?
+                        """
+                    val params = List(
+                      SqlParameter("jsonb", updatedApproverJson.noSpaces),
+                      SqlParameter("string", applicationID)
+                    )
+                    writeDB(updateQuery, params).flatMap { _ =>
+                      if (checkAllApproved(updatedApproverJson)) {
+                        executeApplication(applicationID).flatMap { _ =>
+                          val completeQuery =
+                            """
+                                UPDATE application
+                                SET completed = true
+                                WHERE applicationID = ?
+                              """
+                          val completeParams = List(SqlParameter("string", applicationID))
+                          writeDB(completeQuery, completeParams).map(_ => "Application approved, executed, and marked as completed successfully")
+                        }
+                      } else {
+                        IO.pure("Application approved successfully")
+                      }
                     }
-                  }
-                case (_, false) =>
-                  IO.pure("No update performed: Either already approved or no matching approver found")
+                  case (_, false) =>
+                    IO.pure("No update performed: Either already approved or no matching approver found")
+                }
               }
             case Left(error) => IO.raiseError(new Exception(s"Error processing JSON: ${error.getMessage}"))
           }

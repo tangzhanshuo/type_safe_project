@@ -29,8 +29,8 @@ case class AddApplicationMessagePlanner(
         writeDB(
           s"""
              |INSERT INTO application (
-             |  applicationID, usertype, username, applicationType, info, approver
-             |) VALUES (?, ?, ?, ?, ?, ?)
+             |  applicationID, usertype, username, applicationType, info, approver, completed
+             |) VALUES (?, ?, ?, ?, ?, ?, ?)
                """.stripMargin,
           List(
             SqlParameter("string", applicationID),
@@ -38,7 +38,8 @@ case class AddApplicationMessagePlanner(
             SqlParameter("string", username),
             SqlParameter("string", applicationType),
             SqlParameter("jsonb", info),
-            SqlParameter("jsonb", approver)
+            SqlParameter("jsonb", approver),
+            SqlParameter("boolean", "false")
           )
         ).map(_ => applicationID)
 

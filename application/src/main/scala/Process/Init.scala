@@ -23,7 +23,8 @@ object Init {
            |  username TEXT,
            |  applicationType TEXT,
            |  info JSONB,
-           |  approver JSONB
+           |  approver JSONB,
+           |  completed BOOLEAN
            |)
          """.stripMargin, List()
       )
