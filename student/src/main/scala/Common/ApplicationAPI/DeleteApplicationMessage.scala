@@ -4,5 +4,7 @@ import Common.API.API
 import Global.ServiceCenter.applicationServiceCode
 
 case class DeleteApplicationMessage(
-                                applicationID: String
+                                   usertype: String,
+                                   username: String,
+                                   applicationID: String
                               ) extends API[String](applicationServiceCode)
