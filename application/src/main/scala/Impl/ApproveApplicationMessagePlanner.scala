@@ -30,24 +30,27 @@ case class ApproveApplicationMessagePlanner(
             json.hcursor.get[String]("approver").flatMap(parse)
           } match {
             case Right(approverJson) =>
-              val (updatedApproverJson, wasUpdated) = updateApprover(approverJson)
-              println(s"Updated JSON: ${updatedApproverJson.noSpaces}")
-              println(s"Was Updated: $wasUpdated")
-              if (wasUpdated) {
-                val updateQuery = """
-                  UPDATE application
-                  SET approver = ?
-                  WHERE applicationID = ?
-                """
-                val params = List(
-                  SqlParameter("jsonb", updatedApproverJson.noSpaces),
-                  SqlParameter("string", applicationID)
-                )
-                writeDB(updateQuery, params).map { _ =>
-                  "Application approved successfully"
-                }
-              } else {
-                IO.pure("No matching approver found to update")
+              updateApprover(approverJson) match {
+                case (updatedApproverJson, true) =>
+                  println(s"Updated JSON: ${updatedApproverJson.noSpaces}")
+                  val updateQuery = """
+                    UPDATE application
+                    SET approver = ?
+                    WHERE applicationID = ?
+                  """
+                  val params = List(
+                    SqlParameter("jsonb", updatedApproverJson.noSpaces),
+                    SqlParameter("string", applicationID)
+                  )
+                  writeDB(updateQuery, params).flatMap { _ =>
+                    if (checkAllApproved(updatedApproverJson)) {
+                      executeApplication(applicationID).map(_ => "Application approved and executed successfully")
+                    } else {
+                      IO.pure("Application approved successfully")
+                    }
+                  }
+                case (_, false) =>
+                  IO.pure("No update performed: Either already approved or no matching approver found")
               }
             case Left(error) => IO.raiseError(new Exception(s"Error processing JSON: ${error.getMessage}"))
           }
@@ -60,50 +63,70 @@ case class ApproveApplicationMessagePlanner(
     approverJson.asArray match {
       case Some(approvers) =>
         println(s"Approvers: ${approvers.map(_.noSpaces).mkString(", ")}")
-        val (updatedApprovers, wasUpdated) = approvers.foldLeft((Vector.empty[Json], false)) {
-          case ((acc, true), approver) => (acc :+ approver, true)
-          case ((acc, false), approver) =>
-            println(s"Checking approver: ${approver.noSpaces}")
-            println(s"Matches exactly: ${matchesApproverExactly(approver)}")
-            println(s"Matches loosely: ${matchesApproverLoosely(approver)}")
-            if (matchesApproverExactly(approver) || matchesApproverLoosely(approver)) {
-              (acc :+ updateApproverElement(approver), true)
-            } else {
-              (acc :+ approver, false)
-            }
+        if (approvers.exists(alreadyApproved)) {
+          println("User has already approved")
+          (approverJson, false)
+        } else {
+          val matchingApprover = approvers.find(matchesApproverExactly)
+            .orElse(approvers.find(matchesApproverLoosely))
+
+          matchingApprover match {
+            case Some(approver) =>
+              val updatedApprovers = approvers.map { a =>
+                if (a == approver) updateApproverElement(a) else a
+              }
+              (Json.fromValues(updatedApprovers), true)
+            case None =>
+              println("No matching approver found")
+              (approverJson, false)
+          }
         }
-        (Json.fromValues(updatedApprovers), wasUpdated)
       case None =>
         println("Approver JSON is not an array")
         (approverJson, false)
     }
   }
 
+  private def alreadyApproved(approver: Json): Boolean = {
+    val cursor = approver.hcursor
+    cursor.get[String]("usertype").toOption.contains(usertype) &&
+      cursor.get[String]("username").toOption.contains(username) &&
+      cursor.get[Boolean]("approved").toOption.contains(true)
+  }
+
   private def matchesApproverExactly(approver: Json): Boolean = {
     val cursor = approver.hcursor
-    val matchesUsertype = cursor.get[String]("usertype").toOption.contains(usertype)
-    val matchesUsername = cursor.get[String]("username").toOption.contains(username)
-    val isNotApproved = cursor.get[Boolean]("approved").toOption.contains(false)
-    println(s"Exact match - usertype: $matchesUsertype, username: $matchesUsername, not approved: $isNotApproved")
-    matchesUsertype && matchesUsername && isNotApproved
+    cursor.get[String]("usertype").toOption.contains(usertype) &&
+      cursor.get[String]("username").toOption.contains(username) &&
+      cursor.get[Boolean]("approved").toOption.contains(false)
   }
 
   private def matchesApproverLoosely(approver: Json): Boolean = {
     val cursor = approver.hcursor
-    val matchesUsertype = cursor.get[String]("usertype").toOption.contains(usertype)
-    val hasEmptyUsername = cursor.get[String]("username").toOption.forall(_.isEmpty)
-    val isNotApproved = cursor.get[Boolean]("approved").toOption.contains(false)
-    println(s"Loose match - usertype: $matchesUsertype, empty username: $hasEmptyUsername, not approved: $isNotApproved")
-    matchesUsertype && hasEmptyUsername && isNotApproved
+    cursor.get[String]("usertype").toOption.contains(usertype) &&
+      cursor.get[String]("username").toOption.exists(_.isEmpty) &&
+      cursor.get[Boolean]("approved").toOption.contains(false)
   }
 
   private def updateApproverElement(approver: Json): Json = {
-    val updated = approver.mapObject { obj =>
+    approver.mapObject { obj =>
       obj
         .add("username", Json.fromString(username))
         .add("approved", Json.fromBoolean(true))
     }
-    println(s"Updated approver: ${updated.noSpaces}")
-    updated
+  }
+
+  private def checkAllApproved(approverJson: Json): Boolean = {
+    approverJson.asArray.exists { approvers =>
+      approvers.forall { approver =>
+        approver.hcursor.get[Boolean]("approved").getOrElse(false)
+      }
+    }
+  }
+
+  private def executeApplication(applicationID: String): IO[Unit] = {
+    IO {
+      println(s"executeApplication called for applicationID: $applicationID")
+    }
   }
 }
