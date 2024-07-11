@@ -14,22 +14,22 @@ object Routes:
   private def executePlan(messageType: String, str: String): IO[String] =
     messageType match {
       case "StudentGetCourseListMessage" =>
-        IO(decode[StudentGetCourseListMessage](str).getOrElse(throw new Exception("Invalid JSON for StudentGetCourseListMessage")))
+        IO(decode[StudentGetCourseListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentGetCourseListMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "StudentGetCourseMessage" =>
-        IO(decode[StudentGetCourseMessage](str).getOrElse(throw new Exception("Invalid JSON for StudentGetCourseMessage")))
+        IO(decode[StudentGetCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentGetCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "StudentAddCourseMessage" =>
-        IO(decode[StudentAddCourseMessage](str).getOrElse(throw new Exception("Invalid JSON for StudentAddCourseMessage")))
+        IO(decode[StudentAddCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentAddCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "StudentDeleteCourseMessage" =>
-        IO(decode[StudentDeleteCourseMessage](str).getOrElse(throw new Exception("Invalid JSON for StudentDeleteCourseMessage")))
+        IO(decode[StudentDeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentDeleteCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
@@ -47,7 +47,7 @@ object Routes:
           }
 
       case "StudentGetCourseByUsernameMessage" =>
-        IO(decode[StudentGetCourseByUsernameMessage](str).getOrElse(throw new Exception("Invalid JSON for StudentGetCourseByUsernameMessage")))
+        IO(decode[StudentGetCourseByUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentGetCourseByUsernameMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
