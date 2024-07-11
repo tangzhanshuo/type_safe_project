@@ -8,6 +8,7 @@ import io.circe.generic.auto.*
 import io.circe.parser.parse
 import io.circe.syntax.*
 import io.circe.{Json, JsonObject}
+import Impl.ApplicationExecutor.executeApplication
 
 case class ApproveApplicationMessagePlanner(
                                              applicationID: String,
@@ -121,12 +122,6 @@ case class ApproveApplicationMessagePlanner(
       approvers.forall { approver =>
         approver.hcursor.get[Boolean]("approved").getOrElse(false)
       }
-    }
-  }
-
-  private def executeApplication(applicationID: String): IO[Unit] = {
-    IO {
-      println(s"executeApplication called for applicationID: $applicationID")
     }
   }
 }
