@@ -23,6 +23,9 @@ export function TeacherCourseManage() {
                     <button onClick={() => history.push('/teacher/coursemanage/addcourse')} className="button">
                         Add Course
                     </button>
+                    <button onClick={() => history.push('/teacher/coursemanage/deletecourse')} className="button">
+                        Delete Course
+                    </button>
                     <button onClick={() => history.push('/teacher')} className="button">
                         Back to TeacherMain
                     </button>

@@ -11,6 +11,7 @@ import scala.util.Random
 case class TeacherAddCourseMessagePlanner(usertype: String,
                                           username: String,
                                           password: String,
+                                          courseID: Int,
                                           courseName: String,
                                           teacherName: String,
                                           capacity: Int,

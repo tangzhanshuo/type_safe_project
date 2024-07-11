@@ -13,6 +13,7 @@ import { AdminCourse } from 'Pages/Admin/AdminCourse'
 import {TeacherCourseDetail} from "Pages/Teacher/TeacherCourseDetail";
 import {TeacherCourseManage} from "Pages/Teacher/TeacherCourseManage";
 import {TeacherCourseAddtion} from "Pages/Teacher/TeacherCourseAddtion";
+import {TeacherCourseDeletion} from "Pages/Teacher/TeacherCourseDeletion";
 import { AdminApplicationTest } from 'Pages/Admin/AdminApplicationTest'
 
 const Layout = () => {
@@ -28,6 +29,7 @@ const Layout = () => {
                 <Route path="/teacher" exact component={TeacherMain} />
                 <Route path="/teacher/coursemanage" exact component={TeacherCourseManage} />
                 <Route path="/teacher/coursemanage/addcourse" exact component={TeacherCourseAddtion} />
+                <Route path="/teacher/coursemanage/deletecourse" exact component={TeacherCourseDeletion} />
                 <Route path="/teacher/coursedetail" exact component={TeacherCourseDetail} />
                 <Route path="/admin" exact component={AdminMain} />
                 <Route path="/admin/course" exact component={AdminCourse} />

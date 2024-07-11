@@ -8,6 +8,7 @@ import 'Pages/css/Main.css';
 
 export function TeacherCourseAddtion() {
     const history = useHistory();
+    const [courseID, setCourseID] = useState(0); // [1]
     const [courseName, setCourseName] = useState('');
     const [teacherName, setTeacherName] = useState('');
     const [capacity, setCapacity] = useState(0);
@@ -33,6 +34,7 @@ export function TeacherCourseAddtion() {
     }, [history]);
 
     const addCourse = async () => {
+        setCourseID(0)
         if (!courseName || !teacherName || capacity === null || !info || !courseHourJson || classroomID === null || credits === null || !kwargsJson) {
             setAddCourseResponse('Please ensure all fields are correctly filled.');
             return;
@@ -71,12 +73,12 @@ export function TeacherCourseAddtion() {
             return;
         }
 
-        const response = await sendPostRequest(new TeacherAddCourseMessage(courseName, teacherName, capacity, info, courseHourJson, classroomID, credits, kwargsJson));
+        const response = await sendPostRequest(new TeacherAddCourseMessage(courseID, courseName, teacherName, capacity, info, courseHourJson, classroomID, credits, kwargsJson));
         if (response.isError) {
             setAddCourseResponse(response.error);
             return;
         }
-        setAddCourseResponse('Course added successfully')
+        setAddCourseResponse(`Course added successfully.`);
     }
 
     return (
@@ -152,10 +154,18 @@ export function TeacherCourseAddtion() {
                     </div>
                 </div>
                 <div className="button-group">
-                    <button onClick={addCourse} className="button">Register Course</button>
-                    <button onClick={() => history.goBack()} className="button">Back</button>
-                    <button onClick={() => history.push('/teacher')} className="button">Back to TeacherMain</button>
-                    <button onClick={() => logout(history)} className="button">Log out</button>
+                    <button onClick={addCourse} className="button">
+                        Register Course
+                    </button>
+                    <button onClick={() => history.push('/teacher/coursemanage')} className="button">
+                        Back To CourseManagement
+                    </button>
+                    <button onClick={() => history.push('/teacher')} className="button">
+                        Back to TeacherMain
+                    </button>
+                    <button onClick={() => logout(history)} className="button">
+                        Log out
+                    </button>
                 </div>
                 {addCourseResponse && <p>{addCourseResponse}</p>}
             </main>
