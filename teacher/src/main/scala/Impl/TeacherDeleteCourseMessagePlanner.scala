@@ -1,0 +1,5 @@
+package Impl
+
+class TeacherDeleteCourseMessagePlanner {
+
+}

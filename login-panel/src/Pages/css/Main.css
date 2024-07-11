@@ -106,6 +106,22 @@ label {
     background-color: #21a1f1;
 }
 
+.form-row {
+    position: relative;
+    margin-bottom: 30px; /* Adjust based on your layout */
+}
+
+.label-above {
+    position: absolute;
+    top: -20px; /* Adjust this value based on your layout */
+    left: 0;
+    background: #fff;
+    padding: 0 5px;
+    font-size: 14px;
+    color: #999;
+    transition: all 0.3s ease;
+}
+
 .error {
     color: #ff4d4d;
 }
