@@ -1,26 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
 import 'Pages/css/Main.css';
 import Auth from 'Plugins/CommonUtils/AuthState'
 import { logout } from 'Plugins/CommonUtils/UserManager'
-import { AdminAddApplicationMessage } from 'Plugins/AdminAPI/AdminAddApplicationMessage'
 import { AdminDeleteApplicationMessage } from 'Plugins/AdminAPI/AdminDeleteApplicationMessage'
-import { AdminGetApplicationFromIDMessage } from 'Plugins/AdminAPI/AdminGetApplicationFromIDMessage'
-import { AdminGetApplicationFromApplicantMessage } from 'Plugins/AdminAPI/AdminGetApplicationFromApplicantMessage'
 import { AdminGetApplicationFromApproverMessage } from 'Plugins/AdminAPI/AdminGetApplicationFromApproverMessage'
 import { AdminApproveApplicationMessage } from 'Plugins/AdminAPI/AdminApproveApplicationMessage'
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
 
+interface Approver {
+    approved: boolean;
+    username: string;
+    usertype: 'admin' | 'teacher' | 'student';
+}
+
+interface Application {
+    applicationid: string;
+    usertype: string;
+    username: string;
+    applicationtype: string;
+    info: string;
+    approver: string;
+}
+
 export function AdminApplicationTest() {
     const history = useHistory();
-    const [applicationID, setApplicationID] = useState('');
-    const [applicationType, setApplicationType] = useState('');
-    const [info, setInfo] = useState('');
-    const [approver, setApprover] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [applications, setApplications] = useState<Application[]>([]);
 
     useEffect(() => {
         const { usertype, username, password } = Auth.getState();
@@ -30,76 +38,18 @@ export function AdminApplicationTest() {
         else if (usertype !== 'admin') {
             history.push('/');
         }
-    }, []);
+    }, [history]);
 
-    const handleAdd = async () => {
-        if (!applicationType.trim() || !info.trim() || !approver.trim()) {
-            setErrorMessage('Application Type, Info, and Approver are required fields.');
-            setSuccessMessage('');
-            return;
-        }
-
-        const message = new AdminAddApplicationMessage(applicationType, info, approver);
+    const handleDelete = async (applicationId: string) => {
+        const message = new AdminDeleteApplicationMessage(applicationId);
 
         const response = await sendPostRequest(message);
         if (!response.isError) {
-            setSuccessMessage(JSON.stringify(response.data));
+            setSuccessMessage('Application deleted successfully');
             setErrorMessage('');
-            setApplicationType('');
-            setInfo('');
-            setApprover('');
-        } else {
-            setErrorMessage(response.error || 'Failed to add application');
-            setSuccessMessage('');
-        }
-    };
-
-    const handleDelete = async () => {
-        if (!applicationID.trim()) {
-            setErrorMessage('Application ID is required');
-            return;
-        }
-
-        const message = new AdminDeleteApplicationMessage(applicationID);
-
-        const response = await sendPostRequest(message);
-        if (!response.isError) {
-            setSuccessMessage(JSON.stringify(response.data));
-            setErrorMessage('');
-            setApplicationID('');
+            handleGetFromApprover(); // Refresh the applications list
         } else {
             setErrorMessage(response.error || 'Failed to delete application');
-            setSuccessMessage('');
-        }
-    };
-
-    const handleGetFromID = async () => {
-        if (!applicationID.trim()) {
-            setErrorMessage('Application ID is required');
-            return;
-        }
-
-        const message = new AdminGetApplicationFromIDMessage(applicationID);
-
-        const response = await sendPostRequest(message);
-        if (!response.isError) {
-            setSuccessMessage(JSON.stringify(response.data));
-            setErrorMessage('');
-        } else {
-            setErrorMessage(response.error || 'Failed to retrieve application');
-            setSuccessMessage('');
-        }
-    };
-
-    const handleGetFromApplicant = async () => {
-        const message = new AdminGetApplicationFromApplicantMessage();
-
-        const response = await sendPostRequest(message);
-        if (!response.isError) {
-            setSuccessMessage(JSON.stringify(response.data));
-            setErrorMessage('');
-        } else {
-            setErrorMessage(response.error || 'Failed to retrieve applications');
             setSuccessMessage('');
         }
     };
@@ -109,30 +59,57 @@ export function AdminApplicationTest() {
 
         const response = await sendPostRequest(message);
         if (!response.isError) {
-            setSuccessMessage(JSON.stringify(response.data));
+            // Sort applications by applicationid
+            const sortedApplications = response.data.sort((a: Application, b: Application) =>
+                a.applicationid.localeCompare(b.applicationid)
+            );
+            setApplications(sortedApplications);
+            setSuccessMessage('Applications retrieved successfully');
             setErrorMessage('');
         } else {
-            setErrorMessage(response.error || 'Failed to retrieve applications');
-            setSuccessMessage('');
+            setApplications([]); // Clear the applications table for any error
+            if (response.error === 'No application found') {
+                setSuccessMessage('No applications found');
+                setErrorMessage('');
+            } else {
+                setErrorMessage(response.error || 'Failed to retrieve applications');
+                setSuccessMessage('');
+            }
         }
     };
 
-    const handleApprove = async () => {
-        if (!applicationID.trim()) {
-            setErrorMessage('Application ID is required');
-            return;
-        }
-
-        const message = new AdminApproveApplicationMessage(applicationID);
+    const handleApprove = async (applicationId: string) => {
+        const message = new AdminApproveApplicationMessage(applicationId);
 
         const response = await sendPostRequest(message);
         if (!response.isError) {
-            setSuccessMessage(JSON.stringify(response.data));
+            setSuccessMessage('Application approved successfully');
             setErrorMessage('');
+            handleGetFromApprover(); // Refresh the applications list
         } else {
             setErrorMessage(response.error || 'Failed to approve application');
             setSuccessMessage('');
         }
+    };
+
+    const parseApprovers = (approverString: string): Approver[] => {
+        try {
+            return JSON.parse(approverString);
+        } catch (error) {
+            console.error('Error parsing approver data:', error);
+            return [];
+        }
+    };
+
+    const renderApproverCell = (approver: Approver | undefined) => {
+        if (!approver) return <td></td>;
+        return (
+            <td>
+                {approver.usertype}: {approver.username}
+                <br />
+                Approved: {approver.approved ? 'Yes' : 'No'}
+            </td>
+        );
     };
 
     return (
@@ -141,59 +118,58 @@ export function AdminApplicationTest() {
                 <h1>AdminApplicationTest</h1>
             </header>
             <main className="App-main">
-                <div className="input-group">
-                    <div className="input-container">
-                        <input
-                            type="text"
-                            placeholder="Application ID"
-                            value={applicationID}
-                            onChange={(e) => setApplicationID(e.target.value)}
-                            className="input-field"
-                        />
-                        <label>Application ID</label>
-                    </div>
-                    <div className="input-container">
-                        <input
-                            type="text"
-                            placeholder="Application Type"
-                            value={applicationType}
-                            onChange={(e) => setApplicationType(e.target.value)}
-                            className="input-field"
-                        />
-                        <label>Application Type</label>
-                    </div>
-                    <div className="input-container">
-                        <input
-                            type="text"
-                            placeholder="Info"
-                            value={info}
-                            onChange={(e) => setInfo(e.target.value)}
-                            className="input-field"
-                        />
-                        <label>Info</label>
-                    </div>
-                    <div className="input-container">
-                        <input
-                            type="text"
-                            placeholder="Approver"
-                            value={approver}
-                            onChange={(e) => setApprover(e.target.value)}
-                            className="input-field"
-                        />
-                        <label>Approver</label>
-                    </div>
-                </div>
                 {errorMessage && <div className="error-message" style={{color: 'red'}}>{errorMessage}</div>}
                 {successMessage && <div className="success-message" style={{color: 'green'}}>{successMessage}</div>}
                 <div className="button-group">
-                    <button onClick={handleAdd} className="button">Add</button>
-                    <button onClick={handleDelete} className="button">Delete</button>
-                    <button onClick={handleGetFromID} className="button">Get from ID</button>
-                    <button onClick={handleGetFromApplicant} className="button">Get from Applicant</button>
-                    <button onClick={handleGetFromApprover} className="button">Get from Approver</button>
-                    <button onClick={handleApprove} className="button">Approve</button>
+                    <button onClick={handleGetFromApprover} className="button">Get Applications</button>
                     <button onClick={() => logout(history)} className="button">Log out</button>
                 </div>
+
+                {applications.length > 0 && (
+                    <div className="applications-table">
+                        <h2>Applications</h2>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Application ID</th>
+                                <th>User Type</th>
+                                <th>Username</th>
+                                <th>Application Type</th>
+                                <th>Info</th>
+                                <th>Approver 1</th>
+                                <th>Approver 2</th>
+                                <th>Approver 3</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {applications.map((app) => {
+                                const approvers = parseApprovers(app.approver);
+                                return (
+                                    <tr key={app.applicationid}>
+                                        <td>{app.applicationid}</td>
+                                        <td>{app.usertype}</td>
+                                        <td>{app.username}</td>
+                                        <td>{app.applicationtype}</td>
+                                        <td>{app.info}</td>
+                                        {renderApproverCell(approvers[0])}
+                                        {renderApproverCell(approvers[1])}
+                                        {renderApproverCell(approvers[2])}
+                                        <td>
+                                            <button onClick={() => handleApprove(app.applicationid)} className="approve-button">
+                                                Approve
+                                            </button>
+                                            <button onClick={() => handleDelete(app.applicationid)} className="delete-button">
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </main>
         </div>
     );

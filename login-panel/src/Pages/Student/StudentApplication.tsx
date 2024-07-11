@@ -85,7 +85,11 @@ export function StudentApplication() {
 
         const response = await sendPostRequest(message);
         if (!response.isError) {
-            setApplications(response.data);
+            // Sort applications by applicationid
+            const sortedApplications = response.data.sort((a: Application, b: Application) =>
+                a.applicationid.localeCompare(b.applicationid)
+            );
+            setApplications(sortedApplications);
             setSuccessMessage('Applications retrieved successfully');
             setErrorMessage('');
         } else {
