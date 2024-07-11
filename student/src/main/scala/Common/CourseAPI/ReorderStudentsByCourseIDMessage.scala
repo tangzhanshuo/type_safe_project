@@ -5,4 +5,4 @@ import Common.Object.SqlParameter
 import Global.ServiceCenter.courseServiceCode
 import io.circe.Json
 
-case class GetClassroomMessage(classroomID: Int) extends API[String](courseServiceCode)
+case class ReorderStudentsByCourseIDMessage(courseID: Int) extends API[String](courseServiceCode)

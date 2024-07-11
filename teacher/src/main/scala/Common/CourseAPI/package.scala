@@ -50,8 +50,8 @@ package object CourseAPI {
   def addStudent2Course(courseID: Int, studentUsername: Option[String], priority: Option[Int])(using PlanContext): IO[String] =
     AddStudent2CourseMessage(courseID, studentUsername, priority).send
 
-  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[String] =
-    GetCourseByTeacherUsernameMessage(teacherUsername).send
+  def getCoursesByTeacherUsername(teacherUsername: String)(using PlanContext): IO[String] =
+    GetCoursesByTeacherUsernameMessage(teacherUsername).send
 
   def deleteStudentFromCourse(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
     DeleteStudentFromCourseMessage(courseID, studentUsername).send

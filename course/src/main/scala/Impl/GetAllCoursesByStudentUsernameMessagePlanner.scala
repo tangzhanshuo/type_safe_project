@@ -8,9 +8,9 @@ import Common.DBAPI.readDBRows
 import Common.Object.SqlParameter
 import io.circe.Json
 
-case class GetCourseByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[String] {
+case class GetAllCoursesByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    val query = "SELECT * FROM course WHERE enrolledstudents @> ?::jsonb"
+    val query = "SELECT * FROM course WHERE allstudents @> ?::jsonb"
     readDBRows(query, List(SqlParameter("string", studentUsername))).map { rows =>
       if (rows.nonEmpty) {
         rows.asJson.noSpaces
