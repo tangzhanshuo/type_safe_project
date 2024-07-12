@@ -11,14 +11,12 @@ import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMess
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage'
 import { StudentGetCourseMessage } from 'Plugins/StudentAPI/StudentGetCourseMessage'
 import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage'
-import './App.css';
-import {AdminAddStudent2CourseMessage} from "Plugins/AdminAPI/AdminAddStudent2CourseMessage"; // Ensure you have an App.css file in your src directory
+import './App.css'; // Ensure you have an App.css file in your src directory
 
 
 export function StudentCourse() {
     const [studentCourseID, setStudentCourseID] = useState('');
     const [studentUsername, setStudentUsername] = useState('');
-    const [studentPriority, setStudentPriority] = useState('');
     const [course, setCourse] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const history = useHistory();
@@ -31,7 +29,6 @@ export function StudentCourse() {
     useEffect(() => {
         getCourseList();
         fetchSelectedCourses();
-        setStudentUsername(Auth.getState().username);
     }, []);
 
     const fetchSelectedCourses = async () => {
@@ -65,13 +62,7 @@ export function StudentCourse() {
             setAddCourseResponse('Invalid course ID');
             return;
         }
-        const response = await sendPostRequest(new StudentAddCourseMessage(
-            id,
-            //parseInt(studentPriority, 10)
-            0
-            )
-        )
-
+        const response = await sendPostRequest(new StudentAddCourseMessage(id))
         if (response.isError) {
             setAddCourseResponse(response.error)
             return
