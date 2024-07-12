@@ -18,7 +18,7 @@ case class ReorderStudentsByCourseIDMessagePlanner(courseID: Int, override val p
     val getCourseInfoQuery = "SELECT capacity, enrolledstudents, allstudents FROM course WHERE courseid = ?"
     val getCourseInfoParams = List(SqlParameter("int", courseID.toString))
 
-    val updateStudentsQuery = "UPDATE course SET enrolledstudents = ? WHERE courseid = ?"
+    val updateStudentsQuery = "UPDATE course SET enrolledstudents = ?, allstudents = ? WHERE courseid = ?"
 
     // 检查课程是否存在
     val courseExistsIO = readDBBoolean(checkCourseExistsQuery, checkCourseExistsParams)
@@ -45,31 +45,28 @@ case class ReorderStudentsByCourseIDMessagePlanner(courseID: Int, override val p
     // 组合检查和更新操作
     courseExistsIO.flatMap { _ =>
       courseInfoIO.flatMap { case (capacity, _, allStudents) =>
-        // 根据 priority 对 allStudents 进行排序
-        val sortedAllStudents = allStudents.sortBy(_("priority").as[Int].getOrElse(Int.MaxValue))
+        // 根据 priority 将 allStudents 划分成不同的列表
+        val groupedByPriority = allStudents.groupBy(_("priority").as[Int].getOrElse(Int.MaxValue))
 
-        // 如果 allStudents 数量超过 capacity 并且有大量相同 priority 的学生，需要随机抽样
-        val finalEnrolledStudents = if (sortedAllStudents.size > capacity) {
-          val selectedStudents = sortedAllStudents.take(capacity)
-          val remainingStudents = sortedAllStudents.drop(capacity)
-
-          // 找到最后一个被选中的 priority
-          val lastSelectedPriority = selectedStudents.lastOption.flatMap(_("priority").as[Int].toOption).getOrElse(Int.MaxValue)
-          val samePriorityStudents = remainingStudents.filter(_("priority").as[Int].contains(lastSelectedPriority))
-
-          // 随机抽样
-          val randomSample = Random.shuffle(samePriorityStudents).take(capacity - selectedStudents.count(_("priority").as[Int].contains(lastSelectedPriority)))
-
-          // 更新 enrolledStudents
-          (selectedStudents ++ randomSample).take(capacity)
-        } else {
-          sortedAllStudents
+        // 对每个列表进行随机排序
+        val sortedAndShuffled = groupedByPriority.toList.sortBy(_._1).flatMap { case (_, students) =>
+          Random.shuffle(students)
         }
 
-        val finalEnrolledStudentsJsonString = finalEnrolledStudents.asJson.noSpaces
+        // 更新 time
+        val updatedAllStudents = sortedAndShuffled.zipWithIndex.map { case (student, index) =>
+          student + ("time" -> Json.fromInt(index))
+        }
 
+        // 从排序后的列表中取出前 capacity 个学生作为 enrolledStudents
+        val finalEnrolledStudents = updatedAllStudents.take(capacity)
+        val finalEnrolledStudentsJsonString = finalEnrolledStudents.asJson.noSpaces
+        val updatedAllStudentsJsonString = updatedAllStudents.asJson.noSpaces
+
+        // 更新数据库
         writeDB(updateStudentsQuery, List(
           SqlParameter("jsonb", finalEnrolledStudentsJsonString),
+          SqlParameter("jsonb", updatedAllStudentsJsonString),
           SqlParameter("int", courseID.toString)
         )).map(_ => s"Students reordered and enrolled for course $courseID")
       }
