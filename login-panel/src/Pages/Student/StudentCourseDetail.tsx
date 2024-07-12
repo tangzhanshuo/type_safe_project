@@ -56,7 +56,7 @@ export function StudentCourseDetail() {
             setAddCourseResponse('Invalid course ID');
             return;
         }
-        const response = await sendPostRequest(new StudentAddCourseMessage(id))
+        const response = await sendPostRequest(new StudentAddCourseMessage(id,0))
         if (response.isError) {
             setAddCourseResponse(response.error)
             return

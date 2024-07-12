@@ -7,12 +7,12 @@ import { sendUserRequest } from 'Plugins/CommonUtils/UserManager'
 import Auth from 'Plugins/CommonUtils/AuthState'
 
 export function AdminMain() {
-    const history = useHistory();
-    const [usertype, setUsertype] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const [foundPassword, setFoundPassword] = useState('');
+        const history = useHistory();
+        const [usertype, setUsertype] = useState('');
+        const [username, setUsername] = useState('');
+        const [password, setPassword] = useState('');
+        const [errorMessage, setErrorMessage] = useState('');
+        const [foundPassword, setFoundPassword] = useState('');
 
     useEffect(() => {
         // Assuming username and password are stored in localStorage
