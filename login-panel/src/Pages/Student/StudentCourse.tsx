@@ -34,10 +34,12 @@ export function StudentCourse() {
         setStudentUsername(Auth.getState().username);
     }, []);
 
+
     const fetchSelectedCourses = async () => {
         const response = await sendPostRequest(new StudentGetCourseByUsernameMessage(Auth.getState().username));
         if (response.isError) {
             setErrorMessage(response.error);
+            setSelectedCourses([]);
             return;
         }
         try {
@@ -77,6 +79,7 @@ export function StudentCourse() {
             return
         }
         setAddCourseResponse('Course added successfully')
+        fetchSelectedCourses();
     }
 
     const deleteCourseWithId = async (courseid: string) => {
@@ -88,9 +91,11 @@ export function StudentCourse() {
         const response = await sendPostRequest(new StudentDeleteCourseMessage(id))
         if (response.isError) {
             setDeleteCourseResponse(response.error)
+            fetchSelectedCourses();
             return
         }
         setDeleteCourseResponse('Course deleted successfully')
+        fetchSelectedCourses();
     }
 
     const getCourseList = async () => {
@@ -148,12 +153,11 @@ export function StudentCourse() {
                                     <td>{course.credits}</td>
                                     <td>{course.info}</td>
                                     <td>
-                                        <button onClick={() => addCourseWithId(course.courseid)} className="button">
-                                            Select
-                                        </button>
-                                        <button onClick={() => deleteCourseWithId(course.courseid)} className="button">
-                                            Delete
-                                        </button>
+                                        {!selectedCourses.some(selectedCourse => selectedCourse.courseid === course.courseid) && (
+                                            <button onClick={() => addCourseWithId(course.courseid)} className="button">
+                                                Select
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -192,6 +196,7 @@ export function StudentCourse() {
                                 <th>Capacity</th>
                                 <th>Credits</th>
                                 <th>Info</th>
+                                <th>Options</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -203,6 +208,11 @@ export function StudentCourse() {
                                     <td>{course.capacity}</td>
                                     <td>{course.credits}</td>
                                     <td>{course.info}</td>
+                                    <td>
+                                        <button onClick={() => deleteCourseWithId(course.courseid)} className="button">
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>

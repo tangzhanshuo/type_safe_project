@@ -2,11 +2,11 @@ import { StudentMessage } from 'Plugins/StudentAPI/StudentMessage';
 
 export class StudentAddCourseMessage extends StudentMessage {
     courseID: number;
-    Priority: number;
+    priority: number;
 
-    constructor(courseID: number, Priority: number) {
+    constructor(courseID: number, priority: number) {
         super();
         this.courseID = courseID;
-        this.Priority = Priority;
+        this.priority = priority;
     }
 }
