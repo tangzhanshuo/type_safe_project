@@ -8,7 +8,7 @@ import Common.DBAPI.readDBRows
 import Common.Object.SqlParameter
 import io.circe.Json
 
-case class GetCoursesByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[String] {
+case class GetCourseByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
       val query = """
       SELECT * FROM course 
