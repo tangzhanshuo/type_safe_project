@@ -4,7 +4,7 @@ import cats.effect.IO
 import Common.API.{PlanContext, Planner}
 import Common.CourseAPI.getCourseByStudentUsername
 
-case class AdminGetCoursesByStudentUsernameMessagePlanner(
+case class AdminGetCourseByStudentUsernameMessagePlanner(
                                                  studentUsername: String,
                                                  override val planContext: PlanContext
                                                ) extends Planner[String] {

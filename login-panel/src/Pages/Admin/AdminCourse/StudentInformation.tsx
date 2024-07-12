@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { AdminAddStudent2CourseMessage } from 'Plugins/AdminAPI/AdminAddStudent2CourseMessage';
 import { AdminDeleteStudentFromCourseMessage } from 'Plugins/AdminAPI/AdminDeleteStudentFromCourseMessage';
-import { AdminGetCoursesByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetCoursesByStudentUsernameMessage';
+import { AdminGetCourseByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetCourseByStudentUsernameMessage';
 import { AdminGetWaitingCoursesByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetWaitingCoursesByStudentUsernameMessage';
 
 interface Props {
@@ -76,7 +76,7 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
             return;
         }
 
-        const message = new AdminGetCoursesByStudentUsernameMessage(studentUsername);
+        const message = new AdminGetCourseByStudentUsernameMessage(studentUsername);
 
         try {
             const response = await sendPostRequest(message);
