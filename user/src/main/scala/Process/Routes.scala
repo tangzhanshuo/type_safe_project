@@ -41,16 +41,7 @@ object Routes:
               Map("password" -> password).asJson.noSpaces
             }
           }
-      case "UserGetCourseMessage" =>
-        IO(decode[UserGetCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetCourseMessage")))
-          .flatMap { m =>
-            m.fullPlan.flatMap { jsonString =>
-              parse(jsonString) match {
-                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
-                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
-              }
-            }
-          }
+
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
