@@ -27,13 +27,14 @@ export function StudentCourse() {
     const [addCourseResponse, setAddCourseResponse] = useState('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
     const [selectedCourses, setSelectedCourses] = useState([]);
+    const [showAddResponse, setShowAddResponse] = useState(false);
+    const [showDeleteResponse, setShowDeleteResponse] = useState(false);
     
     useEffect(() => {
         getCourseList();
         fetchSelectedCourses();
         setStudentUsername(Auth.getState().username);
     }, []);
-
 
     const fetchSelectedCourses = async () => {
         const response = await sendPostRequest(new StudentGetCourseByUsernameMessage(Auth.getState().username));
@@ -63,6 +64,7 @@ export function StudentCourse() {
 
     const addCourseWithId = async (courseid: string) => {
         const id = parseInt(courseid, 10);
+
         if (isNaN(id)) {
             setAddCourseResponse('Invalid course ID');
             return;
@@ -72,13 +74,15 @@ export function StudentCourse() {
             //parseInt(studentPriority, 10)
             0
             )
-        )
+        );
 
         if (response.isError) {
             setAddCourseResponse(response.error)
             return
         }
-        setAddCourseResponse('Course added successfully')
+        setAddCourseResponse('Course '+id+' added successfully')
+        setShowAddResponse(true);
+        setTimeout(() => setShowAddResponse(false), 500);
         fetchSelectedCourses();
     }
 
@@ -91,10 +95,11 @@ export function StudentCourse() {
         const response = await sendPostRequest(new StudentDeleteCourseMessage(id))
         if (response.isError) {
             setDeleteCourseResponse(response.error)
-            fetchSelectedCourses();
             return
         }
-        setDeleteCourseResponse('Course deleted successfully')
+        setDeleteCourseResponse('Course '+id+' deleted successfully');
+        setShowDeleteResponse(true);
+        setTimeout(() => setShowDeleteResponse(false), 500); // Adjust time as needed
         fetchSelectedCourses();
     }
 
@@ -166,17 +171,13 @@ export function StudentCourse() {
                     ) : (
                         <p>No courses to display. Click 'Get Courses' to load the course list.</p>
                     )}
-                    <p style={{ color: 'red' }}>{errorMessage}</p>
-                    {addCourseResponse && (
-                        <div className="fade-out">
+                    {errorMessage && errorMessage!='No courses found with student username: '+studentUsername && (<p style={{ color: 'red' }}>{errorMessage}</p>)}
+                    {
+                        <div className="response" style={{opacity: showAddResponse ? 1 : 0}}>
                             {addCourseResponse}
                         </div>
-                    )}
-                    {deleteCourseResponse && (
-                        <div className="fade-out">
-                            {deleteCourseResponse}
-                        </div>
-                    )}
+                    }
+
                     <button onClick={() => history.push('/student')} className="button">
                         Back to StudentMain
                     </button>
@@ -185,7 +186,9 @@ export function StudentCourse() {
                     </button>
                 </div>
                 <div>
-                    <h2>Selected Courses</h2>
+                    <header>
+                        <h3> Selected courses </h3>
+                    </header>
                     {selectedCourses.length > 0 ? (
                         <table className="course-table">
                             <thead>
@@ -217,9 +220,14 @@ export function StudentCourse() {
                             ))}
                             </tbody>
                         </table>
-                    ) : (
+                        ) : (
                         <p>No selected courses.</p>
                     )}
+                    {
+                        <div className="response" style={{opacity: showDeleteResponse ? 1 : 0}}>
+                            {deleteCourseResponse}
+                        </div>
+                    }
                 </div>
 
             </main>
