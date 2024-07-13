@@ -31,8 +31,8 @@ export function AdminApplicationTest() {
     const [applications, setApplications] = useState<Application[]>([]);
 
     useEffect(() => {
-        const { usertype, username, password } = Auth.getState();
-        if (!usertype || !username || !password) {
+        const { usertype, username, token } = Auth.getState();
+        if (!usertype || !username || !token) {
             history.push('/login');
         }
         else if (usertype !== 'admin') {

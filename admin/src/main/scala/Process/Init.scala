@@ -15,7 +15,6 @@ object Init {
     given PlanContext=PlanContext(traceID = TraceID(UUID.randomUUID().toString),0)
     for{
       _ <- API.init(config.maximumClientConnection)
-      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS student.user_name (user_name TEXT, password TEXT)", List())
     } yield ()
 
 }

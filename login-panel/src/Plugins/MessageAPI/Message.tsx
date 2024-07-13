@@ -4,14 +4,14 @@ import Auth from "Plugins/CommonUtils/AuthState";
 export abstract class Message extends API {
     usertype: string;
     username: string;
-    password: string;
+    token: string;
 
     constructor() {
         super();
 
-        const { usertype, username, password } = Auth.getState();
+        const { usertype, username, token } = Auth.getState();
         this.usertype = usertype;
         this.username = username;
-        this.password = password;
+        this.token = token;
     }
 }

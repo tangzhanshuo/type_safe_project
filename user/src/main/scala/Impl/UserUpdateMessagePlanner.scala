@@ -11,13 +11,13 @@ case class UserUpdateMessagePlanner(usertype: String, username: String, password
   override def plan(using planContext: PlanContext): IO[String] = {
     val dbName = usertype.toLowerCase
     // Check if the user is already registered
-    val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${dbName}.user_name WHERE user_name = ?)",
+    val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${dbName} WHERE user_name = ?)",
       List(SqlParameter("String", username))
     )
 
     checkUserExists.flatMap { exists =>
       if (exists) {
-        writeDB(s"UPDATE ${dbName}.user_name SET password = ? WHERE user_name = ?",
+        writeDB(s"UPDATE ${dbName} SET password = ? WHERE user_name = ?",
           List(
             SqlParameter("String", password),
             SqlParameter("String", username)

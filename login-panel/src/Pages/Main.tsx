@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
 import 'Pages/css/Main.css';
 import { sendUserRequest } from 'Plugins/CommonUtils/UserManager'
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import Auth from 'Plugins/CommonUtils/AuthState'
 
 export function Main() {
     const history = useHistory();
@@ -27,6 +28,13 @@ export function Main() {
                     </button>
                     <button onClick={() => history.push('/admin')} className="button">
                         Admin
+                    </button>
+                    <button onClick={() => {
+                        sendUserRequest("register","admin","a","a")
+                        sendUserRequest("register","teacher","a","a")
+                        sendUserRequest("register","student","a","a")
+                    }} className="button">
+                        Register test accounts
                     </button>
                 </div>
             </main>

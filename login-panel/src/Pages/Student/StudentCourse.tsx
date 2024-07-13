@@ -52,9 +52,9 @@ export function StudentCourse() {
     }
 
     useEffect(() => {
-        const { usertype, username, password } = Auth.getState();
+        const { usertype, username, token } = Auth.getState();
 
-        if (!usertype || !username || !password) {
+        if (!usertype || !username || !token) {
             history.push('/login');
         }
         else if (usertype !== 'student') {
@@ -229,11 +229,7 @@ export function StudentCourse() {
                         </div>
                     }
                 </div>
-
             </main>
-
         </div>
-
-    )
-        ;
+    );
 }

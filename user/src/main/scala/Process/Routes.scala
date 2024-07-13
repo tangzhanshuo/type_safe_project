@@ -42,6 +42,12 @@ object Routes:
             }
           }
 
+      case "UserValidateTokenMessage" =>
+        IO(decode[UserValidateTokenMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserValidateTokenMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

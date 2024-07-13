@@ -24,9 +24,9 @@ export function TeacherCourseAddtion() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const { usertype, username, password } = Auth.getState();
+        const { usertype, username, token } = Auth.getState();
 
-        if (!usertype || !username || !password) {
+        if (!usertype || !username || !token) {
             history.push('/login');
         } else if (usertype !== 'teacher') {
             history.push('/');

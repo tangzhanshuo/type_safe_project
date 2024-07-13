@@ -23,9 +23,9 @@ export function AdminCourse() {
     const [availableClassrooms, setAvailableClassrooms] = useState<any[]>([]);
 
     useEffect(() => {
-        const { usertype, username, password } = Auth.getState();
+        const { usertype, username, token } = Auth.getState();
 
-        if (!usertype || !username || !password) {
+        if (!usertype || !username || !token) {
             history.push('/login');
         }
 

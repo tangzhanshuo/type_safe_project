@@ -17,10 +17,12 @@ export const sendUserRequest = async (messageType: string, usertype: string, use
     switch (messageType) {
         case "login":
             const loginResponse = await sendUnverifiedPostRequest(new UserLoginMessage(usertype, username, password));
-            if (!loginResponse.isError && loginResponse.data === 'Valid user') {
+            if (!loginResponse.isError && loginResponse.data.includes('Valid user')) {
+                const token = loginResponse.data.split("Token:")[1].trim();
+                console.log(token);
                 Auth.getState().setUsertype(usertype);
                 Auth.getState().setUsername(username);
-                Auth.getState().setPassword(password);
+                Auth.getState().setToken(token);
                 return 'Login successful';
             }
             return 'Invalid user';
@@ -45,6 +47,6 @@ export const sendUserRequest = async (messageType: string, usertype: string, use
 export const logout = (history: History) => {
     Auth.getState().setUsertype('');
     Auth.getState().setUsername('');
-    Auth.getState().setPassword('');
+    Auth.getState().setToken('');
     history.push('/')
 }

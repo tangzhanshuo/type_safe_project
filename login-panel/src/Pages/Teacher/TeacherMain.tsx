@@ -11,9 +11,9 @@ export function TeacherMain() {
 
     useEffect(() => {
         // Assuming username and password are stored in localStorage
-        const { usertype, username, password } = Auth.getState();
+        const { usertype, username, token } = Auth.getState();
 
-        if (!usertype || !username || !password) {
+        if (!usertype || !username || !token) {
             // Redirect to login page
             history.push('/login');
         }

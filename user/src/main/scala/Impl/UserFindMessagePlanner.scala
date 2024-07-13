@@ -11,7 +11,7 @@ case class UserFindMessagePlanner(usertype: String, username: String, override v
   override def plan(using planContext: PlanContext): IO[String] = {
     val dbName = usertype.toLowerCase
     // Query to find the user's password
-    val findPasswordQuery = s"SELECT password FROM ${dbName}.user_name WHERE user_name = ?"
+    val findPasswordQuery = s"SELECT password FROM ${dbName} WHERE user_name = ?"
 
     // Execute the query to get the password
     readDBString(findPasswordQuery, List(SqlParameter("String", username))).flatMap {

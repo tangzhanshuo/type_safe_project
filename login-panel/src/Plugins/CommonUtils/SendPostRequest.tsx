@@ -47,10 +47,10 @@ export const sendUnverifiedPostRequest = async (message: API) => {
 export const sendPostRequest = async (message: API) => {
     const response = await sendUnverifiedPostRequest(message)
     if (response.isError && response.error === 'Invalid user') {
-        const { setUsertype, setUsername, setPassword } = Auth.getState();
+        const { setUsertype, setUsername, setToken } = Auth.getState();
         setUsertype('');
         setUsername('');
-        setPassword('');
+        setToken('');
     }
     return response
 };

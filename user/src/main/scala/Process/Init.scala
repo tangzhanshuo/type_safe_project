@@ -15,14 +15,9 @@ object Init {
     given PlanContext=PlanContext(traceID = TraceID(UUID.randomUUID().toString),0)
     for{
       _ <- API.init(config.maximumClientConnection)
-      _ <- initSchema("student")
-      _ <- initSchema("teacher")
-      _ <- initSchema("admin")
-      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS student.user_name (user_name TEXT, password TEXT)", List())
-      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS teacher.user_name (user_name TEXT, password TEXT)", List())
-      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS admin.user_name (user_name TEXT, password TEXT)", List())
-      //insert an admin named "a" with password "a"
-      _ <- writeDB(s"INSERT INTO admin.user_name (user_name, password) VALUES ('a', 'a')", List())
+      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS student (user_name TEXT, password TEXT)", List())
+      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS teacher (user_name TEXT, password TEXT)", List())
+      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS admin (user_name TEXT, password TEXT)", List())
     } yield ()
 
 }

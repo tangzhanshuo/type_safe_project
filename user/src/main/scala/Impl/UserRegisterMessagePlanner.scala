@@ -6,24 +6,33 @@ import Common.API.{PlanContext, Planner}
 import Common.DBAPI.*
 import Common.Object.SqlParameter
 import Common.ServiceUtils.schemaName
+import at.favre.lib.crypto.bcrypt.BCrypt
 
 case class UserRegisterMessagePlanner(usertype: String, username: String, password: String, override val planContext: PlanContext) extends Planner[String]:
   override def plan(using planContext: PlanContext): IO[String] = {
     val dbName = usertype.toLowerCase
-    // Check if the user is already registered
-    val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${dbName}.user_name WHERE user_name = ?)",
-        List(SqlParameter("String", username))
-      )
 
-    checkUserExists.flatMap { exists =>
-      if (exists) {
-        IO.raiseError(new Exception("already registered"))
+    // Hash the password using BCrypt
+    val hashedPassword = IO {
+      val bcrypt = BCrypt.withDefaults()
+      bcrypt.hashToString(12, password.toCharArray)
+    }
+
+    // Check if the user is already registered
+    val checkUserExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM ${dbName} WHERE user_name = ?)",
+      List(SqlParameter("String", username))
+    )
+
+    for {
+      exists <- checkUserExists
+      hashed <- hashedPassword
+      result <- if (exists) {
+        IO.raiseError(new Exception("User already registered"))
       } else {
-        writeDB(s"INSERT INTO ${dbName}.user_name (user_name, password) VALUES (?, ?)",
+        writeDB(s"INSERT INTO ${dbName} (user_name, password) VALUES (?, ?)",
           List(SqlParameter("String", username),
-               SqlParameter("String", password)
+            SqlParameter("String", hashed)
           ))
       }
-    }
+    } yield result
   }
-

@@ -41,10 +41,10 @@ object PortalService {
       updatedJson = bodyJson.deepMerge(Json.obj("planContext" -> planContextJson))
       _ <- IO.println(updatedJson)
       verificationResponse <- if (serviceName != "User") {
-        val verificationUri = Uri.unsafeFromString(s"http://${address("User")}/api/UserLoginMessage")
+        val verificationUri = Uri.unsafeFromString(s"http://${address("User")}/api/UserValidateTokenMessage")
         sendRequest(client, verificationUri, updatedJson).flatMap {
-          case Right(json) if json.asString.contains("Valid user") => IO.pure(Right(json))
-          case Right(_) => IO.pure(Left(new Exception("Invalid user")))
+          case Right(json) => IO.pure(Right(json))
+          //case Right(_) => IO.pure(Left(new Exception("Invalid user")))
           case Left(e) => IO.pure(Left(e))
         }
       } else {
