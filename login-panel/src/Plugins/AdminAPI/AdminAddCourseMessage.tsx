@@ -1,7 +1,6 @@
 import { AdminMessage } from 'Plugins/AdminAPI/AdminMessage';
 
 export class AdminAddCourseMessage extends AdminMessage {
-    courseID: number;
     courseName: string;
     teacherUsername: string;
     teacherName: string;
@@ -14,7 +13,6 @@ export class AdminAddCourseMessage extends AdminMessage {
     allStudentsJson: string; // JSON represented as String
 
     constructor(
-        courseID: number,
         courseName: string,
         teacherUsername: string,
         teacherName: string,
@@ -27,7 +25,6 @@ export class AdminAddCourseMessage extends AdminMessage {
         allStudentsJson: string
     ) {
         super();
-        this.courseID = courseID;
         this.courseName = courseName;
         this.teacherUsername = teacherUsername;
         this.teacherName = teacherName;

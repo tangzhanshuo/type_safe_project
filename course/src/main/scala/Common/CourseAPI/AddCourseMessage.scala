@@ -4,7 +4,6 @@ import Common.API.API
 import Global.ServiceCenter.courseServiceCode
 
 case class AddCourseMessage(
-                             courseID: Int,
                              courseName: String,
                              teacherUsername: String,
                              teacherName: String,

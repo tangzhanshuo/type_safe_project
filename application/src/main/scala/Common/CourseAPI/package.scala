@@ -4,10 +4,10 @@ import Common.API.{API, PlanContext, TraceID}
 import Common.Object.SqlParameter
 import Global.ServiceCenter.courseServiceCode
 import cats.effect.IO
+import io.circe.Json
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.http4s.client.Client
-import io.circe.Json
 
 package object CourseAPI {
 
@@ -63,6 +63,9 @@ package object CourseAPI {
 
   def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetCourseByStudentUsernameMessage(studentUsername).send
+
+  def getWaitingPositionByStudentUsernameMessage(studentUsername: String)(using PlanContext): IO[String] =
+    GetWaitingPositionByStudentUsernameMessage(studentUsername).send
 
   def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetWaitingCoursesByStudentUsernameMessage(studentUsername).send

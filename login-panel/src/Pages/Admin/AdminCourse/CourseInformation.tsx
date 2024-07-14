@@ -27,13 +27,12 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
     const [allStudentsJson, setAllStudentsJson] = useState('');
 
     const handleAddCourse = async () => {
-        if (!courseID || !courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHourJson || !classroomID || !credits || !enrolledStudentsJson || !allStudentsJson) {
+        if (!courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHourJson || !classroomID || !credits || !enrolledStudentsJson || !allStudentsJson) {
             setErrorMessage('All fields are required');
             return;
         }
 
         const message = new AdminAddCourseMessage(
-            parseInt(courseID, 10),
             courseName,
             teacherUsername,
             teacherName,

@@ -5,7 +5,6 @@ import Common.API.{PlanContext, Planner}
 import Common.CourseAPI.addCourse
 
 case class AdminAddCourseMessagePlanner(
-                                         courseID: Int,
                                          courseName: String,
                                          teacherUsername: String,
                                          teacherName: String,
@@ -19,6 +18,6 @@ case class AdminAddCourseMessagePlanner(
                                          override val planContext: PlanContext
                                        ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    addCourse(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, allStudentsJson)
+    addCourse(courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, allStudentsJson)
   }
 }
