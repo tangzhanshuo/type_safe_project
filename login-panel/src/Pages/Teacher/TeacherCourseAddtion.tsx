@@ -16,7 +16,7 @@ export function TeacherCourseAddtion() {
     const [courseHourJson, setCourseHourJson] = useState('');
     const [classroomID, setClassroomID] = useState(0);
     const [credits, setCredits] = useState(0);
-    const [kwargsJson, setKwargsJson] = useState('');
+    const [allStudentsJson, setAllStudentsJson] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [addCourseResponse, setAddCourseResponse] = useState('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
@@ -35,7 +35,7 @@ export function TeacherCourseAddtion() {
 
     const addCourse = async () => {
         setCourseID(0)
-        if (!courseName || !teacherName || capacity === null || !info || !courseHourJson || classroomID === null || credits === null || !kwargsJson) {
+        if (!courseName || !teacherName || capacity === null || !info || !courseHourJson || classroomID === null || credits === null || !allStudentsJson) {
             setAddCourseResponse('Please ensure all fields are correctly filled.');
             return;
         }
@@ -68,12 +68,12 @@ export function TeacherCourseAddtion() {
             setAddCourseResponse('Invalid credits');
             return;
         }
-        if (typeof kwargsJson !== 'string') {
+        if (typeof allStudentsJson !== 'string') {
             setAddCourseResponse('Invalid kwargs JSON');
             return;
         }
 
-        const response = await sendPostRequest(new TeacherAddCourseMessage(courseID, courseName, teacherName, capacity, info, courseHourJson, classroomID, credits, kwargsJson));
+        const response = await sendPostRequest(new TeacherAddCourseMessage(courseID, courseName, teacherName, capacity, info, courseHourJson, classroomID, credits, allStudentsJson));
         if (response.isError) {
             setAddCourseResponse(response.error);
             return;
@@ -145,11 +145,11 @@ export function TeacherCourseAddtion() {
                                placeholder="Number" className="input-field" />
                     </div>
                     <div className="form-row">
-                        <label htmlFor="kwargsJson" className="label-above">
+                        <label htmlFor="allStudentsJson" className="label-above">
                             Kwargs
                         </label>
-                        <input id="kwargsJson" type="text" value={kwargsJson}
-                               onChange={(e) => setKwargsJson(e.target.value)}
+                        <input id="allStudentsJson" type="text" value={allStudentsJson}
+                               onChange={(e) => setAllStudentsJson(e.target.value)}
                                placeholder="JSON String" className="input-field" />
                     </div>
                 </div>
