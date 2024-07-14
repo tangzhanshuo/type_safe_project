@@ -169,6 +169,7 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
         }
     };
 
+
     return (
         <section className="course-info">
             <h2>Course Information</h2>

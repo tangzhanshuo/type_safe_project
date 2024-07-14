@@ -67,7 +67,7 @@ package object CourseAPI {
   def getAllCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetAllCoursesByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingPositionByStudentUsernameMessage(studentUsername: String)(using PlanContext): IO[String] =
+  def getWaitingPositionByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetWaitingPositionByStudentUsernameMessage(studentUsername).send
 
   def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
@@ -87,4 +87,8 @@ package object CourseAPI {
 
   def getAvailableClassroomByCapacityHour(capacity: Int, courseHourJson: String)(using PlanContext): IO[String] =
     GetAvailableClassroomByCapacityHourMessage(capacity, courseHourJson).send
+
+  def reorderStudentsByCourseID(classroomID: Int)(using PlanContext): IO[String] =
+    ReorderStudentsByCourseIDMessage(classroomID).send
+
 }

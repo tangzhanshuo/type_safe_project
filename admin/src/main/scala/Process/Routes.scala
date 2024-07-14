@@ -34,7 +34,7 @@ object Routes:
             }
           }
       case "AdminGetCourseListMessage" =>
-        IO(decode[AdminGetCourseListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetCourseMessage")))
+        IO(decode[AdminGetCourseListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetCourseListMessage")))
           .flatMap { m =>
             m.fullPlan.flatMap { jsonString =>
               parse(jsonString) match {
@@ -44,47 +44,47 @@ object Routes:
             }
           }
       case "AdminDeleteCourseMessage" =>
-        IO(decode[AdminDeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminDeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminDeleteCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "AdminUpdateCourseMessage" =>
-        IO(decode[AdminUpdateCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminUpdateCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminUpdateCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "AdminAddStudent2CourseMessage" =>
-        IO(decode[AdminAddStudent2CourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminAddStudent2CourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddStudent2CourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "AdminDeleteStudentFromCourseMessage" =>
-        IO(decode[AdminDeleteStudentFromCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminDeleteStudentFromCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminDeleteStudentFromCourseMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "AdminGetCourseByStudentUsernameMessage" =>
-        IO(decode[AdminGetCourseByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminGetCourseByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetCourseByStudentUsernameMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "AdminGetWaitingPositionByStudentUsernameMessage" =>
-        IO(decode[AdminGetWaitingPositionByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminGetWaitingPositionByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetWaitingPositionByStudentUsernameMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "AdminGetWaitingCoursesByStudentUsernameMessage" =>
-        IO(decode[AdminGetWaitingCoursesByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminGetWaitingCoursesByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetWaitingCoursesByStudentUsernameMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "AdminAddClassroomMessage" =>
-        IO(decode[AdminAddClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminAddClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddClassroomMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
       case "AdminDeleteClassroomMessage" =>
-        IO(decode[AdminDeleteClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddCourseMessage")))
+        IO(decode[AdminDeleteClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminDeleteClassroomMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
@@ -118,6 +118,12 @@ object Routes:
               }
             }
           }
+      case "AdminReorderStudentsByCourseIDMessage" =>
+        IO(decode[AdminReorderStudentsByCourseIDMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminReorderStudentsByCourseIDMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
       case "AdminAddApplicationMessage" =>
         IO(decode[AdminAddApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminAddApplicationMessage")))
           .flatMap { m =>

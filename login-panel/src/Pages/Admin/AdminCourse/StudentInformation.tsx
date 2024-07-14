@@ -5,6 +5,7 @@ import { AdminDeleteStudentFromCourseMessage } from 'Plugins/AdminAPI/AdminDelet
 import { AdminGetCourseByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetCourseByStudentUsernameMessage';
 import { AdminGetWaitingCoursesByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetWaitingCoursesByStudentUsernameMessage';
 import { AdminGetWaitingPositionByStudentUsernameMessage} from 'Plugins/AdminAPI/AdminGetWaitingPositionByStudentUsernameMessage';
+import { AdminReorderStudentsByCourseIDMessage } from 'Plugins/AdminAPI/AdminReorderStudentsByCourseIDMessage'
 interface Props {
     setErrorMessage: (msg: string) => void;
     setSuccessMessage: (msg: string) => void;
@@ -142,6 +143,28 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
         }
     };
 
+    const handleReorderStudentsByCourseID = async () => {
+        if (!studentCourseID) {
+            setErrorMessage('Course ID is required');
+            return;
+        }
+
+        const message = new AdminReorderStudentsByCourseIDMessage(parseInt(studentCourseID, 10));
+
+        try {
+            const response = await sendPostRequest(message);
+            if (!response.isError) {
+                setSuccessMessage('Reorder successfully');
+                setErrorMessage('');
+            } else {
+                setErrorMessage('Failed to Reorder');
+                setSuccessMessage('');
+            }
+        } catch (error) {
+            setErrorMessage('Error occurred while reorder');
+            setSuccessMessage('');
+        }
+    };
     return (
         <section className="student-info">
             <h2>Student Information</h2>
@@ -192,6 +215,10 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
                 </button>
                 <button onClick={handleGetWaitingPositionByStudentUsername} className="button">
                     Get Waiting Position
+                </button>
+
+                <button onClick={handleReorderStudentsByCourseID} className="button"> {/* Add this button */}
+                    Reorder Students
                 </button>
             </div>
         </section>

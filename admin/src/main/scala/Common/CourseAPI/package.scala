@@ -87,4 +87,8 @@ package object CourseAPI {
 
   def getAvailableClassroomByCapacityHour(capacity: Int, courseHourJson: String)(using PlanContext): IO[String] =
     GetAvailableClassroomByCapacityHourMessage(capacity, courseHourJson).send
+
+  def reorderStudentsByCourseID(classroomID: Int)(using PlanContext): IO[String] =
+    ReorderStudentsByCourseIDMessage(classroomID).send
+
 }
