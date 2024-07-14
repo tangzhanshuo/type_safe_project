@@ -18,7 +18,7 @@ case class ApproveApplicationMessagePlanner(
                                            ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
     val selectRowQuery = """
-      SELECT approver, completed
+      SELECT approver, status
       FROM application
       WHERE applicationID = ?
     """
@@ -30,12 +30,12 @@ case class ApproveApplicationMessagePlanner(
             println(s"Parsed JSON: ${json.noSpaces}")
             for {
               approverJson <- json.hcursor.get[String]("approver").flatMap(parse)
-              completed <- json.hcursor.get[Boolean]("completed")
-            } yield (approverJson, completed)
+              status <- json.hcursor.get[String]("status")
+            } yield (approverJson, status)
           } match {
-            case Right((approverJson, completed)) =>
-              if (completed) {
-                IO.pure("Application has already been completed")
+            case Right((approverJson, status)) =>
+              if (status != "pending") {
+                IO.pure(s"Cannot approve application. Current status: $status")
               } else {
                 updateApprover(approverJson) match {
                   case (updatedApproverJson, true) =>
@@ -52,15 +52,35 @@ case class ApproveApplicationMessagePlanner(
                     )
                     writeDB(updateQuery, params).flatMap { _ =>
                       if (checkAllApproved(updatedApproverJson)) {
-                        executeApplication(applicationID).flatMap { _ =>
-                          val completeQuery =
-                            """
+                        executeApplication(applicationID).attempt.flatMap {
+                          case Right(_) =>
+                            val updateStatusQuery =
+                              """
                                 UPDATE application
-                                SET completed = true
+                                SET status = ?
                                 WHERE applicationID = ?
                               """
-                          val completeParams = List(SqlParameter("string", applicationID))
-                          writeDB(completeQuery, completeParams).map(_ => "Application approved, executed, and marked as completed successfully")
+                            val updateStatusParams = List(
+                              SqlParameter("string", "completed"),
+                              SqlParameter("string", applicationID)
+                            )
+                            writeDB(updateStatusQuery, updateStatusParams).map(_ =>
+                              "Application approved, executed, and marked as completed successfully"
+                            )
+                          case Left(error) =>
+                            val updateStatusQuery =
+                              """
+                                UPDATE application
+                                SET status = ?
+                                WHERE applicationID = ?
+                              """
+                            val updateStatusParams = List(
+                              SqlParameter("string", "failed"),
+                              SqlParameter("string", applicationID)
+                            )
+                            writeDB(updateStatusQuery, updateStatusParams).map(_ =>
+                              s"Application approved, but execution failed: ${error.getMessage}"
+                            )
                         }
                       } else {
                         IO.pure("Application approved successfully")

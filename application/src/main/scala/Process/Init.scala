@@ -24,7 +24,7 @@ object Init {
            |  applicationType TEXT,
            |  info JSONB,
            |  approver JSONB,
-           |  completed BOOLEAN
+           |  status TEXT
            |)
          """.stripMargin, List()
       )
