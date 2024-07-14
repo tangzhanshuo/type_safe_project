@@ -42,6 +42,12 @@ object Routes:
             m.fullPlan.map(_.asJson.toString)
           }
 
+      case "RejectApplicationMessage" =>
+        IO(decode[RejectApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for RejectApplicationMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
       case "DeleteApplicationMessage" =>
         IO(decode[DeleteApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for DeleteApplicationMessage")))
           .flatMap { m =>

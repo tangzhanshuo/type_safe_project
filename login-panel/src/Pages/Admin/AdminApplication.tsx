@@ -7,6 +7,7 @@ import { logout } from 'Plugins/CommonUtils/UserManager'
 import { AdminDeleteApplicationMessage } from 'Plugins/AdminAPI/AdminDeleteApplicationMessage'
 import { AdminGetApplicationFromApproverMessage } from 'Plugins/AdminAPI/AdminGetApplicationFromApproverMessage'
 import { AdminApproveApplicationMessage } from 'Plugins/AdminAPI/AdminApproveApplicationMessage'
+import { AdminRejectApplicationMessage } from 'Plugins/AdminAPI/AdminRejectApplicationMessage'
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
 
 interface Approver {
@@ -22,9 +23,10 @@ interface Application {
     applicationtype: string;
     info: string;
     approver: string;
+    status: string;
 }
 
-export function AdminApplicationTest() {
+export function AdminApplication() {
     const history = useHistory();
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -92,6 +94,20 @@ export function AdminApplicationTest() {
         }
     };
 
+    const handleReject = async (applicationId: string) => {
+        const message = new AdminRejectApplicationMessage(applicationId);
+
+        const response = await sendPostRequest(message);
+        if (!response.isError) {
+            setSuccessMessage('Application rejected successfully');
+            setErrorMessage('');
+            handleGetFromApprover(); // Refresh the applications list
+        } else {
+            setErrorMessage(response.error || 'Failed to reject application');
+            setSuccessMessage('');
+        }
+    };
+
     const parseApprovers = (approverString: string): Approver[] => {
         try {
             return JSON.parse(approverString);
@@ -136,6 +152,7 @@ export function AdminApplicationTest() {
                                 <th>Username</th>
                                 <th>Application Type</th>
                                 <th>Info</th>
+                                <th>Status</th>
                                 <th>Approver 1</th>
                                 <th>Approver 2</th>
                                 <th>Approver 3</th>
@@ -152,12 +169,16 @@ export function AdminApplicationTest() {
                                         <td>{app.username}</td>
                                         <td>{app.applicationtype}</td>
                                         <td>{app.info}</td>
+                                        <td>{app.status}</td>
                                         {renderApproverCell(approvers[0])}
                                         {renderApproverCell(approvers[1])}
                                         {renderApproverCell(approvers[2])}
                                         <td>
                                             <button onClick={() => handleApprove(app.applicationid)} className="approve-button">
                                                 Approve
+                                            </button>
+                                            <button onClick={() => handleReject(app.applicationid)} className="reject-button">
+                                                Reject
                                             </button>
                                             <button onClick={() => handleDelete(app.applicationid)} className="delete-button">
                                                 Delete

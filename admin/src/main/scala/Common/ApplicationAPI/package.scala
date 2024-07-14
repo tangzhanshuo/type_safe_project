@@ -78,6 +78,9 @@ package object ApplicationAPI {
   def approveApplication(usertype: String, username: String, applicationID: String)(using PlanContext): IO[String] =
     ApproveApplicationMessage(usertype, username, applicationID).send
 
+  def rejectApplication(usertype: String, username: String, applicationID: String)(using PlanContext): IO[String] =
+    RejectApplicationMessage(usertype, username, applicationID).send
+
   def deleteApplication(usertype: String, username: String, applicationID: String)(using PlanContext): IO[String] =
     DeleteApplicationMessage(usertype, username, applicationID).send
 }

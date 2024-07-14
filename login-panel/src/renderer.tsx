@@ -13,7 +13,7 @@ import { AdminCourse } from 'Pages/Admin/AdminCourse'
 import { TeacherCourseDetail } from 'Pages/Teacher/TeacherCourseDetail'
 import {TeacherCourse} from "Pages/Teacher/TeacherCourse";
 import {TeacherAddCourse} from "Pages/Teacher/TeacherAddCourse";
-import { AdminApplicationTest } from 'Pages/Admin/AdminApplicationTest'
+import { AdminApplication } from 'Pages/Admin/AdminApplication'
 
 const Layout = () => {
     return (
@@ -31,7 +31,7 @@ const Layout = () => {
                 <Route path="/teacher/course" exact component={TeacherCourse} />
                 <Route path="/admin" exact component={AdminMain} />
                 <Route path="/admin/course" exact component={AdminCourse} />
-                <Route path="/admin/apptest" exact component={AdminApplicationTest} />
+                <Route path="/admin/application" exact component={AdminApplication} />
             </Switch>
         </HashRouter>
     )
