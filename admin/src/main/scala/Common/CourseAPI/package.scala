@@ -64,7 +64,10 @@ package object CourseAPI {
   def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetCourseByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingPositionByStudentUsernameMessage(studentUsername: String)(using PlanContext): IO[String] =
+  def getAllCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+    GetAllCoursesByStudentUsernameMessage(studentUsername).send
+
+  def getWaitingPositionByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetWaitingPositionByStudentUsernameMessage(studentUsername).send
 
   def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =

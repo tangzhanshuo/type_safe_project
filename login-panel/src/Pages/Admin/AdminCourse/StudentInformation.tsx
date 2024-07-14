@@ -4,7 +4,7 @@ import { AdminAddStudent2CourseMessage } from 'Plugins/AdminAPI/AdminAddStudent2
 import { AdminDeleteStudentFromCourseMessage } from 'Plugins/AdminAPI/AdminDeleteStudentFromCourseMessage';
 import { AdminGetCourseByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetCourseByStudentUsernameMessage';
 import { AdminGetWaitingCoursesByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetWaitingCoursesByStudentUsernameMessage';
-
+import { AdminGetWaitingPositionByStudentUsernameMessage} from 'Plugins/AdminAPI/AdminGetWaitingPositionByStudentUsernameMessage';
 interface Props {
     setErrorMessage: (msg: string) => void;
     setSuccessMessage: (msg: string) => void;
@@ -118,6 +118,30 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
         }
     };
 
+    const handleGetWaitingPositionByStudentUsername = async () => {
+        if (!studentUsername) {
+            setErrorMessage('Student Username is required');
+            return;
+        }
+
+        const message = new AdminGetWaitingPositionByStudentUsernameMessage(studentUsername);
+
+        try {
+            const response = await sendPostRequest(message);
+            if (!response.isError) {
+                setWaitingCourses(response.data);
+                setSuccessMessage('Waiting position retrieved successfully');
+                setErrorMessage('');
+            } else {
+                setErrorMessage('Failed to retrieve waiting position');
+                setSuccessMessage('');
+            }
+        } catch (error) {
+            setErrorMessage('Error occurred while retrieving waiting position');
+            setSuccessMessage('');
+        }
+    };
+
     return (
         <section className="student-info">
             <h2>Student Information</h2>
@@ -165,6 +189,9 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
                 </button>
                 <button onClick={handleGetWaitingCoursesByStudentUsername} className="button">
                     Get Waiting Courses
+                </button>
+                <button onClick={handleGetWaitingPositionByStudentUsername} className="button">
+                    Get Waiting Position
                 </button>
             </div>
         </section>
