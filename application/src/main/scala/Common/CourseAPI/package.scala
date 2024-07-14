@@ -12,7 +12,6 @@ import io.circe.Json
 package object CourseAPI {
 
   def addCourse(
-                 courseID: Int,
                  courseName: String,
                  teacherUsername: String,
                  teacherName: String,
@@ -24,7 +23,7 @@ package object CourseAPI {
                  enrolledStudentsJson: String,
                  allStudentsJson: String
                )(using PlanContext): IO[String] =
-    AddCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, allStudentsJson).send
+    AddCourseMessage(courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, allStudentsJson).send
 
   def deleteCourse(courseID: Int)(using PlanContext): IO[String] =
     DeleteCourseMessage(courseID).send

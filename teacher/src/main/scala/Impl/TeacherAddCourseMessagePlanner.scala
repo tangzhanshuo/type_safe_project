@@ -7,11 +7,11 @@ import Common.API.{PlanContext, Planner}
 import Common.Object.SqlParameter
 import Common.CourseAPI.addCourse
 import scala.util.Random
+import Common.ApplicationAPI.{createApplication, addApplication}
+import io.circe.Json
 
 case class TeacherAddCourseMessagePlanner(usertype: String,
                                           username: String,
-                                          password: String,
-                                          courseID: Int,
                                           courseName: String,
                                           teacherName: String,
                                           capacity: Int,
@@ -22,13 +22,16 @@ case class TeacherAddCourseMessagePlanner(usertype: String,
                                           kwargsJson: String,
                                           override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    if (usertype != "teacher" && usertype != "admin") {
-      IO.pure("No permission")
-    }
-    else {
-      val courseID = Random.nextInt();
-      val teacherUsername = username;
-      val enrolledStudentsJson = "[]";
-      addCourse(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, kwargsJson)}
+    val application = createApplication(usertype, username, "TeacherAddCourse")
+    application.addInfo("courseName", courseName)
+    application.addInfo("teacherName", teacherName)
+    application.addInfo("capacity", capacity)
+    application.addInfo("info", info)
+    application.addInfo("courseHourJson", courseHourJson)
+    application.addInfo("classroomID", classroomID)
+    application.addInfo("credits", credits)
+    application.addInfo("kwargsJson", kwargsJson)
+    application.addApprover("admin")
+    addApplication(application)
   }
 }

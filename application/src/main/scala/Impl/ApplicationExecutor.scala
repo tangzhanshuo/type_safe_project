@@ -60,7 +60,6 @@ object ApplicationExecutor {
 
   private def executeTeacherAddCourse(username: String, info: Json)(using planContext: PlanContext): IO[Unit] = {
     for {
-      courseID <- IO.fromOption(info.hcursor.downField("courseID").as[Int].toOption)(new Exception("courseID not found in info"))
       courseName <- IO.fromOption(info.hcursor.downField("courseName").as[String].toOption)(new Exception("courseName not found in info"))
       teacherName <- IO.fromOption(info.hcursor.downField("teacherName").as[String].toOption)(new Exception("teacherName not found in info"))
       capacity <- IO.fromOption(info.hcursor.downField("capacity").as[Int].toOption)(new Exception("capacity not found in info"))
@@ -70,8 +69,7 @@ object ApplicationExecutor {
       credits <- IO.fromOption(info.hcursor.downField("credits").as[Int].toOption)(new Exception("credits not found in info"))
       enrolledStudentsJson <- IO.pure("[]") // Start with an empty array for new course
       allStudentsJson <- IO.pure("[]") // Start with an empty array for new course
-      _ <- addCourse(
-        courseID = courseID,
+      courseID <- addCourse(
         courseName = courseName,
         teacherUsername = username,
         teacherName = teacherName,

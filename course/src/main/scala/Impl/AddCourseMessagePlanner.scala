@@ -10,7 +10,6 @@ import Common.DBAPI.*
 import Common.Object.SqlParameter
 
 case class AddCourseMessagePlanner(
-                                    courseID: Int,
                                     courseName: String,
                                     teacherUsername: String,
                                     teacherName: String,
@@ -24,9 +23,18 @@ case class AddCourseMessagePlanner(
                                     override val planContext: PlanContext
                                   ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    val checkCourseExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM course WHERE courseid = ?)",
-      List(SqlParameter("int", courseID.toString))
-    )
+    def getNewCourseID: IO[Int] = {
+      readDBRows("SELECT MAX(courseid) FROM course", List.empty)
+        .map { jsonList =>
+          jsonList.headOption
+            .flatMap(_.asObject)
+            .flatMap(_.values.headOption)
+            .flatMap(_.asNumber)
+            .flatMap(_.toInt)
+            .map(_ + 1)
+            .getOrElse(1)
+        }
+    }
 
     val checkClassroomExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM classroom WHERE classroomid = ?)",
       List(SqlParameter("int", classroomID.toString))
@@ -52,10 +60,10 @@ case class AddCourseMessagePlanner(
       }
     }
 
-    def addCourseToDB: IO[String] = writeDB(s"""
-                                               |INSERT INTO course (
-                                               |  courseid, coursename, teacherusername, teachername, capacity, info, coursehour, classroomid, credits, enrolledstudents, allstudents
-                                               |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    def addCourseToDB(courseID: Int): IO[String] = writeDB(s"""
+                                                              |INSERT INTO course (
+                                                              |  courseid, coursename, teacherusername, teachername, capacity, info, coursehour, classroomid, credits, enrolledstudents, allstudents
+                                                              |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.stripMargin,
       List(
         SqlParameter("int", courseID.toString),
@@ -70,48 +78,43 @@ case class AddCourseMessagePlanner(
         SqlParameter("jsonb", enrolledStudentsJson),
         SqlParameter("jsonb", allStudentsJson)
       )
-    ).map(_ => s"Course $courseName with ID $courseID successfully added")
+    ).map(_ => courseID.toString)
 
-    def updateClassroomEnrolledCourses(classroomID: Int, existingCourses: Json): IO[Unit] = {
+    def updateClassroomEnrolledCourses(classroomID: Int, existingCourses: Json, courseID: Int): IO[Unit] = {
       val updatedCourses = existingCourses.deepMerge(Json.obj(courseID.toString -> parse(courseHourJson).getOrElse(Json.arr())))
       writeDB(s"UPDATE classroom SET enrolledcourses = ? WHERE classroomid = ?",
         List(SqlParameter("jsonb", updatedCourses.noSpaces), SqlParameter("int", classroomID.toString))
       ).map(_ => ())
     }
 
-    checkCourseExists.flatMap { courseExists =>
-      if (courseExists) {
-        IO.raiseError(new Exception("Course with this ID already exists"))
+    checkClassroomExists.flatMap { classroomExists =>
+      if (!classroomExists) {
+        IO.raiseError(new Exception("Classroom with this ID does not exist"))
       } else {
-        checkClassroomExists.flatMap { classroomExists =>
-          if (!classroomExists) {
-            IO.raiseError(new Exception("Classroom with this ID does not exist"))
-          } else {
-            val courseHourValidation = parse(courseHourJson).left.map(e => new Exception(s"Invalid JSON for courseHour: ${e.getMessage}"))
-            val enrolledStudentsValidation = parse(enrolledStudentsJson).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
-            val allStudentsValidation = parse(allStudentsJson).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
+        val courseHourValidation = parse(courseHourJson).left.map(e => new Exception(s"Invalid JSON for courseHour: ${e.getMessage}"))
+        val enrolledStudentsValidation = parse(enrolledStudentsJson).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
+        val allStudentsValidation = parse(allStudentsJson).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
 
-            (courseHourValidation, enrolledStudentsValidation, allStudentsValidation) match {
-              case (Right(_), Right(_), Right(_)) =>
-                val checkConflictAndCapacityIO = for {
-                  existingCourses <- getClassroomEnrolledCourses(classroomID)
-                  conflict = checkCourseHourConflict(existingCourses)
-                  classroomCapacity <- getClassroomCapacity(classroomID)
-                  _ <- if (classroomID >= 0 && conflict) IO.raiseError(new Exception("Course hour conflict detected for the given classroom")) else IO.unit
-                  _ <- if (classroomCapacity > 0 && capacity > classroomCapacity) IO.raiseError(new Exception("Classroom capacity exceeded")) else IO.unit
-                } yield existingCourses
+        (courseHourValidation, enrolledStudentsValidation, allStudentsValidation) match {
+          case (Right(_), Right(_), Right(_)) =>
+            val checkConflictAndCapacityIO = for {
+              existingCourses <- getClassroomEnrolledCourses(classroomID)
+              conflict = checkCourseHourConflict(existingCourses)
+              classroomCapacity <- getClassroomCapacity(classroomID)
+              _ <- if (classroomID >= 0 && conflict) IO.raiseError(new Exception("Course hour conflict detected for the given classroom")) else IO.unit
+              _ <- if (classroomCapacity > 0 && capacity > classroomCapacity) IO.raiseError(new Exception("Classroom capacity exceeded")) else IO.unit
+            } yield existingCourses
 
-                checkConflictAndCapacityIO.flatMap { existingCourses =>
-                  addCourseToDB.flatMap { result =>
-                    updateClassroomEnrolledCourses(classroomID, existingCourses).map(_ => result)
-                  }
-                }
+            for {
+              newCourseID <- getNewCourseID
+              existingCourses <- checkConflictAndCapacityIO
+              result <- addCourseToDB(newCourseID)
+              _ <- updateClassroomEnrolledCourses(classroomID, existingCourses, newCourseID)
+            } yield result
 
-              case (Left(courseHourError), _, _) => IO.raiseError(courseHourError)
-              case (_, Left(enrolledStudentsError), _) => IO.raiseError(enrolledStudentsError)
-              case (_, _, Left(allStudentsError)) => IO.raiseError(allStudentsError)
-            }
-          }
+          case (Left(courseHourError), _, _) => IO.raiseError(courseHourError)
+          case (_, Left(enrolledStudentsError), _) => IO.raiseError(enrolledStudentsError)
+          case (_, _, Left(allStudentsError)) => IO.raiseError(allStudentsError)
         }
       }
     }

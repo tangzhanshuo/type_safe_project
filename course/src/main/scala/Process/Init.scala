@@ -15,8 +15,6 @@ object Init {
 
     for {
       _ <- API.init(config.maximumClientConnection)
-      _ <- initSchema("course")
-      _ <- initSchema("classroom")
       _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS course (
@@ -53,7 +51,7 @@ object Init {
            |  enrolledstudents,
            |  allstudents
            |)
-           |VALUES (-1, '入学', 't', 't', '1', '抢不到就等着退学吧', '[1]', -1, 0, '[]', '[]')
+           |VALUES (1, '入学', 't', 't', '1', '抢不到就等着退学吧', '[1]', -1, 0, '[]', '[]')
            |ON CONFLICT (courseid) DO NOTHING
          """.stripMargin, List()
       )
