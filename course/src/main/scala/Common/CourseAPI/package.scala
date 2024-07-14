@@ -51,7 +51,7 @@ package object CourseAPI {
     AddStudent2CourseMessage(courseID, studentUsername, priority).send
 
   def getCoursesByTeacherUsername(teacherUsername: String)(using PlanContext): IO[String] =
-    GetCoursesByTeacherUsernameMessage(teacherUsername).send
+    GetCourseByTeacherUsernameMessage(teacherUsername).send
 
   def deleteStudentFromCourse(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
     DeleteStudentFromCourseMessage(courseID, studentUsername).send
@@ -64,6 +64,9 @@ package object CourseAPI {
 
   def getCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetCourseByStudentUsernameMessage(studentUsername).send
+
+  def getWaitingPositionByStudentUsernameMessage(studentUsername: String)(using PlanContext): IO[String] =
+    GetWaitingPositionByStudentUsernameMessage(studentUsername).send
 
   def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
     GetWaitingCoursesByStudentUsernameMessage(studentUsername).send

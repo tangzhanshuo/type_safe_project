@@ -57,6 +57,11 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
+      case "GetWaitingPositionByStudentUsernameMessage" =>
+        IO(decode[GetWaitingPositionByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCoursesByStudentUsernameMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
       case "GetWaitingCoursesByStudentUsernameMessage" =>
         IO(decode[GetWaitingCoursesByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCoursesByStudentUsernameMessage")))
           .flatMap { m =>

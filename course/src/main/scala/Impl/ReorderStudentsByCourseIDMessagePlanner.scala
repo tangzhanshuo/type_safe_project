@@ -46,10 +46,10 @@ case class ReorderStudentsByCourseIDMessagePlanner(courseID: Int, override val p
     courseExistsIO.flatMap { _ =>
       courseInfoIO.flatMap { case (capacity, _, allStudents) =>
         // 根据 priority 将 allStudents 划分成不同的列表
-        val groupedByPriority = allStudents.groupBy(_("priority").as[Int].getOrElse(Int.MaxValue))
+        val groupedByPriority = allStudents.groupBy(_("priority").as[Int].getOrElse(Int.MinValue))
 
-        // 对每个列表进行随机排序
-        val sortedAndShuffled = groupedByPriority.toList.sortBy(_._1).flatMap { case (_, students) =>
+        // 对每个列表进行随机排序，并将 priority 数字大的排在前面
+        val sortedAndShuffled = groupedByPriority.toList.sortBy(-_._1).flatMap { case (_, students) =>
           Random.shuffle(students)
         }
 
