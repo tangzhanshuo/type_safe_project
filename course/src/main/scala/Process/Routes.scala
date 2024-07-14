@@ -67,6 +67,11 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
+      case "GetCreditsByStudentUsernameMessage" =>
+        IO(decode[GetCreditsByStudentUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCoursesByStudentUsernameMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
       case "DeleteStudentFromCourseMessage" =>
         IO(decode[DeleteStudentFromCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for DeleteStudentFromCourseMessage")))
           .flatMap { m =>

@@ -16,30 +16,30 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                         <table className="course-table">
                             <thead>
                             <tr>
-                                <th>Course ID</th>
-                                <th>Course Name</th>
-                                <th>Teacher Username</th>
-                                <th>Teacher Name</th>
-                                <th>Capacity</th>
+                                <th className="scrollable-text">Course ID</th>
+                                <th className="scrollable-text">Course Name</th>
+                                <th className="scrollable-text">Teacher Username</th>
+                                <th className="scrollable-text">Teacher Name</th>
+                                <th className="scrollable-text">Capacity</th>
                                 <th className="long-text">Info</th>
-                                <th>Course Hour</th>
-                                <th>Classroom ID</th>
-                                <th>Credits</th>
+                                <th className="scrollable-text">Course Hour</th>
+                                <th className="scrollable-text">Classroom ID</th>
+                                <th className="scrollable-text">Credits</th>
                                 <th className="long-text">Enrolled Students</th>
                                 <th className="long-text">All Students</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <td>{courseDetails.courseid}</td>
-                                <td>{courseDetails.coursename}</td>
-                                <td>{courseDetails.teacherusername}</td>
-                                <td>{courseDetails.teachername}</td>
-                                <td>{courseDetails.capacity}</td>
+                                <td className="scrollable-text">{courseDetails.courseid}</td>
+                                <td className="scrollable-text">{courseDetails.coursename}</td>
+                                <td className="scrollable-text">{courseDetails.teacherusername}</td>
+                                <td className="scrollable-text">{courseDetails.teachername}</td>
+                                <td className="scrollable-text">{courseDetails.capacity}</td>
                                 <td className="long-text">{courseDetails.info}</td>
-                                <td>{courseDetails.coursehour}</td>
-                                <td>{courseDetails.classroomid}</td>
-                                <td>{courseDetails.credits}</td>
+                                <td className="scrollable-text">{courseDetails.coursehour}</td>
+                                <td className="scrollable-text">{courseDetails.classroomid}</td>
+                                <td className="scrollable-text">{courseDetails.credits}</td>
                                 <td className="long-text">{courseDetails.enrolledstudents}</td>
                                 <td className="long-text">{courseDetails.allstudents}</td>
                             </tr>
@@ -55,15 +55,15 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                         <table className="course-table">
                             <thead>
                             <tr>
-                                <th>Course ID</th>
-                                <th>Course Name</th>
-                                <th>Teacher Username</th>
-                                <th>Teacher Name</th>
-                                <th>Capacity</th>
+                                <th className="scrollable-text">Course ID</th>
+                                <th className="scrollable-text">Course Name</th>
+                                <th className="scrollable-text">Teacher Username</th>
+                                <th className="scrollable-text">Teacher Name</th>
+                                <th className="scrollable-text">Capacity</th>
                                 <th className="long-text">Info</th>
-                                <th>Course Hour</th>
-                                <th>Classroom ID</th>
-                                <th>Credits</th>
+                                <th className="scrollable-text">Course Hour</th>
+                                <th className="scrollable-text">Classroom ID</th>
+                                <th className="scrollable-text">Credits</th>
                                 <th className="long-text">Enrolled Students</th>
                                 <th className="long-text">All Students</th>
                             </tr>
@@ -71,15 +71,15 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                             <tbody>
                             {courseList.map((course, index) => (
                                 <tr key={index}>
-                                    <td>{course.courseid}</td>
-                                    <td>{course.coursename}</td>
-                                    <td>{course.teacherusername}</td>
-                                    <td>{course.teachername}</td>
-                                    <td>{course.capacity}</td>
+                                    <td className="scrollable-text">{course.courseid}</td>
+                                    <td className="scrollable-text">{course.coursename}</td>
+                                    <td className="scrollable-text">{course.teacherusername}</td>
+                                    <td className="scrollable-text">{course.teachername}</td>
+                                    <td className="scrollable-text">{course.capacity}</td>
                                     <td className="long-text">{course.info}</td>
-                                    <td>{course.coursehour}</td>
-                                    <td>{course.classroomid}</td>
-                                    <td>{course.credits}</td>
+                                    <td className="scrollable-text">{course.coursehour}</td>
+                                    <td className="scrollable-text">{course.classroomid}</td>
+                                    <td className="scrollable-text">{course.credits}</td>
                                     <td className="long-text">{course.enrolledstudents}</td>
                                     <td className="long-text">{course.allstudents}</td>
                                 </tr>
