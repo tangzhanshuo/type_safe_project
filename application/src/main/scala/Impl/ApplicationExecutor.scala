@@ -5,7 +5,7 @@ import Common.DBAPI.*
 import Common.Object.SqlParameter
 import io.circe.parser.parse
 import io.circe.{Encoder, Json}
-import Common.CourseAPI.{addCourse, addStudent2Course}
+import Common.CourseAPI.{addCourse, addStudent2Course, deleteCourse}
 import Common.API.PlanContext
 
 object ApplicationExecutor {
@@ -41,6 +41,7 @@ object ApplicationExecutor {
     (applicationType, usertype.toLowerCase) match {
       case ("StudentAdd2Course", "student") => executeStudentAdd2Course(username, info)
       case ("TeacherAddCourse", "teacher") => executeTeacherAddCourse(username, info)
+      case ("TeacherDeleteCourse", "teacher") => executeTeacherDeleteCourse(info)
       case (appType, uType) => IO.raiseError(new Exception(s"Unsupported application type or invalid user type: $appType for $uType"))
     }
   }
@@ -82,6 +83,14 @@ object ApplicationExecutor {
         allStudentsJson = allStudentsJson
       )
       _ <- IO.println(s"Course added successfully: $courseName (ID: $courseID) by teacher: $teacherName (Username: $username)")
+    } yield ()
+  }
+
+  private def executeTeacherDeleteCourse(info: Json)(using planContext: PlanContext): IO[Unit] = {
+    for {
+      courseID <- IO.fromOption(info.hcursor.downField("courseID").as[Int].toOption)(new Exception("courseID not found in info"))
+      _ <- deleteCourse(courseID)
+      _ <- IO.println(s"Course with ID $courseID deleted successfully")
     } yield ()
   }
 }

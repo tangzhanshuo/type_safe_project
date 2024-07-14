@@ -23,6 +23,16 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+      case "TeacherGetCourseListMessage" =>
+        IO(decode[TeacherGetCourseListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for TeacherGetCourseListMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+      case "TeacherGetCourseMessage" =>
+        IO(decode[TeacherGetCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for TeacherGetCourseMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

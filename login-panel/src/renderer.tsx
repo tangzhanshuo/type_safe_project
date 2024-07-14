@@ -10,6 +10,7 @@ import { StudentCourseDetail } from 'Pages/Student/StudentCourseDetail'
 import { TeacherMain } from 'Pages/Teacher/TeacherMain'
 import { AdminMain } from 'Pages/Admin/AdminMain'
 import { AdminCourse } from 'Pages/Admin/AdminCourse'
+import { TeacherCourse } from 'Pages/Teacher/TeacherCourse'
 import {TeacherCourseDetail} from "Pages/Teacher/TeacherCourseDetail";
 import {TeacherCourseManage} from "Pages/Teacher/TeacherCourseManage";
 import {TeacherCourseAddtion} from "Pages/Teacher/TeacherCourseAddtion";
@@ -27,6 +28,7 @@ const Layout = () => {
                 <Route path="/student/application" exact component={StudentApplication} />
                 <Route path="/student/course/:courseid" component={StudentCourseDetail} />
                 <Route path="/teacher" exact component={TeacherMain} />
+                <Route path="/teacher/course/:courseid" exact component={TeacherCourse} />
                 <Route path="/teacher/coursemanage" exact component={TeacherCourseManage} />
                 <Route path="/teacher/coursemanage/addcourse" exact component={TeacherCourseAddtion} />
                 <Route path="/teacher/coursemanage/deletecourse" exact component={TeacherCourseDeletion} />
