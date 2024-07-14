@@ -10,11 +10,9 @@ import { StudentCourseDetail } from 'Pages/Student/StudentCourseDetail'
 import { TeacherMain } from 'Pages/Teacher/TeacherMain'
 import { AdminMain } from 'Pages/Admin/AdminMain'
 import { AdminCourse } from 'Pages/Admin/AdminCourse'
-import { TeacherCourse } from 'Pages/Teacher/TeacherCourse'
-import {TeacherCourseDetail} from "Pages/Teacher/TeacherCourseDetail";
-import {TeacherCourseManage} from "Pages/Teacher/TeacherCourseManage";
-import {TeacherCourseAddtion} from "Pages/Teacher/TeacherCourseAddtion";
-import {TeacherCourseDeletion} from "Pages/Teacher/TeacherCourseDeletion";
+import { TeacherCourseDetail } from 'Pages/Teacher/TeacherCourseDetail'
+import {TeacherCourse} from "Pages/Teacher/TeacherCourse";
+import {TeacherAddCourse} from "Pages/Teacher/TeacherAddCourse";
 import { AdminApplicationTest } from 'Pages/Admin/AdminApplicationTest'
 
 const Layout = () => {
@@ -26,13 +24,11 @@ const Layout = () => {
                 <Route path="/student" exact component={StudentMain} />
                 <Route path="/student/course" exact component={StudentCourse} />
                 <Route path="/student/application" exact component={StudentApplication} />
-                <Route path="/student/course/:courseid" component={StudentCourseDetail} />
+                <Route path="/student/course/:courseid(\d+)" component={StudentCourseDetail} />
                 <Route path="/teacher" exact component={TeacherMain} />
-                <Route path="/teacher/course/:courseid" exact component={TeacherCourse} />
-                <Route path="/teacher/coursemanage" exact component={TeacherCourseManage} />
-                <Route path="/teacher/coursemanage/addcourse" exact component={TeacherCourseAddtion} />
-                <Route path="/teacher/coursemanage/deletecourse" exact component={TeacherCourseDeletion} />
-                <Route path="/teacher/coursedetail" exact component={TeacherCourseDetail} />
+                <Route path="/teacher/course/:courseid(\d+)" exact component={TeacherCourseDetail} />
+                <Route path="/teacher/course/add" exact component={TeacherAddCourse} />
+                <Route path="/teacher/course" exact component={TeacherCourse} />
                 <Route path="/admin" exact component={AdminMain} />
                 <Route path="/admin/course" exact component={AdminCourse} />
                 <Route path="/admin/apptest" exact component={AdminApplicationTest} />

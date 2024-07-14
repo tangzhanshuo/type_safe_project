@@ -6,7 +6,7 @@ import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import 'Pages/css/Main.css';
 
-export function TeacherCourseAddtion() {
+export function TeacherAddCourse() {
     const history = useHistory();
     const [courseID, setCourseID] = useState(0); // [1]
     const [courseName, setCourseName] = useState('');
@@ -157,8 +157,8 @@ export function TeacherCourseAddtion() {
                     <button onClick={addCourse} className="button">
                         Register Course
                     </button>
-                    <button onClick={() => history.push('/teacher/coursemanage')} className="button">
-                        Back To CourseManagement
+                    <button onClick={() => history.push('/teacher/course')} className="button">
+                        Back To Courses
                     </button>
                     <button onClick={() => history.push('/teacher')} className="button">
                         Back to TeacherMain

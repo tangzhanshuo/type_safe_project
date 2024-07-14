@@ -29,11 +29,8 @@ export function TeacherMain() {
         </header>
         <main className="App-main">
             <div className="button-group">
-                <button onClick={() => history.push('/teacher/coursemanage')} className="button">
-                    Course Management
-                </button>
-                <button onClick={() => history.push('/teacher/coursedetail')} className="button">
-                    Course Details
+                <button onClick={() => history.push('/teacher/course')} className="button">
+                    Courses
                 </button>
                 <button onClick={() => history.push('/')} className="button">
                     Back to Main

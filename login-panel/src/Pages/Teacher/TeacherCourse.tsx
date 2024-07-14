@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useHistory, Link } from 'react-router-dom';
-import { API } from 'Plugins/CommonUtils/API';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
-import { TeacherGetCourseMessage } from 'Plugins/TeacherAPI/TeacherGetCourseMessage';
-import { TeacherDeleteCourseMessage } from 'Plugins/TeacherAPI/TeacherDeleteCourseMessage';
+import { useHistory, Link } from 'react-router-dom';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
+import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { TeacherGetCourseListMessage } from 'Plugins/TeacherAPI/TeacherGetCourseListMessage';
+import { TeacherDeleteCourseMessage } from 'Plugins/TeacherAPI/TeacherDeleteCourseMessage';
 import 'Pages/css/Main.css';
 
 interface Course {
@@ -16,17 +15,14 @@ interface Course {
     info: string;
     coursehour: string;
     classroomid: number;
-    enrolledstudents: string[];
-    teachername: string;
+    enrolledstudents: string;
 }
 
-export function TeacherCourse() {
+export function TeacherCourse(): JSX.Element {
     const history = useHistory();
-    const { courseid } = useParams<{ courseid: string }>();
-    const [errorMessage, setErrorMessage] = useState('');
-    const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
-    const [course, setCourse] = useState<Course | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const { usertype, username, token } = Auth.getState();
@@ -36,108 +32,105 @@ export function TeacherCourse() {
         } else if (usertype !== 'teacher') {
             history.push('/');
         } else {
-            getCourse();
+            getCourses();
         }
-    }, [courseid, history]);
+    }, [history]);
 
-    const getCourse = async () => {
-        const id = parseInt(courseid, 10);
-        if (isNaN(id)) {
-            setErrorMessage('Invalid course ID');
-            return;
-        }
-
-        const response = await sendPostRequest(new TeacherGetCourseMessage(id));
+    const getCourses = async (): Promise<void> => {
+        setIsLoading(true);
+        const response = await sendPostRequest(new TeacherGetCourseListMessage());
         if (response.isError) {
             setErrorMessage(response.error);
+            setIsLoading(false);
             return;
         }
         try {
-            const parsedCourse: Course = JSON.parse(response.data);
-            setCourse(parsedCourse);
+            const parsedCourses: Course[] = JSON.parse(response.data);
+            setCourses(parsedCourses);
         } catch (error) {
             setErrorMessage('Error parsing course data');
         }
         setIsLoading(false);
     }
 
-    const deleteCourse = async () => {
-        const id = parseInt(courseid, 10);
-        if (isNaN(id)) {
-            setDeleteCourseResponse('Invalid course ID');
-            return;
-        }
-        const response = await sendPostRequest(new TeacherDeleteCourseMessage(id));
+    const deleteCourse = async (courseid: number): Promise<void> => {
+        const response = await sendPostRequest(new TeacherDeleteCourseMessage(courseid));
         if (response.isError) {
-            setDeleteCourseResponse(response.error);
+            setErrorMessage(response.error);
             return;
         }
-        setDeleteCourseResponse('Course deleted successfully');
-        // Redirect to course list after successful deletion
-        setTimeout(() => history.push('/teacher/course'), 2000);
+        // Refresh the course list after successful deletion
+        getCourses();
     }
 
     return (
         <div className="App">
             <header className="App-header">
-                <h1>Course Details</h1>
+                <h1>Teacher Course Management</h1>
             </header>
             <main className="App-main">
-                <div className="course-details">
+                <div className="course-list">
                     {errorMessage ? (
                         <p style={{ color: 'red' }}>{errorMessage}</p>
                     ) : isLoading ? (
-                        <p>Loading course details...</p>
-                    ) : course ? (
-                        <>
-                            <h2>{course.coursename}</h2>
-                            <table className="details-table">
-                                <tbody>
-                                <tr>
-                                    <th>Course ID:</th>
-                                    <td>{course.courseid}</td>
-                                </tr>
-                                <tr>
-                                    <th>Teacher:</th>
-                                    <td>{course.teachername}</td>
-                                </tr>
-                                <tr>
-                                    <th>Capacity:</th>
+                        <p>Loading courses...</p>
+                    ) : courses.length > 0 ? (
+                        <table className="details-table">
+                            <thead>
+                            <tr>
+                                <th>Course ID</th>
+                                <th>Course Name</th>
+                                <th>Capacity</th>
+                                <th>Credits</th>
+                                <th>Info</th>
+                                <th>Course Hours</th>
+                                <th>Classroom ID</th>
+                                <th>Enrolled Students</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {courses.map(course => (
+                                <tr key={course.courseid}>
+                                    <td>
+                                        <Link to={`/teacher/course/${course.courseid}`}>
+                                            {course.courseid}
+                                        </Link>
+                                    </td>
+                                    <td>{course.coursename}</td>
                                     <td>{course.capacity}</td>
-                                </tr>
-                                <tr>
-                                    <th>Credits:</th>
                                     <td>{course.credits}</td>
-                                </tr>
-                                <tr>
-                                    <th>Info:</th>
                                     <td>{course.info}</td>
-                                </tr>
-                                <tr>
-                                    <th>Course Hours:</th>
                                     <td>{course.coursehour}</td>
-                                </tr>
-                                <tr>
-                                    <th>Classroom ID:</th>
                                     <td>{course.classroomid}</td>
-                                </tr>
-                                <tr>
-                                    <th>Enrolled Students:</th>
                                     <td>{course.enrolledstudents}</td>
+                                    <td>
+                                        <button
+                                            onClick={() => deleteCourse(course.courseid)}
+                                            className="button delete-button"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
-                                </tbody>
-                            </table>
-                            {deleteCourseResponse && <p>{deleteCourseResponse}</p>}
-                        </>
+                            ))}
+                            </tbody>
+                        </table>
                     ) : (
-                        <p>No course data available.</p>
+                        <p>No courses available.</p>
                     )}
                     <div className="button-group">
-                        <button onClick={() => history.push('/teacher/coursedetail')} className="button">
-                            Back to Course List
+                        <button onClick={() => history.push('/teacher/course/add')} className="button">
+                            Add Course
+                        </button>
+                        <button onClick={getCourses} className="button">
+                            Refresh Courses
                         </button>
                         <button onClick={() => history.push('/teacher')} className="button">
                             Back to TeacherMain
+                        </button>
+                        <button onClick={() => history.push('/')} className="button">
+                            Back to Main
                         </button>
                         <button onClick={() => logout(history)} className="button">
                             Log out
