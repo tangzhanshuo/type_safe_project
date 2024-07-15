@@ -7,6 +7,7 @@
 - [ ] CourseApi: Get course by course name
 - [ ] Functionality: Auto student priority from plan
 - [ ] Functionality: 预选-正选切换
+- [ ] User: Add name column to all users, and add route to getname and changename
 
 ### In Progress
 - [ ] ObjectType for everything. 
