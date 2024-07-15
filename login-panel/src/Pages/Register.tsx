@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { sendUserRequest } from 'Plugins/CommonUtils/UserManager';
 
-interface LoginParams {
+interface RegisterParams {
     usertype: 'student' | 'teacher' | 'admin';
 }
 
-export function Login() {
+export function Register() {
     const history = useHistory();
-    const { usertype } = useParams<LoginParams>();
+    const { usertype } = useParams<RegisterParams>();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
@@ -20,18 +21,23 @@ export function Login() {
         }
     }, [usertype, history]);
 
-    const handleLogin = async () => {
-        const response = await sendUserRequest("login", usertype, username, password);
-        if (!response.isError && response.data.includes('Valid user')) {
+    const handleRegister = async () => {
+        if (password !== confirmPassword) {
+            setErrorMessage('Passwords do not match.');
+            return;
+        }
+
+        const response = await sendUserRequest("register", usertype, username, password);
+        if (!response.error && response.data.includes('Operation(s) done successfully')) {
             setShowSuccessPopup(true);
         } else {
-            setErrorMessage('Login failed. Please check your credentials.');
+            setErrorMessage('Registration failed. Please try again.');
         }
     };
 
     const handleSuccessOk = () => {
         setShowSuccessPopup(false);
-        history.push(`/${usertype}/dashboard`);
+        history.push(`/login/${usertype}`);
     };
 
     return (
@@ -39,10 +45,10 @@ export function Login() {
             <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-10 rounded-xl shadow-md">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-                        {usertype.charAt(0).toUpperCase() + usertype.slice(1)} Login
+                        {usertype.charAt(0).toUpperCase() + usertype.slice(1)} Registration
                     </h2>
                 </div>
-                <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
+                <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); handleRegister(); }}>
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
                             <label htmlFor="username" className="sr-only">Username</label>
@@ -64,10 +70,23 @@ export function Login() {
                                 name="password"
                                 type="password"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="confirm-password" className="sr-only">Confirm Password</label>
+                            <input
+                                id="confirm-password"
+                                name="confirm-password"
+                                type="password"
+                                required
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="Confirm Password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                             />
                         </div>
                     </div>
@@ -79,7 +98,7 @@ export function Login() {
                             type="submit"
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                            Sign in
+                            Register
                         </button>
                     </div>
                 </form>
@@ -97,10 +116,10 @@ export function Login() {
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center" id="my-modal">
                     <div className="relative p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 animate-popup">
                         <div className="mt-3 text-center">
-                            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Login Successful</h3>
+                            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Registration Successful</h3>
                             <div className="mt-2 px-7 py-3">
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    You have successfully logged in.
+                                    You have successfully registered. You can now log in.
                                 </p>
                             </div>
                             <div className="items-center px-4 py-3">

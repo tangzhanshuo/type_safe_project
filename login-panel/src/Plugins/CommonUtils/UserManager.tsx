@@ -5,13 +5,14 @@ import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage';
 import { sendUnverifiedPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { History } from 'history';
 import Auth from 'Plugins/CommonUtils/AuthState';
+import { Response } from 'Plugins/CommonUtils/SendPostRequest';
 
 export const sendUserRequest = async (messageType: string, usertype: string, username: string, password: string, setFoundPassword?: (password: string) => void) => {
+    const response = new Response();
     if (!usertype || !username) {
-        return 'Some required fields are missing';
-    }
-    if (!password && messageType !== 'find') {
-        return 'Password is required';
+        response.isError = true;
+        response.error = 'Some required fields are missing';
+        return response
     }
     switch (messageType) {
         case "login":
@@ -22,21 +23,15 @@ export const sendUserRequest = async (messageType: string, usertype: string, use
                 Auth.getState().setUsertype(usertype);
                 Auth.getState().setUsername(username);
                 Auth.getState().setToken(token);
-                return 'Login successful';
             }
-            return 'Invalid user';
-            break;
+            return loginResponse
         case "register":
-            await sendUnverifiedPostRequest(new UserRegisterMessage(usertype, username, password));
-            break;
+            return await sendUnverifiedPostRequest(new UserRegisterMessage(usertype, username, password));
         case "delete":
-            await sendUnverifiedPostRequest(new UserDeleteMessage(usertype, username, password));
-            break;
+            return await sendUnverifiedPostRequest(new UserDeleteMessage(usertype, username, password));
         case "update":
-            await sendUnverifiedPostRequest(new UserUpdateMessage(usertype, username, password));
-            break;
+            return await sendUnverifiedPostRequest(new UserUpdateMessage(usertype, username, password));
     }
-    return '';
 };
 
 export const logout = (history: History) => {

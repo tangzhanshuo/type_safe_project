@@ -2,7 +2,7 @@ import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import Auth from 'Plugins/CommonUtils/AuthState';
 
-class Response {
+export class Response {
     isError: boolean;
     error: any;
     data: any;
