@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, Link } from 'react-router-dom';
 import { sendUserRequest } from 'Plugins/CommonUtils/UserManager';
 
 interface LoginParams {
@@ -83,7 +83,13 @@ export function Login() {
                         </button>
                     </div>
                 </form>
-                <div className="text-center">
+                <div className="flex justify-between items-center">
+                    <Link
+                        to={`/register/${usertype}`}
+                        className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    >
+                        Register
+                    </Link>
                     <button
                         onClick={() => history.push('/')}
                         className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"

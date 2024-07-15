@@ -4,6 +4,7 @@ import { HashRouter, Route, Switch } from 'react-router-dom'
 import './index.css'
 import { ThemeProvider } from 'Plugins/CommonUtils/ThemeContext'  // Import ThemeProvider
 import { Main } from 'Pages/Main'
+import { Register } from 'Pages/Register'
 import { Login } from 'Pages/Login'
 import { StudentCourseList } from 'Pages/Student/StudentCourseList'
 import { StudentApplication } from 'Pages/Student/StudentApplication'
@@ -25,6 +26,7 @@ const Layout = () => {
             <HashRouter>
                 <Switch>
                     <Route path="/" exact component={Main} />
+                    <Route path="/register/:usertype" exact component={Register} />
                     <Route path="/login/:usertype" exact component={Login} />
                     <Route path="/student/mycourse" exact component={StudentMyCourse} />
                     <Route path="/student/courselist" exact component={StudentCourseList} />
