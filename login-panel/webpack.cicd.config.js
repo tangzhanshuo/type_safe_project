@@ -36,7 +36,7 @@ const listrPackage = ({
             },
         },
         {
-            title: 'Running packaging hooks',
+            title: 'Running packaging Hooks',
             task: async ({ forgeConfig }, task) => {
                 return task.newListr([
                     {

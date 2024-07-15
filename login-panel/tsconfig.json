@@ -18,6 +18,8 @@
             "Images/*": ["Images/*"],
             "Pages/*": ["Pages/*"],
             "Plugins/*": ["Plugins/*"],
+            "Components/*": ["Components/*"],
+            "Hooks/*": ["Hooks/*"],
             "Styles/*": ["Styles/*"],
             "Utils/*": ["Utils/*"]
         },

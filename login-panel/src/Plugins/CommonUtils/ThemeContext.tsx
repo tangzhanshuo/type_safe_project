@@ -1,9 +1,9 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
-type ThemeContextType = {
+interface ThemeContextType {
     darkMode: boolean;
     toggleDarkMode: () => void;
-};
+}
 
 export const ThemeContext = createContext<ThemeContextType>({
     darkMode: false,
@@ -15,18 +15,18 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode, setDarkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+    });
 
     useEffect(() => {
-        const isDarkMode = localStorage.getItem('darkMode') === 'true';
-        setDarkMode(isDarkMode);
-    }, []);
+        document.documentElement.classList.toggle('dark', darkMode);
+        localStorage.setItem('darkMode', darkMode.toString());
+    }, [darkMode]);
 
-    const toggleDarkMode = () => {
-        const newDarkMode = !darkMode;
-        setDarkMode(newDarkMode);
-        localStorage.setItem('darkMode', newDarkMode.toString());
-    };
+    const toggleDarkMode = useCallback(() => {
+        setDarkMode(prevMode => !prevMode);
+    }, []);
 
     return (
         <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>

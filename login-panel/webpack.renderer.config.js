@@ -48,6 +48,8 @@ module.exports = {
             Assets: path.resolve(__dirname, 'src/Assets/'),
             Images: path.resolve(__dirname, 'src/Images/'),
             Pages: path.resolve(__dirname, 'src/Pages/'),
+            Components: path.resolve(__dirname, 'src/Components/'),
+            Hooks: path.resolve(__dirname, 'src/Hooks/'),
             Plugins: path.resolve(__dirname, 'src/Plugins/'),
             Styles: path.resolve(__dirname, 'src/Styles/'),
             Utils: path.resolve(__dirname, 'src/Utils/'),

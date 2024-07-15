@@ -5,6 +5,13 @@ module.exports = {
     "./public/index.html",
   ],
   theme: {
+    extend: {
+      transitionProperty: {
+        'colors': 'background-color, border-color, color, fill, stroke',
+      },
+    },
+  },
+  variants: {
     extend: {},
   },
   plugins: [],
