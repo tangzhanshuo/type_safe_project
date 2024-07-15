@@ -1,7 +1,8 @@
-import React, { ReactNode, useContext, useEffect } from 'react';
+import React, { ReactNode, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from 'Hooks/UseAuth';
 import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
+import { FaHome, FaBook, FaList, FaSignOutAlt } from 'react-icons/fa';
 
 interface StudentLayoutProps {
     children: ReactNode;
@@ -12,39 +13,42 @@ export function StudentLayout({ children }: StudentLayoutProps) {
     useAuth('student');
     const { toggleDarkMode } = useContext(ThemeContext);
 
+    const menuItems = [
+        { path: '/student/dashboard', name: 'Dashboard', icon: FaHome },
+        { path: '/student/mycourse', name: 'My Courses', icon: FaBook },
+        { path: '/student/courselist', name: 'Courses List', icon: FaList },
+    ];
+
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
             {/* Sidebar */}
-            <div className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-md overflow-y-auto">
-                <div className="p-4">
-                    <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Student Portal</h2>
+            <div className="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-blue-500 to-blue-700 dark:from-gray-800 dark:to-gray-900 shadow-md overflow-y-auto flex flex-col">
+                <div className="p-6">
+                    <h2 className="text-2xl font-semibold text-white">Student Portal</h2>
                 </div>
-                <nav className="mt-4">
-                    <Link
-                        to="/student/dashboard"
-                        className={`block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 ${
-                            location.pathname === '/student/dashboard' ? 'bg-gray-200 dark:bg-gray-700' : ''
-                        }`}
-                    >
-                        Dashboard
-                    </Link>
-                    <Link
-                        to="/student/courses"
-                        className={`block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 ${
-                            location.pathname === '/student/courses' ? 'bg-gray-200 dark:bg-gray-700' : ''
-                        }`}
-                    >
-                        Courses
-                    </Link>
-                    <Link
-                        to="/student/profile"
-                        className={`block py-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 ${
-                            location.pathname === '/student/profile' ? 'bg-gray-200 dark:bg-gray-700' : ''
-                        }`}
-                    >
-                        Profile
-                    </Link>
+
+                <nav className="mt-6 flex-grow">
+                    {menuItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`flex items-center py-3 px-6 text-blue-100 dark:text-gray-300 hover:bg-blue-600 dark:hover:bg-gray-700 transition-colors duration-200 ${
+                                location.pathname === item.path ? 'bg-blue-600 dark:bg-gray-700' : ''
+                            }`}
+                        >
+                            <item.icon className="mr-3" />
+                            {item.name}
+                        </Link>
+                    ))}
                 </nav>
+
+                {/* Logout button */}
+                <div className="p-6">
+                    <button className="flex items-center w-full py-2 px-4 text-blue-100 dark:text-gray-300 hover:bg-blue-600 dark:hover:bg-gray-700 transition-colors duration-200 rounded">
+                        <FaSignOutAlt className="mr-3" />
+                        Logout
+                    </button>
+                </div>
             </div>
 
             {/* Main content */}
