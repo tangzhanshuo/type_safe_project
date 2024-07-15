@@ -12,11 +12,11 @@ import { TeacherMain } from 'Pages/Teacher/TeacherMain'
 import { AdminCourse } from 'Pages/Admin/AdminCourse'
 import { TeacherCourseDetail } from 'Pages/Teacher/TeacherCourseDetail'
 import { TeacherCourse } from "Pages/Teacher/TeacherCourse"
-import { TeacherAddCourse } from "Pages/Teacher/TeacherAddCourse"
+import {TeacherCourse} from "Pages/Teacher/TeacherCourse"
+import {TeacherAddCourse} from "Pages/Teacher/TeacherAddCourse"
 import { AdminApplication } from 'Pages/Admin/AdminApplication'
 import { StudentDashboard } from 'Pages/Student/StudentDashboard'
 import { StudentMyCourse } from 'Pages/Student/StudentMyCourse'
-import { AdminDashboard } from 'Pages/Admin/AdminDashboard'
 
 const Layout = () => {
     return (
@@ -30,11 +30,11 @@ const Layout = () => {
                     <Route path="/student/dashboard" exact component={StudentDashboard} />
                     <Route path="/student/application" exact component={StudentApplication} />
                     <Route path="/student/course/:courseid(\d+)" component={StudentCourseDetail} />
-                    <Route path="/teacher/dashboard" exact component={TeacherMain} />
-                    <Route path="/teacher/course/add" exact component={TeacherAddCourse} />
+                    <Route path="/teacher" exact component={TeacherMain} />
                     <Route path="/teacher/course/:courseid(\d+)" exact component={TeacherCourseDetail} />
+                    <Route path="/teacher/course/add" exact component={TeacherAddCourse} />
                     <Route path="/teacher/course" exact component={TeacherCourse} />
-                    <Route path="/admin/dashboard" exact component={AdminDashboard} />
+                    <Route path="/admin" exact component={AdminMain} />
                     <Route path="/admin/course" exact component={AdminCourse} />
                     <Route path="/admin/application" exact component={AdminApplication} />
                 </Switch>

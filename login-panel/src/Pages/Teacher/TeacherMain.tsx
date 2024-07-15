@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
 import { logout } from 'Plugins/CommonUtils/UserManager'
+import { TeacherLayout } from 'Components/Teacher/TeacherLayout';
+import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
 import 'Pages/css/Main.css';
-import Auth from 'Plugins/CommonUtils/AuthState' // Import the CSS file
+import Auth from 'Plugins/CommonUtils/AuthState'
 
 export function TeacherMain() {
     const history = useHistory();
+    const { darkMode } = useContext(ThemeContext);
 
     useEffect(() => {
         // Assuming username and password are stored in localStorage
@@ -23,23 +26,24 @@ export function TeacherMain() {
     }, []);
 
     return (
-    <div className="App">
-        <header className="App-header">
-            <h1>TeacherMain</h1>
-        </header>
-        <main className="App-main">
-            <div className="button-group">
-                <button onClick={() => history.push('/teacher/course')} className="button">
-                    Courses
-                </button>
-                <button onClick={() => history.push('/')} className="button">
-                    Back to Main
-                </button>
-                <button onClick={() => logout(history)} className="button">
-                    Log out
-                </button>
+        <TeacherLayout>
+            <div className="p-6">
+                <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Welcome to Teacher Dashboard</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button
+                        onClick={() => history.push('/')}
+                        className={`${darkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-600'} text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105`}
+                    >
+                        Back to Main
+                    </button>
+                    <button
+                        onClick={() => logout(history)}
+                        className={`${darkMode ? 'bg-red-600 hover:bg-red-700' : 'bg-red-500 hover:bg-red-600'} text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105`}
+                    >
+                        Log out
+                    </button>
+                </div>
             </div>
-        </main>
-    </div>
+        </TeacherLayout>
     );
 }
