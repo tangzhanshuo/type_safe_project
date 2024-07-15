@@ -6,16 +6,18 @@ import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCour
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import { StudentLayout } from 'Components/Student/StudentLayout';
-import { FaSync, FaTrash, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaSync, FaTrash, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
 
 interface Course {
-    courseid: string;
+    courseid: number;
     coursename: string;
     teachername: string;
     capacity: number;
     credits: number;
     info: string;
 }
+
+type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'All';
 
 export function StudentMyCourse() {
     const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
@@ -24,6 +26,8 @@ export function StudentMyCourse() {
     const [showDeleteResponse, setShowDeleteResponse] = useState<boolean>(false);
     const [sortColumn, setSortColumn] = useState<keyof Course>('courseid');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [searchColumn, setSearchColumn] = useState<SearchColumn>('All');
     const history = useHistory();
 
     useEffect(() => {
@@ -51,18 +55,13 @@ export function StudentMyCourse() {
         }
     };
 
-    const deleteCourseWithId = async (courseid: string) => {
-        const id = parseInt(courseid, 10);
-        if (isNaN(id)) {
-            setDeleteCourseResponse('Invalid course ID');
-            return;
-        }
-        const response = await sendPostRequest(new StudentDeleteCourseMessage(id));
+    const deleteCourseWithId = async (courseid: number) => {
+        const response = await sendPostRequest(new StudentDeleteCourseMessage(courseid));
         if (response.isError) {
             setDeleteCourseResponse(response.error);
             return;
         }
-        setDeleteCourseResponse('Course ' + id + ' deleted successfully');
+        setDeleteCourseResponse('Course ' + courseid + ' deleted successfully');
         setShowDeleteResponse(true);
         setTimeout(() => setShowDeleteResponse(false), 2000);
         fetchSelectedCourses();
@@ -82,6 +81,31 @@ export function StudentMyCourse() {
         if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
         return 0;
     });
+
+    const filterCourses = (courses: Course[]) => {
+        return courses.filter(course => {
+            if (searchTerm === '') return true;
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            switch (searchColumn) {
+                case 'ID':
+                    return course.courseid.toString().includes(lowerSearchTerm);
+                case 'Name':
+                    return course.coursename.toLowerCase().includes(lowerSearchTerm);
+                case 'Teacher':
+                    return course.teachername.toLowerCase().includes(lowerSearchTerm);
+                case 'All':
+                    return (
+                        course.courseid.toString().includes(lowerSearchTerm) ||
+                        course.coursename.toLowerCase().includes(lowerSearchTerm) ||
+                        course.teachername.toLowerCase().includes(lowerSearchTerm)
+                    );
+                default:
+                    return true;
+            }
+        });
+    };
+
+    const filteredAndSortedCourses = filterCourses(sortedCourses);
 
     const SortIcon = ({ column }: { column: keyof Course }) => {
         if (column !== sortColumn) return null;
@@ -114,8 +138,31 @@ export function StudentMyCourse() {
                     </button>
                 </div>
 
+                <div className="flex items-center space-x-4 mb-4">
+                    <select
+                        value={searchColumn}
+                        onChange={(e) => setSearchColumn(e.target.value as SearchColumn)}
+                        className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    >
+                        <option value="All">All</option>
+                        <option value="ID">ID</option>
+                        <option value="Name">Name</option>
+                        <option value="Teacher">Teacher</option>
+                    </select>
+                    <div className="relative flex-grow">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search courses..."
+                            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                        />
+                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                    </div>
+                </div>
+
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                    {sortedCourses.length > 0 ? (
+                    {filteredAndSortedCourses.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
@@ -130,7 +177,7 @@ export function StudentMyCourse() {
                                 </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                {sortedCourses.map((course) => (
+                                {filteredAndSortedCourses.map((course) => (
                                     <tr key={course.courseid}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <Link to={`/student/course/${course.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
@@ -157,7 +204,7 @@ export function StudentMyCourse() {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No selected courses.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No selected courses found matching your search criteria.</p>
                     )}
                 </div>
 
