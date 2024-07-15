@@ -9,9 +9,9 @@ import { StudentCourseList } from 'Pages/Student/StudentCourseList'
 import { StudentApplication } from 'Pages/Student/StudentApplication'
 import { StudentCourseDetail } from 'Pages/Student/StudentCourseDetail'
 import { TeacherMain } from 'Pages/Teacher/TeacherMain'
+import { AdminMain } from 'Pages/Admin/AdminMain'
 import { AdminCourse } from 'Pages/Admin/AdminCourse'
 import { TeacherCourseDetail } from 'Pages/Teacher/TeacherCourseDetail'
-import { TeacherCourse } from "Pages/Teacher/TeacherCourse"
 import {TeacherCourse} from "Pages/Teacher/TeacherCourse"
 import {TeacherAddCourse} from "Pages/Teacher/TeacherAddCourse"
 import { AdminApplication } from 'Pages/Admin/AdminApplication'
