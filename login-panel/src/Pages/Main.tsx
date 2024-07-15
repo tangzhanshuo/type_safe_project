@@ -65,7 +65,7 @@ export function Main() {
 
                 <section className="text-center mb-16">
                     <h3 className="text-2xl font-bold mb-4">Experience the Future of Education</h3>
-                    <button className="bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">
+                    <button onClick={() => history.push('/114514')} className="bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">
                         Take a Tour
                     </button>
                 </section>

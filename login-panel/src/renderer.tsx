@@ -19,6 +19,7 @@ import { AdminApplication } from 'Pages/Admin/AdminApplication'
 import { StudentDashboard } from 'Pages/Student/StudentDashboard'
 import { StudentMyCourse } from 'Pages/Student/StudentMyCourse'
 import { AdminDashboard } from 'Pages/Admin/AdminDashboard'
+import { NotFoundPage } from 'Pages/NotFoundPage'
 
 const Layout = () => {
     return (
@@ -42,6 +43,7 @@ const Layout = () => {
                     <Route path="/admin/user" exact component={AdminMain} />
                     <Route path="/admin/course" exact component={AdminCourse} />
                     <Route path="/admin/application" exact component={AdminApplication} />
+                    <Route component={NotFoundPage} />
                 </Switch>
             </HashRouter>
         </ThemeProvider>
