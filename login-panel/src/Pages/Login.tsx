@@ -55,7 +55,7 @@ export function Login() {
                                 name="username"
                                 type="text"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Username"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
@@ -68,7 +68,7 @@ export function Login() {
                                 name="password"
                                 type="password"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -76,7 +76,7 @@ export function Login() {
                         </div>
                     </div>
 
-                    {errorMessage && <p className="mt-2 text-center text-sm text-red-600">{errorMessage}</p>}
+                    {errorMessage && <p className="mt-2 text-center text-sm text-red-600 dark:text-red-400">{errorMessage}</p>}
 
                     <div>
                         <button
@@ -90,7 +90,7 @@ export function Login() {
                 <div className="text-center">
                     <button
                         onClick={() => history.push('/')}
-                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                        className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
                     >
                         Back to Home
                     </button>
@@ -98,12 +98,12 @@ export function Login() {
             </div>
 
             {showSuccessPopup && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center" id="my-modal">
-                    <div className="relative p-5 border w-96 shadow-lg rounded-md bg-white animate-popup">
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center" id="my-modal">
+                    <div className="relative p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 animate-popup">
                         <div className="mt-3 text-center">
-                            <h3 className="text-lg leading-6 font-medium text-gray-900">Login Successful</h3>
+                            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">Login Successful</h3>
                             <div className="mt-2 px-7 py-3">
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
                                     You have successfully logged in.
                                 </p>
                             </div>
