@@ -6,7 +6,7 @@ import { ThemeProvider } from 'Plugins/CommonUtils/ThemeContext'  // Import Them
 import { Main } from 'Pages/Main'
 import { Login } from 'Pages/Login'
 import { StudentMain } from 'Pages/Student/StudentMain'
-import { StudentCourse } from 'Pages/Student/StudentCourse'
+import { StudentCourseList } from 'Pages/Student/StudentCourseList'
 import { StudentApplication } from 'Pages/Student/StudentApplication'
 import { StudentCourseDetail } from 'Pages/Student/StudentCourseDetail'
 import { TeacherMain } from 'Pages/Teacher/TeacherMain'
@@ -17,6 +17,7 @@ import {TeacherCourse} from "Pages/Teacher/TeacherCourse"
 import {TeacherAddCourse} from "Pages/Teacher/TeacherAddCourse"
 import { AdminApplication } from 'Pages/Admin/AdminApplication'
 import { StudentDashboard } from 'Pages/Student/StudentDashboard'
+import { StudentMyCourse } from 'Pages/Student/StudentMyCourse'
 
 const Layout = () => {
     return (
@@ -26,7 +27,8 @@ const Layout = () => {
                     <Route path="/" exact component={Main} />
                     <Route path="/login/:usertype" exact component={Login} />
                     <Route path="/student" exact component={StudentMain} />
-                    <Route path="/student/course" exact component={StudentCourse} />
+                    <Route path="/student/mycourse" exact component={StudentMyCourse} />
+                    <Route path="/student/courselist" exact component={StudentCourseList} />
                     <Route path="/student/dashboard" exact component={StudentDashboard} />
                     <Route path="/student/application" exact component={StudentApplication} />
                     <Route path="/student/course/:courseid(\d+)" component={StudentCourseDetail} />
