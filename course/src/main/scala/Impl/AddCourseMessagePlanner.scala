@@ -15,27 +15,14 @@ case class AddCourseMessagePlanner(
                                     teacherName: String,
                                     capacity: Int,
                                     info: String,
-                                    courseHourJson: String, // JSON represented as String
+                                    courseHourJson: String,
                                     classroomID: Int,
                                     credits: Int,
-                                    enrolledStudentsJson: String, // JSON represented as String
-                                    allStudentsJson: String, // JSON represented as String
+                                    enrolledStudentsJson: String,
+                                    allStudentsJson: String,
                                     override val planContext: PlanContext
                                   ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    def getNewCourseID: IO[Int] = {
-      readDBRows("SELECT MAX(courseid) FROM course", List.empty)
-        .map { jsonList =>
-          jsonList.headOption
-            .flatMap(_.asObject)
-            .flatMap(_.values.headOption)
-            .flatMap(_.asNumber)
-            .flatMap(_.toInt)
-            .map(_ + 1)
-            .getOrElse(1)
-        }
-    }
-
     val checkClassroomExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM classroom WHERE classroomid = ?)",
       List(SqlParameter("int", classroomID.toString))
     )
@@ -60,13 +47,12 @@ case class AddCourseMessagePlanner(
       }
     }
 
-    def addCourseToDB(courseID: Int): IO[String] = writeDB(s"""
-                                                              |INSERT INTO course (
-                                                              |  courseid, coursename, teacherusername, teachername, capacity, info, coursehour, classroomid, credits, enrolledstudents, allstudents
-                                                              |) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """.stripMargin,
+    def addCourseToDB(): IO[Unit] = writeDB(s"""
+      INSERT INTO course (
+        coursename, teacherusername, teachername, capacity, info, coursehour, classroomid, credits, enrolledstudents, allstudents
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """.stripMargin,
       List(
-        SqlParameter("int", courseID.toString),
         SqlParameter("string", courseName),
         SqlParameter("string", teacherUsername),
         SqlParameter("string", teacherName),
@@ -78,13 +64,32 @@ case class AddCourseMessagePlanner(
         SqlParameter("jsonb", enrolledStudentsJson),
         SqlParameter("jsonb", allStudentsJson)
       )
-    ).map(_ => courseID.toString)
+    ).void
 
-    def updateClassroomEnrolledCourses(classroomID: Int, existingCourses: Json, courseID: Int): IO[Unit] = {
-      val updatedCourses = existingCourses.deepMerge(Json.obj(courseID.toString -> parse(courseHourJson).getOrElse(Json.arr())))
+    def getCourseID(): IO[String] = readDBString(s"""
+  SELECT courseid FROM course
+  WHERE coursename = ? AND teacherusername = ? AND teachername = ? AND capacity = ?
+    AND info = ? AND coursehour::text = ? AND classroomid = ? AND credits = ?
+  ORDER BY courseid DESC
+  LIMIT 1
+""".stripMargin,
+      List(
+        SqlParameter("string", courseName),
+        SqlParameter("string", teacherUsername),
+        SqlParameter("string", teacherName),
+        SqlParameter("int", capacity.toString),
+        SqlParameter("string", info),
+        SqlParameter("string", courseHourJson),  // Changed from "jsonb" to "string"
+        SqlParameter("int", classroomID.toString),
+        SqlParameter("int", credits.toString)
+      )
+    )
+
+    def updateClassroomEnrolledCourses(classroomID: Int, existingCourses: Json, courseID: String): IO[Unit] = {
+      val updatedCourses = existingCourses.deepMerge(Json.obj(courseID -> parse(courseHourJson).getOrElse(Json.arr())))
       writeDB(s"UPDATE classroom SET enrolledcourses = ? WHERE classroomid = ?",
         List(SqlParameter("jsonb", updatedCourses.noSpaces), SqlParameter("int", classroomID.toString))
-      ).map(_ => ())
+      ).void
     }
 
     checkClassroomExists.flatMap { classroomExists =>
@@ -106,11 +111,11 @@ case class AddCourseMessagePlanner(
             } yield existingCourses
 
             for {
-              newCourseID <- getNewCourseID
               existingCourses <- checkConflictAndCapacityIO
-              result <- addCourseToDB(newCourseID)
+              _ <- addCourseToDB()
+              newCourseID <- getCourseID()
               _ <- updateClassroomEnrolledCourses(classroomID, existingCourses, newCourseID)
-            } yield result
+            } yield newCourseID
 
           case (Left(courseHourError), _, _) => IO.raiseError(courseHourError)
           case (_, Left(enrolledStudentsError), _) => IO.raiseError(enrolledStudentsError)

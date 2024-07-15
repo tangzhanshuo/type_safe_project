@@ -18,7 +18,7 @@ object Init {
       _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS course (
-           |  courseid INT PRIMARY KEY,
+           |  courseid SERIAL PRIMARY KEY,
            |  coursename TEXT,
            |  teacherusername TEXT,
            |  teachername TEXT,
@@ -36,10 +36,10 @@ object Init {
         // d = 1, 2, 3, 4, 5, 6, 7 stands for 星期d
         // h = 1, 2, 3, 4, 5, 6 stands for 第h段时间
       )
+      /*
       _ <- writeDB(
         s"""
            |INSERT INTO course (
-           |  courseid,
            |  coursename,
            |  teacherusername,
            |  teachername,
@@ -51,10 +51,10 @@ object Init {
            |  enrolledstudents,
            |  allstudents
            |)
-           |VALUES (1, '入学', 't', 't', '1', '抢不到就等着退学吧', '[1]', -1, 0, '[]', '[]')
+           |VALUES ('入学', 't', 't', '1', '抢不到就等着退学吧', '[1]', -1, 0, '[]', '[]')
            |ON CONFLICT (courseid) DO NOTHING
          """.stripMargin, List()
-      )
+      )*/
       _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS classroom (
