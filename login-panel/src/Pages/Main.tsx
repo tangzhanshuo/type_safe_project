@@ -24,8 +24,8 @@ export function Main() {
                         onClick={toggleDarkMode}
                         className="bg-gray-200 dark:bg-gray-700 p-2 rounded-full"
                     >
-                        <span className="dark:hidden">🌙</span>
-                        <span className="hidden dark:inline">☀️</span>
+                        <span className="dark:hidden">☀️</span>
+                        <span className="hidden dark:inline">🌙</span>
                     </button>
                 </nav>
             </header>

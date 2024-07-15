@@ -62,8 +62,8 @@ export function StudentLayout({ children }: StudentLayoutProps) {
                             onClick={toggleDarkMode}
                             className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500"
                         >
-                            <span className="dark:hidden">🌙</span>
-                            <span className="hidden dark:inline">☀️</span>
+                            <span className="dark:hidden">☀️</span>
+                            <span className="hidden dark:inline">🌙</span>
                         </button>
                     </div>
                 </header>
