@@ -31,6 +31,7 @@ const Layout = () => {
                     <Route path="/student/dashboard" exact component={StudentDashboard} />
                     <Route path="/student/application" exact component={StudentApplication} />
                     <Route path="/student/course/:courseid(\d+)" component={StudentCourseDetail} />
+                    <Route path="/teacher" exact component={TeacherMain} />
                     <Route path="/teacher/dashboard" exact component={TeacherMain} />
                     <Route path="/teacher/course/add" exact component={TeacherAddCourse} />
                     <Route path="/teacher/course/:courseid(\d+)" exact component={TeacherCourseDetail} />
