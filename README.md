@@ -15,4 +15,4 @@
 - [x] Completed Feature
 
 ### Deprecated
-- [x] Old Feature: Feature that has been removed or replaced**
+- [x] Old Feature: Feature that has been removed or replaced
