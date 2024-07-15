@@ -3,14 +3,28 @@ const plugins = require('./webpack.plugins')
 const path = require('path')
 const TerserPlugin = require('terser-webpack-plugin')
 
-rules.push({
-    test: /\.css$/,
-    use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
-})
+// Remove the existing CSS rule from rules if it exists
+const filteredRules = rules.filter(rule => !rule.test || !rule.test.toString().includes('.css'))
 
 module.exports = {
     module: {
-        rules,
+        rules: [
+            ...filteredRules,
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader', 'postcss-loader'],
+            },
+            {
+                test: /\.(ts|tsx)$/,
+                exclude: /(node_modules|\.webpack)/,
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
+                    },
+                },
+            },
+        ],
     },
 
     optimization: {

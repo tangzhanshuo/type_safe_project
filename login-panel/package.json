@@ -5,13 +5,16 @@
     "description": "My Electron application description",
     "main": ".webpack/main",
     "scripts": {
-        "start": "electron-forge start",
+        "start": "yarn build:css && electron-forge start",
         "package": "electron-forge package",
         "make": "electron-forge make --platform=win32 --arch=x64",
         "publish": "electron-forge publish",
         "lint": "eslint . --cache --ext .js,.jsx,.ts,.tsx --max-warnings 0",
         "prepare": "husky install",
-        "build": "node webpack.cicd.config.js"
+        "build": "node webpack.cicd.config.js",
+        "build:css": "tailwindcss -i ./src/index.css -o ./src/styles/tailwind.css --minify",
+        "watch:css": "tailwindcss -i ./src/index.css -o ./src/styles/tailwind.css --watch",
+        "dev": "concurrently \"yarn watch:css\" \"electron-forge start\""
     },
     "husky": {
         "hooks": {
@@ -105,8 +108,10 @@
         "@typescript-eslint/eslint-plugin": "^4.0.1",
         "@typescript-eslint/parser": "^4.0.1",
         "@vercel/webpack-asset-relocator-loader": "1.6.0",
+        "autoprefixer": "^10.4.19",
         "axios": "^1.7.2",
-        "css-loader": "^6.0.0",
+        "concurrently": "^8.2.2",
+        "css-loader": "^7.1.2",
         "electron": "13.1.7",
         "electron-squirrel-startup": "^1.0.0",
         "eslint": "^7.6.0",
@@ -117,13 +122,16 @@
         "husky": "^7.0.0",
         "lint-staged": "^11.1.1",
         "node-loader": "^2.0.0",
+        "postcss": "^8.4.39",
+        "postcss-loader": "^8.1.1",
         "qrcode.react": "^1.0.1",
         "react-refresh": "^0.14.0",
         "react-refresh-typescript": "^2.0.9",
         "react-router": "^5.2.0",
         "react-router-dom": "^5.2.0",
         "react-star-ratings": "^2.3.0",
-        "style-loader": "^3.0.0",
+        "style-loader": "^4.0.0",
+        "tailwindcss": "^3.4.4",
         "ts-loader": "^9.2.2",
         "typescript": "^4.0.2",
         "xlsx": "^0.17.0"

@@ -1,6 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { HashRouter, Route, Switch } from 'react-router-dom'
+import './index.css'
 import { Main } from 'Pages/Main'
 import { Login } from 'Pages/Login'
 import { StudentMain } from 'Pages/Student/StudentMain'
