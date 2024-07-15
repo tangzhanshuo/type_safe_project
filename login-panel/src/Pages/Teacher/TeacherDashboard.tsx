@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { TeacherGetCourseListMessage } from 'Plugins/TeacherAPI/TeacherGetCourseListMessage';
@@ -6,6 +6,10 @@ import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { TeacherLayout } from 'Components/Teacher/TeacherLayout';
 import { FaSync } from 'react-icons/fa';
+import axios, { isAxiosError } from 'axios';
+import { API } from 'Plugins/CommonUtils/API';
+import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
+import 'Pages/css/Main.css';
 
 export function TeacherDashboard() {
     const [teacherUsername, setTeacherUsername] = useState('');
@@ -13,6 +17,20 @@ export function TeacherDashboard() {
     const [selectedCoursesCount, setSelectedCoursesCount] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
     const history = useHistory();
+    const { darkMode } = useContext(ThemeContext);
+
+    useEffect(() => {
+        // Assuming username and password are stored in localStorage
+        const { usertype, username, token } = Auth.getState();
+
+        if (!usertype || !username || !token) {
+            // Redirect to login page
+            history.push('/login');
+        }
+        else if (usertype !== 'teacher') {
+            history.push('/');
+        }
+    }, []);
 
     useEffect(() => {
         setTeacherUsername(Auth.getState().username);
