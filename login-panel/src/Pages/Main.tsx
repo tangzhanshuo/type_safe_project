@@ -22,12 +22,18 @@ export function Main() {
                     <img src="/logo.svg" alt="Logo" className="w-10 h-10" />
                     <h1 className="text-2xl font-bold">Course Selection System</h1>
                 </div>
-                <nav>
-                    <ul className="flex space-x-6">
+                <nav className="flex items-center">
+                    <ul className="flex space-x-6 mr-6">
                         <li><a href="#about" className="hover:text-indigo-600 dark:hover:text-indigo-300 transition">About</a></li>
                         <li><a href="#contact" className="hover:text-indigo-600 dark:hover:text-indigo-300 transition">Contact</a></li>
                         <li><a href="#help" className="hover:text-indigo-600 dark:hover:text-indigo-300 transition">Help</a></li>
                     </ul>
+                    <button
+                        onClick={toggleDarkMode}
+                        className="bg-gray-200 dark:bg-gray-700 p-2 rounded-full transition-colors duration-300"
+                    >
+                        {darkMode ? '☀️' : '🌙'}
+                    </button>
                 </nav>
             </header>
 
@@ -37,13 +43,13 @@ export function Main() {
                     <p className="text-xl mb-8">Streamline your academic journey with our cutting-edge system</p>
 
                     <div className="flex justify-center space-x-6 mb-12">
-                        <button onClick={() => history.push('/student/login')} className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105">
+                        <button onClick={() => history.push('/login/student')} className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105">
                             I'm a Student
                         </button>
-                        <button onClick={() => history.push('/teacher/login')} className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105">
+                        <button onClick={() => history.push('/login/teacher')} className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105">
                             I'm a Teacher
                         </button>
-                        <button onClick={() => history.push('/admin/login')} className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105">
+                        <button onClick={() => history.push('/login/admin')} className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:scale-105">
                             I'm an Admin
                         </button>
                     </div>
@@ -109,13 +115,6 @@ export function Main() {
                     </div>
                 </div>
             </footer>
-
-            <button
-                onClick={toggleDarkMode}
-                className="fixed top-4 right-4 bg-gray-200 dark:bg-gray-700 p-2 rounded-full transition-colors duration-300"
-            >
-                {darkMode ? '☀️' : '🌙'}
-            </button>
         </div>
     );
 }

@@ -23,7 +23,7 @@ const Layout = () => {
             <HashRouter>
                 <Switch>
                     <Route path="/" exact component={Main} />
-                    <Route path="/login" exact component={Login} />
+                    <Route path="/login/:usertype" exact component={Login} />
                     <Route path="/student" exact component={StudentMain} />
                     <Route path="/student/course" exact component={StudentCourse} />
                     <Route path="/student/application" exact component={StudentApplication} />
