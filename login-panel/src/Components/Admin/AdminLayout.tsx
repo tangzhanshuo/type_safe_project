@@ -1,8 +1,9 @@
 import React, { ReactNode, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import {Link, useHistory, useLocation} from 'react-router-dom';
 import { useAuth } from 'Hooks/UseAuth';
 import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
 import { FaHome, FaUsers, FaBook, FaChalkboardTeacher, FaClipboardList, FaSignOutAlt } from 'react-icons/fa';
+import {logout} from "Plugins/CommonUtils/UserManager";
 
 interface AdminLayoutProps {
     children: ReactNode;
@@ -12,6 +13,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     const location = useLocation();
     useAuth('admin');
     const { toggleDarkMode } = useContext(ThemeContext);
+    const history = useHistory();
 
     const menuItems = [
         { path: '/admin/dashboard', name: 'Dashboard', icon: FaHome },
@@ -46,7 +48,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                 {/* Logout button */}
                 <div className="p-6">
-                    <button className="flex items-center w-full py-2 px-4 text-indigo-100 dark:text-gray-300 hover:bg-indigo-700 dark:hover:bg-gray-700 transition-colors duration-200 rounded">
+                    <button
+                        onClick={() => logout(history)}
+                        className="flex items-center w-full py-2 px-4 text-blue-100 dark:text-gray-300 hover:bg-blue-600 dark:hover:bg-gray-700 transition-colors duration-200 rounded"
+                    >
                         <FaSignOutAlt className="mr-3" />
                         Logout
                     </button>
