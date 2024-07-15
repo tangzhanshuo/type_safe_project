@@ -160,7 +160,7 @@ export function TeacherAddCourse() {
                     <button onClick={() => history.push('/teacher/course')} className="button">
                         Back To Courses
                     </button>
-                    <button onClick={() => history.push('/teacher')} className="button">
+                    <button onClick={() => history.push('/teacher/dashboard')} className="button">
                         Back to TeacherMain
                     </button>
                     <button onClick={() => logout(history)} className="button">

@@ -136,7 +136,7 @@ export function TeacherCourseDetail() {
                         <button onClick={() => history.push('/teacher/course')} className="button">
                             Back to Course List
                         </button>
-                        <button onClick={() => history.push('/teacher')} className="button">
+                        <button onClick={() => history.push('/teacher/dashboard')} className="button">
                             Back to TeacherMain
                         </button>
                         <button onClick={() => logout(history)} className="button">

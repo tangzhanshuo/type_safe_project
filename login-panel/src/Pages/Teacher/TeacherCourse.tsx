@@ -126,7 +126,7 @@ export function TeacherCourse(): JSX.Element {
                         <button onClick={getCourses} className="button">
                             Refresh Courses
                         </button>
-                        <button onClick={() => history.push('/teacher')} className="button">
+                        <button onClick={() => history.push('/teacher/dashboard')} className="button">
                             Back to TeacherMain
                         </button>
                         <button onClick={() => history.push('/')} className="button">

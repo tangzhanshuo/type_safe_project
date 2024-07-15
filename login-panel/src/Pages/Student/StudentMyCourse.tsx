@@ -218,7 +218,7 @@ export function StudentMyCourse() {
 
                 <div className="flex space-x-4">
                     <button
-                        onClick={() => history.push('/student')}
+                        onClick={() => history.push('/student/dashboard')}
                         className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300"
                     >
                         Back to StudentMain

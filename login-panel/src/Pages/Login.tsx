@@ -35,7 +35,7 @@ export function Login() {
 
     const handleSuccessOk = () => {
         setShowSuccessPopup(false);
-        history.push(`/${usertype}`);
+        history.push(`/${usertype}/dashboard`);
     };
 
     return (

@@ -197,7 +197,7 @@ export function StudentApplication() {
                 <div className="button-group">
                     <button onClick={handleAdd} className="button">Add Application</button>
                     <button onClick={handleGetFromApplicant} className="button">Get My Applications</button>
-                    <button onClick={() => history.push('/student')} className="button">
+                    <button onClick={() => history.push('/student/dashboard')} className="button">
                         Back to StudentMain
                     </button>
                     <button onClick={() => logout(history)} className="button">Log out</button>
