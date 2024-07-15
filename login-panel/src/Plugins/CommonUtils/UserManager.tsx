@@ -2,7 +2,6 @@ import { UserLoginMessage } from 'Plugins/UserAPI/UserLoginMessage';
 import { UserRegisterMessage } from 'Plugins/UserAPI/UserRegisterMessage';
 import { UserDeleteMessage } from 'Plugins/UserAPI/UserDeleteMessage';
 import { UserUpdateMessage } from 'Plugins/UserAPI/UserUpdateMessage';
-import { UserFindMessage } from 'Plugins/UserAPI/UserFindMessage';
 import { sendUnverifiedPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { History } from 'history';
 import Auth from 'Plugins/CommonUtils/AuthState';
@@ -35,10 +34,6 @@ export const sendUserRequest = async (messageType: string, usertype: string, use
             break;
         case "update":
             await sendUnverifiedPostRequest(new UserUpdateMessage(usertype, username, password));
-            break;
-        case "find":
-            const response = await sendUnverifiedPostRequest(new UserFindMessage(usertype, username));
-            if (setFoundPassword) setFoundPassword(response.data.password);
             break;
     }
     return '';

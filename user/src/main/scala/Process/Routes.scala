@@ -19,27 +19,23 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+
       case "UserRegisterMessage" =>
         IO(decode[UserRegisterMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserRegisterMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+
       case "UserDeleteMessage" =>
         IO(decode[UserDeleteMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserDeleteMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+
       case "UserUpdateMessage" =>
         IO(decode[UserUpdateMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserUpdateMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
-          }
-      case "UserFindMessage" =>
-        IO(decode[UserFindMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserFindMessage")))
-          .flatMap { m =>
-            m.fullPlan.map { password =>
-              Map("password" -> password).asJson.noSpaces
-            }
           }
 
       case "UserValidateTokenMessage" =>

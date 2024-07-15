@@ -12,7 +12,6 @@ export function AdminMain() {
         const [username, setUsername] = useState('');
         const [password, setPassword] = useState('');
         const [errorMessage, setErrorMessage] = useState('');
-        const [foundPassword, setFoundPassword] = useState('');
 
     useEffect(() => {
         // Assuming username and password are stored in localStorage
@@ -73,23 +72,7 @@ export function AdminMain() {
                             className="button">
                         Update
                     </button>
-                    <button
-                        onClick={() => sendUserRequest('find', usertype, username, password, (password) => setFoundPassword(password))}
-                        className="button">
-                        Find
-                    </button>
-                    <button onClick={() => history.push('/admin/course')} className="button">
-                        Go to AdminCourse
-                    </button>
-                    <button onClick={() => history.push('/admin/application')} className="button">
-                        Go to Applications
-                    </button>
-                    <button onClick={() => history.push('/')} className="button">
-                        Back to main
-                    </button>
                 </div>
-                {foundPassword && <p className="result">Found Password: {foundPassword}</p>}
-
             </main>
         </div>
 
