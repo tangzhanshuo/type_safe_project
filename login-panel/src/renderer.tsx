@@ -16,6 +16,7 @@ import { TeacherCourseDetail } from 'Pages/Teacher/TeacherCourseDetail'
 import {TeacherCourse} from "Pages/Teacher/TeacherCourse"
 import {TeacherAddCourse} from "Pages/Teacher/TeacherAddCourse"
 import { AdminApplication } from 'Pages/Admin/AdminApplication'
+import { StudentDashboard } from 'Pages/Student/StudentDashboard'
 
 const Layout = () => {
     return (
@@ -26,6 +27,7 @@ const Layout = () => {
                     <Route path="/login/:usertype" exact component={Login} />
                     <Route path="/student" exact component={StudentMain} />
                     <Route path="/student/course" exact component={StudentCourse} />
+                    <Route path="/student/dashboard" exact component={StudentDashboard} />
                     <Route path="/student/application" exact component={StudentApplication} />
                     <Route path="/student/course/:courseid(\d+)" component={StudentCourseDetail} />
                     <Route path="/teacher" exact component={TeacherMain} />
