@@ -5,7 +5,8 @@
 ### Upcoming Features / Tasks
 - [ ] CourseApi: Add student to course forcibly
 - [ ] CourseApi: Get course by course name
-
+- [ ] Functionality: Auto student priority from plan
+- [ ] Functionality: 预选-正选切换
 
 ### In Progress
 - [ ] ObjectType for everything. 
