@@ -215,21 +215,6 @@ export function StudentMyCourse() {
                         {deleteCourseResponse}
                     </div>
                 )}
-
-                <div className="flex space-x-4">
-                    <button
-                        onClick={() => history.push('/student/dashboard')}
-                        className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-                    >
-                        Back to StudentMain
-                    </button>
-                    <button
-                        onClick={() => logout(history)}
-                        className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-                    >
-                        Log out
-                    </button>
-                </div>
             </div>
         </StudentLayout>
     );

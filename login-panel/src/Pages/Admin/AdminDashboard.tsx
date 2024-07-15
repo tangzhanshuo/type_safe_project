@@ -43,21 +43,6 @@ export function AdminDashboard() {
                     <h3 className="text-xl font-semibold mb-4">Quick Stats</h3>
                     <p>Welcome to the Admin Dashboard. Here you can manage users, courses, classrooms, and applications.</p>
                 </div>
-
-                <div className="flex space-x-4">
-                    <button
-                        onClick={() => history.push('/admin/dashboard')}
-                        className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-                    >
-                        Back to AdminMain
-                    </button>
-                    <button
-                        onClick={() => logout(history)}
-                        className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-                    >
-                        Log out
-                    </button>
-                </div>
             </div>
         </AdminLayout>
     );
