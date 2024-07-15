@@ -8,17 +8,30 @@ import Auth from 'Plugins/CommonUtils/AuthState';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage';
-import { FaSync, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaSync, FaTrash, FaPlus, FaSortUp, FaSortDown } from 'react-icons/fa';
+
+interface Course {
+    courseid: string;
+    coursename: string;
+    teachername: string;
+    capacity: number;
+    credits: number;
+    info: string;
+}
 
 export function StudentCourseList() {
-    const [studentUsername, setStudentUsername] = useState('');
-    const [courses, setCourses] = useState([]);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [addCourseResponse, setAddCourseResponse] = useState('');
-    const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
-    const [selectedCourses, setSelectedCourses] = useState([]);
-    const [showAddResponse, setShowAddResponse] = useState(false);
-    const [showDeleteResponse, setShowDeleteResponse] = useState(false);
+    const [studentUsername, setStudentUsername] = useState<string>('');
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [addCourseResponse, setAddCourseResponse] = useState<string>('');
+    const [deleteCourseResponse, setDeleteCourseResponse] = useState<string>('');
+    const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
+    const [showAddResponse, setShowAddResponse] = useState<boolean>(false);
+    const [showDeleteResponse, setShowDeleteResponse] = useState<boolean>(false);
+    const [sortColumn, setSortColumn] = useState<keyof Course>('courseid');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [selectedSortColumn, setSelectedSortColumn] = useState<keyof Course>('courseid');
+    const [selectedSortDirection, setSelectedSortDirection] = useState<'asc' | 'desc'>('asc');
     const history = useHistory();
 
     useEffect(() => {
@@ -37,7 +50,7 @@ export function StudentCourseList() {
             return;
         }
         try {
-            const parsedCourses = JSON.parse(response.data);
+            const parsedCourses: Course[] = JSON.parse(response.data);
             setSelectedCourses(parsedCourses);
             setErrorMessage('');
         } catch (error) {
@@ -86,13 +99,62 @@ export function StudentCourseList() {
             return;
         }
         try {
-            const parsedCourses = JSON.parse(response.data);
+            const parsedCourses: Course[] = JSON.parse(response.data);
             setCourses(parsedCourses);
             setErrorMessage('');
         } catch (error) {
             setErrorMessage('Error parsing course data');
         }
     };
+
+    const handleSort = (column: keyof Course, isSelectedCourses: boolean) => {
+        if (isSelectedCourses) {
+            if (column === selectedSortColumn) {
+                setSelectedSortDirection(selectedSortDirection === 'asc' ? 'desc' : 'asc');
+            } else {
+                setSelectedSortColumn(column);
+                setSelectedSortDirection('asc');
+            }
+        } else {
+            if (column === sortColumn) {
+                setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+            } else {
+                setSortColumn(column);
+                setSortDirection('asc');
+            }
+        }
+    };
+
+    const sortedCourses = [...courses].sort((a, b) => {
+        if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
+        if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const sortedSelectedCourses = [...selectedCourses].sort((a, b) => {
+        if (a[selectedSortColumn] < b[selectedSortColumn]) return selectedSortDirection === 'asc' ? -1 : 1;
+        if (a[selectedSortColumn] > b[selectedSortColumn]) return selectedSortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const SortIcon = ({ column, isSelectedCourses }: { column: keyof Course, isSelectedCourses: boolean }) => {
+        const currentSortColumn = isSelectedCourses ? selectedSortColumn : sortColumn;
+        const currentSortDirection = isSelectedCourses ? selectedSortDirection : sortDirection;
+        if (column !== currentSortColumn) return null;
+        return currentSortDirection === 'asc' ? <FaSortUp className="ml-1" /> : <FaSortDown className="ml-1" />;
+    };
+
+    const renderSortableHeader = (column: keyof Course, label: string, isSelectedCourses: boolean) => (
+        <th
+            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+            onClick={() => handleSort(column, isSelectedCourses)}
+        >
+            <div className="flex items-center">
+                {label}
+                <SortIcon column={column} isSelectedCourses={isSelectedCourses} />
+            </div>
+        </th>
+    );
 
     return (
         <StudentLayout>
@@ -110,22 +172,22 @@ export function StudentCourseList() {
 
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                     <h3 className="text-xl font-semibold mb-4">All Courses</h3>
-                    {courses.length > 0 ? (
+                    {sortedCourses.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course ID</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Teacher</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Capacity</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Credits</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Info</th>
+                                    {renderSortableHeader('courseid', 'Course ID', false)}
+                                    {renderSortableHeader('coursename', 'Course Name', false)}
+                                    {renderSortableHeader('teachername', 'Teacher', false)}
+                                    {renderSortableHeader('capacity', 'Capacity', false)}
+                                    {renderSortableHeader('credits', 'Credits', false)}
+                                    {renderSortableHeader('info', 'Info', false)}
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
                                 </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                {courses.map((course) => (
+                                {sortedCourses.map((course) => (
                                     <tr key={course.courseid}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <Link to={`/student/course/${course.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
@@ -160,22 +222,22 @@ export function StudentCourseList() {
 
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                     <h3 className="text-xl font-semibold mb-4">Selected Courses</h3>
-                    {selectedCourses.length > 0 ? (
+                    {sortedSelectedCourses.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course ID</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Teacher</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Capacity</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Credits</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Info</th>
+                                    {renderSortableHeader('courseid', 'Course ID', true)}
+                                    {renderSortableHeader('coursename', 'Course Name', true)}
+                                    {renderSortableHeader('teachername', 'Teacher', true)}
+                                    {renderSortableHeader('capacity', 'Capacity', true)}
+                                    {renderSortableHeader('credits', 'Credits', true)}
+                                    {renderSortableHeader('info', 'Info', true)}
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
                                 </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                {selectedCourses.map((course) => (
+                                {sortedSelectedCourses.map((course) => (
                                     <tr key={course.courseid}>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.courseid}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.coursename}</td>
