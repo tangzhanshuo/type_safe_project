@@ -6,9 +6,8 @@ import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourse
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
-import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage';
-import { FaSync, FaTrash, FaPlus, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaSync, FaPlus, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 interface Course {
     courseid: string;
@@ -24,14 +23,10 @@ export function StudentCourseList() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [addCourseResponse, setAddCourseResponse] = useState<string>('');
-    const [deleteCourseResponse, setDeleteCourseResponse] = useState<string>('');
     const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
     const [showAddResponse, setShowAddResponse] = useState<boolean>(false);
-    const [showDeleteResponse, setShowDeleteResponse] = useState<boolean>(false);
     const [sortColumn, setSortColumn] = useState<keyof Course>('courseid');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-    const [selectedSortColumn, setSelectedSortColumn] = useState<keyof Course>('courseid');
-    const [selectedSortDirection, setSelectedSortDirection] = useState<'asc' | 'desc'>('asc');
     const history = useHistory();
 
     useEffect(() => {
@@ -75,23 +70,6 @@ export function StudentCourseList() {
         fetchSelectedCourses();
     };
 
-    const deleteCourseWithId = async (courseid: string) => {
-        const id = parseInt(courseid, 10);
-        if (isNaN(id)) {
-            setDeleteCourseResponse('Invalid course ID');
-            return;
-        }
-        const response = await sendPostRequest(new StudentDeleteCourseMessage(id));
-        if (response.isError) {
-            setDeleteCourseResponse(response.error);
-            return;
-        }
-        setDeleteCourseResponse('Course ' + id + ' deleted successfully');
-        setShowDeleteResponse(true);
-        setTimeout(() => setShowDeleteResponse(false), 2000);
-        fetchSelectedCourses();
-    };
-
     const getCourseList = async () => {
         const response = await sendPostRequest(new StudentGetCourseListMessage());
         if (response.isError) {
@@ -107,21 +85,12 @@ export function StudentCourseList() {
         }
     };
 
-    const handleSort = (column: keyof Course, isSelectedCourses: boolean) => {
-        if (isSelectedCourses) {
-            if (column === selectedSortColumn) {
-                setSelectedSortDirection(selectedSortDirection === 'asc' ? 'desc' : 'asc');
-            } else {
-                setSelectedSortColumn(column);
-                setSelectedSortDirection('asc');
-            }
+    const handleSort = (column: keyof Course) => {
+        if (column === sortColumn) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
         } else {
-            if (column === sortColumn) {
-                setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-            } else {
-                setSortColumn(column);
-                setSortDirection('asc');
-            }
+            setSortColumn(column);
+            setSortDirection('asc');
         }
     };
 
@@ -131,27 +100,19 @@ export function StudentCourseList() {
         return 0;
     });
 
-    const sortedSelectedCourses = [...selectedCourses].sort((a, b) => {
-        if (a[selectedSortColumn] < b[selectedSortColumn]) return selectedSortDirection === 'asc' ? -1 : 1;
-        if (a[selectedSortColumn] > b[selectedSortColumn]) return selectedSortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    const SortIcon = ({ column, isSelectedCourses }: { column: keyof Course, isSelectedCourses: boolean }) => {
-        const currentSortColumn = isSelectedCourses ? selectedSortColumn : sortColumn;
-        const currentSortDirection = isSelectedCourses ? selectedSortDirection : sortDirection;
-        if (column !== currentSortColumn) return null;
-        return currentSortDirection === 'asc' ? <FaSortUp className="ml-1" /> : <FaSortDown className="ml-1" />;
+    const SortIcon = ({ column }: { column: keyof Course }) => {
+        if (column !== sortColumn) return null;
+        return sortDirection === 'asc' ? <FaSortUp className="ml-1" /> : <FaSortDown className="ml-1" />;
     };
 
-    const renderSortableHeader = (column: keyof Course, label: string, isSelectedCourses: boolean) => (
+    const renderSortableHeader = (column: keyof Course, label: string) => (
         <th
             className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-            onClick={() => handleSort(column, isSelectedCourses)}
+            onClick={() => handleSort(column)}
         >
             <div className="flex items-center">
                 {label}
-                <SortIcon column={column} isSelectedCourses={isSelectedCourses} />
+                <SortIcon column={column} />
             </div>
         </th>
     );
@@ -177,22 +138,20 @@ export function StudentCourseList() {
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    {renderSortableHeader('courseid', 'Course ID', false)}
-                                    {renderSortableHeader('coursename', 'Course Name', false)}
-                                    {renderSortableHeader('teachername', 'Teacher', false)}
-                                    {renderSortableHeader('capacity', 'Capacity', false)}
-                                    {renderSortableHeader('credits', 'Credits', false)}
-                                    {renderSortableHeader('info', 'Info', false)}
+                                    {renderSortableHeader('courseid', 'Course ID')}
+                                    {renderSortableHeader('coursename', 'Course Name')}
+                                    {renderSortableHeader('teachername', 'Teacher')}
+                                    {renderSortableHeader('capacity', 'Capacity')}
+                                    {renderSortableHeader('credits', 'Credits')}
+                                    {renderSortableHeader('info', 'Info')}
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
                                 </tr>
                                 </thead>
-                                <tbody
-                                    className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 {sortedCourses.map((course) => (
                                     <tr key={course.courseid}>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/student/course/${course.courseid}`}
-                                                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                            <Link to={`/student/course/${course.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                                 {course.courseid}
                                             </Link>
                                         </td>
@@ -218,58 +177,7 @@ export function StudentCourseList() {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No courses to display. Click the refresh button
-                            to load the course list.</p>
-                    )}
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                    <h3 className="text-xl font-semibold mb-4">Selected Courses</h3>
-                    {sortedSelectedCourses.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead className="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    {renderSortableHeader('courseid', 'Course ID', true)}
-                                    {renderSortableHeader('coursename', 'Course Name', true)}
-                                    {renderSortableHeader('teachername', 'Teacher', true)}
-                                    {renderSortableHeader('capacity', 'Capacity', true)}
-                                    {renderSortableHeader('credits', 'Credits', true)}
-                                    {renderSortableHeader('info', 'Info', true)}
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
-                                </tr>
-                                </thead>
-                                <tbody
-                                    className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                {sortedSelectedCourses.map((course) => (
-                                    <tr key={course.courseid}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/student/course/${course.courseid}`}
-                                                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                {course.courseid}
-                                            </Link>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.coursename}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.teachername}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <button
-                                                onClick={() => deleteCourseWithId(course.courseid)}
-                                                className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
-                                                title="Delete course"
-                                            >
-                                                <FaTrash />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No selected courses.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No courses to display. Click the refresh button to load the course list.</p>
                     )}
                 </div>
 
@@ -278,12 +186,6 @@ export function StudentCourseList() {
                 {showAddResponse && (
                     <div className="fixed bottom-4 right-4 bg-green-500 text-white p-2 rounded shadow-lg">
                         {addCourseResponse}
-                    </div>
-                )}
-
-                {showDeleteResponse && (
-                    <div className="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded shadow-lg">
-                        {deleteCourseResponse}
                     </div>
                 )}
 
