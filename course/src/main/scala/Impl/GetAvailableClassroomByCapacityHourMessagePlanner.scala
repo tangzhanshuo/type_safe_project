@@ -8,42 +8,33 @@ import io.circe.syntax._
 import io.circe.Json
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI._
-import Common.Object.SqlParameter
+import Common.Object.{Classroom, SqlParameter}
+import io.circe.Decoder
 
 case class GetAvailableClassroomByCapacityHourMessagePlanner(
                                                               capacity: Int,
-                                                              courseHourJson: String,
+                                                              courseHour: List[Int],
                                                               override val planContext: PlanContext
-                                                            ) extends Planner[String] {
+                                                            ) extends Planner[List[Classroom]] {
 
-  override def plan(using planContext: PlanContext): IO[String] = {
-    val getClassroomsQuery = s"SELECT * FROM classroom"
-
-    def parseCourseHours(courseHourJson: String): List[Int] = {
-      parse(courseHourJson).getOrElse(Json.arr()).as[List[Int]].getOrElse(Nil)
-    }
+  override def plan(using planContext: PlanContext): IO[List[Classroom]] = {
+    val getClassroomsQuery = "SELECT * FROM classroom"
 
     def checkTimeConflict(existingHours: List[Int], newHours: List[Int]): Boolean = {
       existingHours.exists(newHours.contains)
     }
 
-    def getClassroomEnrolledCourses(classroomID: Int): IO[Json] = readDBString(s"SELECT enrolledcourses FROM classroom WHERE classroomid = ?",
-      List(SqlParameter("int", classroomID.toString))
+    def getClassroomEnrolledCourses(classroomid: Int): IO[Map[Int, List[Int]]] = readDBString("SELECT enrolled_courses FROM classroom WHERE classroomid = ?",
+      List(SqlParameter("int", classroomid.toString))
     ).flatMap { enrolledCoursesJsonString =>
-      IO.fromEither(parse(enrolledCoursesJsonString).left.map(e => new Exception(s"Invalid JSON for enrolledCourses: ${e.getMessage}")))
+      IO.fromEither(parse(enrolledCoursesJsonString).flatMap(_.as[Map[Int, List[Int]]]).left.map(e => new Exception(s"Invalid JSON for enrolledCourses: ${e.getMessage}")))
     }
 
-    def getClassroomCapacity(classroomID: Int): IO[Int] = readDBInt(s"SELECT capacity FROM classroom WHERE classroomid = ?",
-      List(SqlParameter("int", classroomID.toString))
-    )
-
-    def isClassroomAvailable(classroomID: Int, existingCourses: Json, newCourseHours: List[Int], classroomCapacity: Int): Boolean = {
-      if (classroomID < 0 || classroomCapacity < 0) {
+    def isClassroomAvailable(classroomid: Int, enrolledCourses: Map[Int, List[Int]], newCourseHours: List[Int], classroomCapacity: Int): Boolean = {
+      if (classroomid < 0 || classroomCapacity < 0) {
         true
       } else {
-        val enrolledCourses = existingCourses.asObject.map(_.toMap).getOrElse(Map.empty)
-        val isAvailableByTime = !enrolledCourses.values.exists { courseHoursJson =>
-          val existingCourseHours = courseHoursJson.as[List[Int]].getOrElse(Nil)
+        val isAvailableByTime = !enrolledCourses.values.exists { existingCourseHours =>
           checkTimeConflict(existingCourseHours, newCourseHours)
         }
         val isAvailableByCapacity = classroomCapacity >= capacity
@@ -51,20 +42,21 @@ case class GetAvailableClassroomByCapacityHourMessagePlanner(
       }
     }
 
-    def sortClassroomsByID(classrooms: List[Json]): List[Json] = {
-      classrooms.sortBy(_.hcursor.get[Int]("classroomid").getOrElse(0))
+    def sortClassroomsById(classrooms: List[Classroom]): List[Classroom] = {
+      classrooms.sortBy(_.classroomid)
     }
 
     readDBRows(getClassroomsQuery, List()).flatMap { rows =>
-      val newCourseHours = parseCourseHours(courseHourJson)
       val availableClassroomsIO = rows.traverse { row =>
-        val classroomID = row.hcursor.get[Int]("classroomid").getOrElse(0)
+        val cursor = row.hcursor
         for {
-          enrolledCourses <- getClassroomEnrolledCourses(classroomID)
-          classroomCapacity <- getClassroomCapacity(classroomID)
+          classroomid <- IO.fromEither(cursor.get[Int]("classroomid").left.map(e => new Exception("Missing classroomid")))
+          classroomName <- IO.fromEither(cursor.get[String]("classroomName").left.map(e => new Exception("Missing classroomName")))
+          classroomCapacity <- IO.fromEither(cursor.get[Int]("capacity").left.map(e => new Exception("Missing capacity")))
+          enrolledCourses <- getClassroomEnrolledCourses(classroomid)
         } yield {
-          if (isClassroomAvailable(classroomID, enrolledCourses, newCourseHours, classroomCapacity)) {
-            Some(row)
+          if (isClassroomAvailable(classroomid, enrolledCourses, courseHour, classroomCapacity)) {
+            Some(Classroom(classroomid, classroomName, classroomCapacity, enrolledCourses))
           } else {
             None
           }
@@ -72,7 +64,7 @@ case class GetAvailableClassroomByCapacityHourMessagePlanner(
       }
       availableClassroomsIO.map { classrooms =>
         val availableClassrooms = classrooms.flatten
-        sortClassroomsByID(availableClassrooms).asJson.noSpaces
+        sortClassroomsById(availableClassrooms)
       }
     }
   }

@@ -32,16 +32,16 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                             <tbody>
                             <tr>
                                 <td className="scrollable-text">{courseDetails.courseid}</td>
-                                <td className="scrollable-text">{courseDetails.coursename}</td>
-                                <td className="scrollable-text">{courseDetails.teacherusername}</td>
-                                <td className="scrollable-text">{courseDetails.teachername}</td>
+                                <td className="scrollable-text">{courseDetails.courseName}</td>
+                                <td className="scrollable-text">{courseDetails.teacherUsername}</td>
+                                <td className="scrollable-text">{courseDetails.teacherName}</td>
                                 <td className="scrollable-text">{courseDetails.capacity}</td>
                                 <td className="long-text">{courseDetails.info}</td>
-                                <td className="scrollable-text">{courseDetails.coursehour}</td>
+                                <td className="scrollable-text">{courseDetails.courseHour}</td>
                                 <td className="scrollable-text">{courseDetails.classroomid}</td>
                                 <td className="scrollable-text">{courseDetails.credits}</td>
-                                <td className="long-text">{courseDetails.enrolledstudents}</td>
-                                <td className="long-text">{courseDetails.allstudents}</td>
+                                <td className="long-text">{courseDetails.enrolledStudents}</td>
+                                <td className="long-text">{courseDetails.allStudents}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -72,16 +72,16 @@ export const RetrievedCourseInformation: React.FC<Props> = ({ courseDetails, cou
                             {courseList.map((course, index) => (
                                 <tr key={index}>
                                     <td className="scrollable-text">{course.courseid}</td>
-                                    <td className="scrollable-text">{course.coursename}</td>
-                                    <td className="scrollable-text">{course.teacherusername}</td>
-                                    <td className="scrollable-text">{course.teachername}</td>
+                                    <td className="scrollable-text">{course.courseName}</td>
+                                    <td className="scrollable-text">{course.teacherUsername}</td>
+                                    <td className="scrollable-text">{course.teacherName}</td>
                                     <td className="scrollable-text">{course.capacity}</td>
                                     <td className="long-text">{course.info}</td>
-                                    <td className="scrollable-text">{course.coursehour}</td>
+                                    <td className="scrollable-text">{course.courseHour}</td>
                                     <td className="scrollable-text">{course.classroomid}</td>
                                     <td className="scrollable-text">{course.credits}</td>
-                                    <td className="long-text">{course.enrolledstudents}</td>
-                                    <td className="long-text">{course.allstudents}</td>
+                                    <td className="long-text">{course.enrolledStudents}</td>
+                                    <td className="long-text">{course.allStudents}</td>
                                 </tr>
                             ))}
                             </tbody>

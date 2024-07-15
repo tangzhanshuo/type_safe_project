@@ -1,14 +1,17 @@
 package Impl
 
 import cats.effect.IO
+import io.circe.syntax._
 import Common.API.{PlanContext, Planner}
-import Common.CourseAPI.getCourse
+import Common.CourseAPI._
+import io.circe.generic.auto._
+import Common.Object.Course
 
 case class AdminGetCourseMessagePlanner(
-                                         courseID: Int,
+                                         courseid: Int,
                                          override val planContext: PlanContext
-                                       ) extends Planner[String] {
-  override def plan(using planContext: PlanContext): IO[String] = {
-    getCourse(courseID)
+                                       ) extends Planner[Course] {
+  override def plan(using planContext: PlanContext): IO[Course] = {
+    getCourse(courseid)
   }
 }

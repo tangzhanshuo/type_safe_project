@@ -1,7 +1,10 @@
 package Common.CourseAPI
 
 import Common.API.API
+import Common.Object.{EnrolledStudent, AllStudent, Course}
 import Global.ServiceCenter.courseServiceCode
+import io.circe.generic.semiauto._
+import io.circe.{Decoder, Encoder}
 
 case class AddCourseMessage(
                              courseName: String,
@@ -9,9 +12,10 @@ case class AddCourseMessage(
                              teacherName: String,
                              capacity: Int,
                              info: String,
-                             courseHourJson: String, // JSON represented as String
-                             classroomID: Int,
+                             courseHour: List[Int],
+                             classroomid: Int,
                              credits: Int,
-                             enrolledStudentsJson: String, // JSON represented as String
-                             allStudentsJson: String // JSON represented as String
-                           ) extends API[String](courseServiceCode)
+                             enrolledStudents: List[EnrolledStudent],
+                             allStudents: List[AllStudent]
+                           ) extends API[Course](courseServiceCode)
+

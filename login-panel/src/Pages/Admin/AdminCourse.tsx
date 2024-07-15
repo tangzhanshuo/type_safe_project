@@ -122,13 +122,14 @@ export function AdminCourse() {
                 {errorMessage && <p className="error">{errorMessage}</p>}
                 {successMessage && <p className="success">{successMessage}</p>}
                 <div className="retrieved-course-container">
-                    <RetrievedCourseInformation courseDetails={courseDetails} title="Retrieved Course" />
-                    <RetrievedCourseInformation courseList={courseList} title="All Courses" />
+                    {/*<RetrievedCourseInformation courseDetails={courseDetails} title="Retrieved Course" />*/}
+                    {/*<RetrievedCourseInformation courseList={courseList} title="All Courses" />*/}
                 </div>
                 <div className="retrieved-classroom-container">
-                    <RetrievedClassroomInformation classroomDetails={classroomDetails} title="Retrieved Classroom" />
-                    <RetrievedClassroomInformation classroomList={classroomList} title="All Classrooms" />
-                    <RetrievedClassroomInformation classroomList={availableClassrooms} title="Available Classrooms" />
+
+                    {/*<RetrievedClassroomInformation classroomDetails={classroomDetails} title="Retrieved Classroom" />*/}
+                    {/*<RetrievedClassroomInformation classroomList={classroomList} title="All Classrooms" />*/}
+                    {/*<RetrievedClassroomInformation classroomList={availableClassrooms} title="Available Classrooms" />*/}
                 </div>
             </main>
         </div>

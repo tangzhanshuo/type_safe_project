@@ -1,49 +1,45 @@
 package Impl
 
 import cats.effect.IO
-import io.circe.generic.auto.*
-import io.circe.parser.parse
-import io.circe.syntax.*
+import io.circe.generic.auto._
+import io.circe.syntax._
 import Common.API.{PlanContext, Planner}
-import Common.DBAPI.*
-import Common.Object.SqlParameter
+import Common.DBAPI._
+import Common.Object.{SqlParameter, Classroom}
 
 case class AddClassroomMessagePlanner(
-                                       classroomID: Int,
+                                       classroomid: Int,
                                        classroomName: String,
                                        capacity: Int, // 新增的capacity字段
-                                       enrolledCoursesJson: String, // JSON represented as String
+                                       enrolledCourses: Map[Int, List[Int]], // JSON represented as String
                                        override val planContext: PlanContext
-                                     ) extends Planner[String] {
-  override def plan(using planContext: PlanContext): IO[String] = {
+                                     ) extends Planner[Classroom] {
+  override def plan(using planContext: PlanContext): IO[Classroom] = {
     val checkClassroomExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM classroom WHERE classroomid = ?)",
-      List(SqlParameter("int", classroomID.toString))
+      List(SqlParameter("int", classroomid.toString))
     )
 
     checkClassroomExists.flatMap { exists =>
       if (exists) {
-        IO.raiseError(new Exception("Classroom with this ID already exists"))
+        IO.raiseError(new Exception("Classroom with this id already exists"))
       } else {
-        // Validate the JSON string by parsing it
-        val enrolledCoursesValidation = parse(enrolledCoursesJson).left.map(e => new Exception(s"Invalid JSON for enrolledCourses: ${e.getMessage}"))
+        // 将enrolledCourses转为JSON字符串
+        val enrolledCoursesJson = enrolledCourses.asJson.noSpaces
 
-        enrolledCoursesValidation match {
-          case Right(_) =>
-            writeDB(s"""
-                       |INSERT INTO classroom (
-                       |  classroomid, classroomname, capacity, enrolledcourses
-                       |) VALUES (?, ?, ?, ?)
+        // 将enrolledCoursesJson作为jsonb类型插入数据库
+        writeDB(
+          s"""
+             |INSERT INTO classroom (
+             |  classroomid, classroom_name, capacity, enrolled_courses
+             |) VALUES (?, ?, ?, ?)
             """.stripMargin,
-              List(
-                SqlParameter("int", classroomID.toString),
-                SqlParameter("string", classroomName),
-                SqlParameter("int", capacity.toString), // 插入新的capacity字段
-                SqlParameter("jsonb", enrolledCoursesJson)
-              )
-            ).map(_ => s"Classroom $classroomName with ID $classroomID and capacity $capacity successfully added")
-
-          case Left(error) => IO.raiseError(error)
-        }
+          List(
+            SqlParameter("int", classroomid.toString),
+            SqlParameter("string", classroomName),
+            SqlParameter("int", capacity.toString), // 插入新的capacity字段
+            SqlParameter("jsonb", enrolledCoursesJson)
+          )
+        ).map(_ => Classroom(classroomid, classroomName, capacity, enrolledCourses))
       }
     }
   }

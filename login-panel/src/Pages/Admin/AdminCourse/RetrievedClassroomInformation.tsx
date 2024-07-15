@@ -25,9 +25,9 @@ export const RetrievedClassroomInformation: React.FC<Props> = ({ classroomDetail
                             <tbody>
                             <tr>
                                 <td className="scrollable-text">{classroomDetails.classroomid}</td>
-                                <td className="scrollable-text">{classroomDetails.classroomname}</td>
+                                <td className="scrollable-text">{classroomDetails.classroomName}</td>
                                 <td className="scrollable-text">{classroomDetails.capacity}</td>
-                                <td className="long-text">{classroomDetails.enrolledcourses}</td>
+                                <td className="long-text">{classroomDetails.enrolledCourses}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -51,9 +51,9 @@ export const RetrievedClassroomInformation: React.FC<Props> = ({ classroomDetail
                             {classroomList.map((classroom, index) => (
                                 <tr key={index}>
                                     <td className="scrollable-text">{classroom.classroomid}</td>
-                                    <td className="scrollable-text">{classroom.classroomname}</td>
+                                    <td className="scrollable-text">{classroom.classroomName}</td>
                                     <td className="scrollable-text">{classroom.capacity}</td>
-                                    <td className="long-text">{classroom.enrolledcourses}</td>
+                                    <td className="long-text">{classroom.enrolledCourses}</td>
                                 </tr>
                             ))}
                             </tbody>

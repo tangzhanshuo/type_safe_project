@@ -20,17 +20,18 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
     const [teacherName, setTeacherName] = useState('');
     const [capacity, setCapacity] = useState('');
     const [info, setInfo] = useState('');
-    const [courseHourJson, setCourseHourJson] = useState('');
+    const [courseHour, setCourseHour] = useState('');
     const [classroomID, setClassroomID] = useState('');
     const [credits, setCredits] = useState('');
-    const [enrolledStudentsJson, setEnrolledStudentsJson] = useState('');
-    const [allStudentsJson, setAllStudentsJson] = useState('');
+    const [enrolledStudents, setEnrolledStudents] = useState('');
+    const [allStudents, setAllStudents] = useState('');
 
     const handleAddCourse = async () => {
-        if (!courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHourJson || !classroomID || !credits || !enrolledStudentsJson || !allStudentsJson) {
+        if (!courseName || !teacherUsername || !teacherName || !capacity || !info || !courseHour || !classroomID || !credits || !enrolledStudents || !allStudents) {
             setErrorMessage('All fields are required');
             return;
         }
+
 
         const message = new AdminAddCourseMessage(
             courseName,
@@ -38,11 +39,11 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
             teacherName,
             parseInt(capacity, 10),
             info,
-            courseHourJson,
+            courseHour,
             parseInt(classroomID, 10),
             parseInt(credits, 10),
-            enrolledStudentsJson,
-            allStudentsJson
+            enrolledStudents,
+            allStudents
         );
 
         try {
@@ -97,11 +98,11 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
             teacherName || undefined,
             capacity ? parseInt(capacity, 10) : undefined,
             info || undefined,
-            courseHourJson || undefined,
+            courseHour || undefined,
             classroomID ? parseInt(classroomID, 10) : undefined,
             credits ? parseInt(credits, 10) : undefined,
-            enrolledStudentsJson || undefined,
-            allStudentsJson || undefined
+            enrolledStudents || undefined,
+            allStudents || undefined
         );
 
         try {
@@ -143,14 +144,14 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
     };
 
     const handleGetAvailableClassrooms = async () => {
-        if (!capacity || !courseHourJson) {
+        if (!capacity || !courseHour) {
             setErrorMessage('Capacity and Course Hour are required');
             return;
         }
 
         const message = new AdminGetAvailableClassroomByCapacityHourMessage(
             parseInt(capacity, 10),
-            courseHourJson
+            courseHour
         );
 
         try {
@@ -238,8 +239,8 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
                     <input
                         type="text"
                         placeholder="Course Hour (JSON List[Number])"
-                        value={courseHourJson}
-                        onChange={(e) => setCourseHourJson(e.target.value)}
+                        value={courseHour}
+                        onChange={(e) => setCourseHour(e.target.value)}
                         className="input-field"
                     />
                     <label>Course Hour (JSON List[Number])</label>
@@ -268,8 +269,8 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
                     <input
                         type="text"
                         placeholder="Enrolled Students (JSON List[Text])"
-                        value={enrolledStudentsJson}
-                        onChange={(e) => setEnrolledStudentsJson(e.target.value)}
+                        value={enrolledStudents}
+                        onChange={(e) => setEnrolledStudents(e.target.value)}
                         className="input-field"
                     />
                     <label>Enrolled Students (JSON List[Text])</label>
@@ -278,8 +279,8 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
                     <input
                         type="text"
                         placeholder="AllStudents (JSON)"
-                        value={allStudentsJson}
-                        onChange={(e) => setAllStudentsJson(e.target.value)}
+                        value={allStudents}
+                        onChange={(e) => setAllStudents(e.target.value)}
                         className="input-field"
                     />
                     <label>AllStudents (JSON)</label>

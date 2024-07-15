@@ -1,12 +1,12 @@
 package Common
 
 import Common.API.{API, PlanContext, TraceID}
-import Common.Object.SqlParameter
+import Common.Object._
 import Global.ServiceCenter.courseServiceCode
 import cats.effect.IO
 import io.circe.Json
-import io.circe.generic.auto.*
-import io.circe.syntax.*
+import io.circe.generic.auto._
+import io.circe.syntax._
 import org.http4s.client.Client
 
 package object CourseAPI {
@@ -17,81 +17,82 @@ package object CourseAPI {
                  teacherName: String,
                  capacity: Int,
                  info: String,
-                 courseHourJson: String,
-                 classroomID: Int,
+                 courseHour: List[Int],
+                 classroomid: Int,
                  credits: Int,
-                 enrolledStudentsJson: String,
-                 allStudentsJson: String
-               )(using PlanContext): IO[String] =
-    AddCourseMessage(courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, allStudentsJson).send
+                 enrolledStudents: List[EnrolledStudent],
+                 allStudents: List[AllStudent]
+               )(using PlanContext): IO[Course] = {
+    AddCourseMessage(courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, enrolledStudents, allStudents).send
+  }
 
-  def deleteCourse(courseID: Int)(using PlanContext): IO[String] =
-    DeleteCourseMessage(courseID).send
+  def deleteCourse(courseid: Int)(using PlanContext): IO[String] =
+    DeleteCourseMessage(courseid).send
 
-  def getCourse(courseID: Int)(using PlanContext): IO[String] =
-    GetCourseMessage(courseID).send
+  def getCourse(courseid: Int)(using PlanContext): IO[Course] =
+    GetCourseMessage(courseid).send
 
   def updateCourse(
-                    courseID: Int,
+                    courseid: Int,
                     courseName: Option[String],
                     teacherUsername: Option[String],
                     teacherName: Option[String],
                     capacity: Option[Int],
                     info: Option[String],
-                    courseHourJson: Option[String],
-                    classroomID: Option[Int],
+                    courseHour: Option[List[Int]],
+                    classroomid: Option[Int],
                     credits: Option[Int],
-                    enrolledStudentsJson: Option[String],
-                    allStudentsJson: Option[String]
-                  )(using PlanContext): IO[String] =
-    UpdateCourseMessage(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHourJson, classroomID, credits, enrolledStudentsJson, allStudentsJson).send
+                    enrolledStudents: Option[List[EnrolledStudent]],
+                    allStudents: Option[List[AllStudent]]
+                  )(using PlanContext): IO[Course] =
+    UpdateCourseMessage(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, enrolledStudents, allStudents).send
 
-  def addStudent2Course(courseID: Int, studentUsername: Option[String], priority: Option[Int])(using PlanContext): IO[String] =
-    AddStudent2CourseMessage(courseID, studentUsername, priority).send
+  def addStudent2Course(courseid: Int, studentUsername: Option[String], priority: Option[Int])(using PlanContext): IO[String] =
+    AddStudent2CourseMessage(courseid, studentUsername, priority).send
 
-  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[String] =
+  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[List[Course]] =
     GetCourseByTeacherUsernameMessage(teacherUsername).send
 
-  def deleteStudentFromCourse(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
-    DeleteStudentFromCourseMessage(courseID, studentUsername).send
+  def deleteStudentFromCourse(courseid: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
+    DeleteStudentFromCourseMessage(courseid, studentUsername).send
 
-  def isStudentEnrolled(courseID: Int, studentUsername: Option[String])(using PlanContext): IO[Boolean] =
-    IsStudentEnrolledMessage(courseID, studentUsername).send
+  def isStudentEnrolled(courseid: Int, studentUsername: Option[String])(using PlanContext): IO[Boolean] =
+    IsStudentEnrolledMessage(courseid, studentUsername).send
 
-  def getCourseList()(using PlanContext): IO[String] =
+  def getCourseList()(using PlanContext): IO[List[Course]] =
     GetCourseListMessage().send
 
-  def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+  def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[List[Course]] =
     GetCourseByStudentUsernameMessage(studentUsername).send
 
-  def getAllCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+  def getAllCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[List[Course]] =
     GetAllCoursesByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingPositionByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+  def getWaitingPositionByStudentUsername(studentUsername: String)(using PlanContext): IO[List[CourseWaitingPosition]] =
     GetWaitingPositionByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+  def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[List[WaitingCourse]] =
     GetWaitingCoursesByStudentUsernameMessage(studentUsername).send
 
-  def getCreditsByStudentUsername(studentUsername: String)(using PlanContext): IO[String] =
+  def getCreditsByStudentUsername(studentUsername: String)(using PlanContext): IO[Int] =
     GetCreditsByStudentUsernameMessage(studentUsername).send
 
-  def addClassroom(classroomID: Int, classroomName: String, capacity: Int, enrolledCoursesJson: String)(using PlanContext): IO[String] =
-    AddClassroomMessage(classroomID, classroomName, capacity, enrolledCoursesJson).send
+  def addClassroom(classroomid: Int, classroomName: String, capacity: Int, enrolledCourses: Map[Int, List[Int]])(using PlanContext): IO[Classroom] =
+    AddClassroomMessage(classroomid, classroomName, capacity, enrolledCourses).send
 
-  def deleteClassroom(classroomID: Int)(using PlanContext): IO[String] =
-    DeleteClassroomMessage(classroomID).send
+  def deleteClassroom(classroomid: Int)(using PlanContext): IO[String] =
+    DeleteClassroomMessage(classroomid).send
 
-  def getClassroomList()(using PlanContext): IO[String] =
+  def getClassroomList()(using PlanContext): IO[List[Classroom]] =
     GetClassroomListMessage().send
 
-  def getClassroom(classroomID: Int)(using PlanContext): IO[String] =
-    GetClassroomMessage(classroomID).send
+  def getClassroom(classroomid: Int)(using PlanContext): IO[Classroom] =
+    GetClassroomMessage(classroomid).send
 
-  def getAvailableClassroomByCapacityHour(capacity: Int, courseHourJson: String)(using PlanContext): IO[String] =
-    GetAvailableClassroomByCapacityHourMessage(capacity, courseHourJson).send
+  def getAvailableClassroomByCapacityHour(capacity: Int, courseHour: List[Int])(using PlanContext): IO[List[Classroom]] =
+    GetAvailableClassroomByCapacityHourMessage(capacity, courseHour).send
 
-  def reorderStudentsByCourseID(classroomID: Int)(using PlanContext): IO[String] =
-    ReorderStudentsByCourseIDMessage(classroomID).send
+  def reorderStudentsByCourseID(classroomid: Int)(using PlanContext): IO[String] =
+    ReorderStudentsByCourseIDMessage(classroomid).send
 
 }

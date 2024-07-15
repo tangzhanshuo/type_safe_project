@@ -5,10 +5,10 @@ import Common.API.{PlanContext, Planner}
 import Common.CourseAPI.deleteClassroom
 
 case class AdminDeleteClassroomMessagePlanner(
-                                            classroomID: Int, // JSON represented as String
+                                            classroomid: Int, // JSON represented as String
                                             override val planContext: PlanContext
                                           ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    deleteClassroom(classroomID)
+    deleteClassroom(classroomid)
   }
 }
