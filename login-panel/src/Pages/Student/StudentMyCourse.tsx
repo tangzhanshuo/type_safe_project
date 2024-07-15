@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
@@ -132,7 +132,11 @@ export function StudentMyCourse() {
                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 {sortedCourses.map((course) => (
                                     <tr key={course.courseid}>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.courseid}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <Link to={`/student/course/${course.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                                {course.courseid}
+                                            </Link>
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.coursename}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.teachername}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>

@@ -186,11 +186,13 @@ export function StudentCourseList() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
                                 </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                <tbody
+                                    className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 {sortedCourses.map((course) => (
                                     <tr key={course.courseid}>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/student/course/${course.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                            <Link to={`/student/course/${course.courseid}`}
+                                                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                                 {course.courseid}
                                             </Link>
                                         </td>
@@ -216,7 +218,8 @@ export function StudentCourseList() {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No courses to display. Click the refresh button to load the course list.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No courses to display. Click the refresh button
+                            to load the course list.</p>
                     )}
                 </div>
 
@@ -236,10 +239,16 @@ export function StudentCourseList() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
                                 </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                <tbody
+                                    className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 {sortedSelectedCourses.map((course) => (
                                     <tr key={course.courseid}>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.courseid}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <Link to={`/student/course/${course.courseid}`}
+                                                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                                {course.courseid}
+                                            </Link>
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.coursename}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.teachername}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>

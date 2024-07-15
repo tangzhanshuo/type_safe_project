@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { API } from 'Plugins/CommonUtils/API';
-import { useParams, useHistory, Link } from 'react-router-dom';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
-import { StudentGetCourseMessage } from 'Plugins/StudentAPI/StudentGetCourseMessage'
-import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage'
-import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage'
-import { logout } from 'Plugins/CommonUtils/UserManager'
+import { useParams, useHistory } from 'react-router-dom';
+import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { StudentGetCourseMessage } from 'Plugins/StudentAPI/StudentGetCourseMessage';
+import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
+import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
+import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
-import 'Pages/css/Main.css'; // Import the CSS file
+import { StudentLayout } from 'Components/Student/StudentLayout';
+
+interface Course {
+    courseid: string;
+    coursename: string;
+    teachername: string;
+    capacity: number;
+    credits: number;
+    info: string;
+    coursehour: any; // You might want to define a more specific type for this
+    classroomid: string;
+    enrolledstudents: any; // You might want to define a more specific type for this
+}
 
 export function StudentCourseDetail() {
     const history = useHistory();
@@ -15,19 +26,10 @@ export function StudentCourseDetail() {
     const [errorMessage, setErrorMessage] = useState('');
     const [addCourseResponse, setAddCourseResponse] = useState('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
-    const [course, setCourse] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [course, setCourse] = useState<Course | null>(null);
 
     useEffect(() => {
-        const { usertype, username, token } = Auth.getState();
-
-        if (!usertype || !username || !token) {
-            history.push('/login');
-        } else if (usertype !== 'student') {
-            history.push('/');
-        } else {
-            getCourse();
-        }
+        getCourse();
     }, [courseid]);
 
     const getCourse = async () => {
@@ -37,18 +39,18 @@ export function StudentCourseDetail() {
             return;
         }
 
-        const response = await sendPostRequest(new StudentGetCourseMessage(id))
+        const response = await sendPostRequest(new StudentGetCourseMessage(id));
         if (response.isError) {
-            setErrorMessage(response.error)
-            return
+            setErrorMessage(response.error);
+            return;
         }
         try {
-            const parsedCourses = JSON.parse(response.data);
-            setCourse(parsedCourses);
+            const parsedCourse = JSON.parse(response.data);
+            setCourse(parsedCourse);
         } catch (error) {
             setErrorMessage('Error parsing course data');
         }
-    }
+    };
 
     const addCourse = async () => {
         const id = parseInt(courseid, 10);
@@ -56,13 +58,13 @@ export function StudentCourseDetail() {
             setAddCourseResponse('Invalid course ID');
             return;
         }
-        const response = await sendPostRequest(new StudentAddCourseMessage(id,0))
+        const response = await sendPostRequest(new StudentAddCourseMessage(id, 0));
         if (response.isError) {
-            setAddCourseResponse(response.error)
-            return
+            setAddCourseResponse(response.error);
+            return;
         }
-        setAddCourseResponse('Course added successfully')
-    }
+        setAddCourseResponse('Course added successfully');
+    };
 
     const deleteCourse = async () => {
         const id = parseInt(courseid, 10);
@@ -70,80 +72,75 @@ export function StudentCourseDetail() {
             setDeleteCourseResponse('Invalid course ID');
             return;
         }
-        const response = await sendPostRequest(new StudentDeleteCourseMessage(id))
+        const response = await sendPostRequest(new StudentDeleteCourseMessage(id));
         if (response.isError) {
-            setDeleteCourseResponse(response.error)
-            return
+            setDeleteCourseResponse(response.error);
+            return;
         }
-        setDeleteCourseResponse('Course added successfully')
-    }
+        setDeleteCourseResponse('Course deleted successfully');
+    };
 
     return (
-        <div className="App">
-            <header className="App-header">
-                <h1>Course Details</h1>
-            </header>
-            <main className="App-main">
-                <div className="course-details">
+        <StudentLayout>
+            <div className="space-y-6">
+                <h2 className="text-2xl font-bold">Course Details</h2>
+                <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                     {errorMessage ? (
-                        <p style={{ color: 'red' }}>{errorMessage}</p>
+                        <p className="text-red-500">{errorMessage}</p>
                     ) : course ? (
                         <>
-                            <h2>{course.coursename}</h2>
-                            <table className="details-table">
-                                <tbody>
+                            <h3 className="text-xl font-semibold mb-4">{course.coursename}</h3>
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 <tr>
-                                    <th>Course ID:</th>
-                                    <td>{course.courseid}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course ID:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.courseid}</td>
                                 </tr>
                                 <tr>
-                                    <th>Teacher:</th>
-                                    <td>{course.teachername}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Teacher:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.teachername}</td>
                                 </tr>
                                 <tr>
-                                    <th>Capacity:</th>
-                                    <td>{course.capacity}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Capacity:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
                                 </tr>
                                 <tr>
-                                    <th>Credits:</th>
-                                    <td>{course.credits}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Credits:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
                                 </tr>
                                 <tr>
-                                    <th>Info:</th>
-                                    <td>{course.info}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Info:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
                                 </tr>
                                 <tr>
-                                    <th>Course Hours:</th>
-                                    <td>{JSON.stringify(course.coursehour)}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course Hours:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{JSON.stringify(course.coursehour)}</td>
                                 </tr>
                                 <tr>
-                                    <th>Classroom ID:</th>
-                                    <td>{course.classroomid}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Classroom ID:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.classroomid}</td>
                                 </tr>
                                 <tr>
-                                    <th>Enrolled Students:</th>
-                                    <td>{JSON.stringify(course.enrolledstudents)}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Enrolled Students:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{JSON.stringify(course.enrolledstudents)}</td>
                                 </tr>
                                 </tbody>
                             </table>
-                            {addCourseResponse && <p>{addCourseResponse}</p>}
+                            {addCourseResponse && <p className="mt-4 text-green-500">{addCourseResponse}</p>}
                         </>
                     ) : (
-                        <p>No course data available.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No course data available.</p>
                     )}
-                    <div className="button-group">
-                        <button onClick={() => addCourse()} className="button">
-                            Register for Course
-                        </button>
-                        <button onClick={() => history.push('/student/course')} className="button">
-                            Back to Course List
-                        </button>
-                        <button onClick={() => logout(history)} className="button">
-                            Log out
-                        </button>
-                    </div>
                 </div>
-            </main>
-        </div>
+                <div className="flex space-x-4">
+                    <button
+                        onClick={addCourse}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                    >
+                        Register for Course
+                    </button>
+                </div>
+            </div>
+        </StudentLayout>
     );
 }
