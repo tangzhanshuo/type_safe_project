@@ -52,7 +52,7 @@ package object CourseAPI {
 
   def forceAddStudent2Course(courseid: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
     ForceAddStudent2CourseMessage(courseid, studentUsername).send
-    
+
   def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[List[Course]] =
     GetCourseByTeacherUsernameMessage(teacherUsername).send
 
@@ -108,7 +108,7 @@ package object CourseAPI {
                   priority: Option[Map[Int, Map[Int, Int]]]
                 )(using PlanContext): IO[Plan] =
     UpdatePlanMessage(planid, planName, creditsLimits, priority ).send
-  
+
 
   def getPriorityByPlanIDYearCourseID(
                                        planid: Int,
@@ -116,4 +116,10 @@ package object CourseAPI {
                                        courseid: Int
                                      )(using PlanContext): IO[Int] =
     GetPriorityByPlanIDYearCourseIDMessage(planid, year, courseid).send
+
+  def getPlan(planid: Int)(using PlanContext): IO[Plan] =
+    GetPlanMessage(planid).send
+
+  def getPlanList()(using PlanContext): IO[List[Plan]] =
+    GetPlanListMessage().send
 }

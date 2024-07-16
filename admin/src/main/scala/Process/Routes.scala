@@ -137,6 +137,16 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
+      case "AdminGetPlanMessage" =>
+        IO(decode[AdminGetPlanMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetPlanMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "AdminGetPlanListMessage" =>
+        IO(decode[AdminGetPlanListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetPlanMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
