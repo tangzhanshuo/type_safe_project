@@ -9,12 +9,13 @@
 - [ ] Functionality: 预选-正选切换
 - [ ] User: Add name column to all users, and add route to getname and changename
 - [ ] Student: add manual select functionality (application)
+- [ ] ObjectType for application types.
+- [ ] ObjectType for plan types.
 
 ### In Progress
-- [ ] ObjectType for everything. 
+- [ ] Front end modifications related to course types
 
 ### Completed
-- [x] Completed Feature
-
+- [x] ObjectType for course and classroom types. 
 ### Deprecated
 - [x] Old Feature: Feature that has been removed or replaced
