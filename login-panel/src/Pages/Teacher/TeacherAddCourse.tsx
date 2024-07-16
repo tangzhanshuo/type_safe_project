@@ -41,7 +41,7 @@ export function TeacherAddCourse() {
             setAddCourseResponse(response.error);
             return;
         }
-        setAddCourseResponse('Course added successfully.');
+        setAddCourseResponse('Course added successfully, waiting for approval');
     }
 
 
@@ -80,7 +80,7 @@ export function TeacherAddCourse() {
                         </button>
                     </div>
 
-                    <p className={addCourseResponse === 'Course added successfully.' ? 'text-green-500' : 'text-red-500'}>
+                    <p className={addCourseResponse === 'Course added successfully, waiting for approval' ? 'text-green-500' : 'text-red-500'}>
                         {addCourseResponse}
                     </p>
                 </div>

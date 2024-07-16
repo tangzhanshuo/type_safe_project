@@ -74,42 +74,62 @@ export function TeacherMyCourse(): JSX.Element {
                         ) : isLoading ? (
                             <p>Loading courses...</p>
                         ) : courses.length > 0 ? (
-                            <table className="details-table">
+                            <table className="min-w-full leading-normal">
                                 <thead>
                                 <tr>
-                                    <th>Course ID</th>
-                                    <th>Course Name</th>
-                                    <th>Capacity</th>
-                                    <th>Credits</th>
-                                    <th>Info</th>
-                                    <th>Course Hours</th>
-                                    <th>Classroom ID</th>
-                                    <th>Enrolled Students</th>
-                                    <th>Actions</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Course ID
+                                    </th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Course Name
+                                    </th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Capacity
+                                    </th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Credits
+                                    </th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Info
+                                    </th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Course Hours
+                                    </th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Classroom ID
+                                    </th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Enrolled Students
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {courses.map(course => (
-                                    <tr key={course.courseid}>
-                                        <td>
-                                            <Link to={`/teacher/course/${course.courseid}`}>
-                                                {course.courseid}
-                                            </Link>
+                                    <tr key={course.courseid} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            {course.courseid}
+
                                         </td>
-                                        <td>{course.courseName}</td>
-                                        <td>{course.capacity}</td>
-                                        <td>{course.credits}</td>
-                                        <td>{course.info}</td>
-                                        <td>{course.courseHour}</td>
-                                        <td>{course.classroomid}</td>
-                                        <td>{course.enrolledStudents}</td>
-                                        <td>
-                                            <button
-                                                onClick={() => deleteCourse(course.courseid)}
-                                                className="button delete-button"
-                                            >
-                                                Delete
-                                            </button>
+                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            {course.courseName}
+                                        </td>
+                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            {course.capacity}
+                                        </td>
+                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            {course.credits}
+                                        </td>
+                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            {course.info}
+                                        </td>
+                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            {course.courseHour}
+                                        </td>
+                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            {course.classroomid}
+                                        </td>
+                                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            {course.enrolledStudents}
                                         </td>
                                     </tr>
                                 ))}
