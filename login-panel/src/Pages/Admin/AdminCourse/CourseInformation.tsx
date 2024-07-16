@@ -102,7 +102,6 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
             classroomID ? parseInt(classroomID, 10) : undefined,
             credits ? parseInt(credits, 10) : undefined,
             enrolledStudents || undefined,
-            allStudents || undefined
         );
 
         try {
