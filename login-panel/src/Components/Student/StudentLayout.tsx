@@ -17,8 +17,8 @@ export function StudentLayout({ children }: StudentLayoutProps) {
 
     const menuItems = [
         { path: '/student/dashboard', name: 'Dashboard', icon: FaHome },
-        { path: '/student/mycourse', name: 'My Courses', icon: FaBook },
-        { path: '/student/courselist', name: 'Courses List', icon: FaList },
+        { path: '/student/myCourse', name: 'My Courses', icon: FaBook },
+        { path: '/student/courseList', name: 'Courses List', icon: FaList },
     ];
 
     return (

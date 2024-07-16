@@ -17,9 +17,9 @@ export function TeacherLayout({ children }: TeacherLayoutProps) {
 
     const menuItems = [
         { path: '/teacher/dashboard', name: 'Dashboard', icon: FaHome },
-        { path: '/teacher/course', name: 'My courses', icon: FaBook },
-        { path: '/teacher/course/add', name: 'Add Course', icon: FaPlus },
-        { path: '/teacher/course', name: 'Courses list', icon: FaList },
+        { path: '/teacher/myCourse', name: 'My courses', icon: FaBook },
+        { path: '/teacher/addCourse', name: 'Add Course', icon: FaPlus },
+        { path: '/teacher/courseList', name: 'Courses list', icon: FaList },
 
     ];
 
