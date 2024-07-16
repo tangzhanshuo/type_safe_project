@@ -10,14 +10,14 @@ import { StudentLayout } from 'Components/Student/StudentLayout';
 
 interface Course {
     courseid: string;
-    coursename: string;
-    teachername: string;
+    courseName: string;
+    teacherName: string;
     capacity: number;
     credits: number;
     info: string;
-    coursehour: any; // You might want to define a more specific type for this
+    courseHour: any; // You might want to define a more specific type for this
     classroomid: string;
-    enrolledstudents: any; // You might want to define a more specific type for this
+    enrolledStudents: any; // You might want to define a more specific type for this
 }
 
 export function StudentCourseDetail() {
@@ -44,12 +44,20 @@ export function StudentCourseDetail() {
             setErrorMessage(response.error);
             return;
         }
-        try {
-            const parsedCourse = JSON.parse(response.data);
-            setCourse(parsedCourse);
-        } catch (error) {
-            setErrorMessage('Error parsing course data');
-        }
+
+        const parsedCourse = {
+            courseid: response.data.courseid,
+            courseName: response.data.courseName,
+            teacherName: response.data.teacherName,
+            capacity: response.data.capacity,
+            credits: response.data.credits,
+            info: response.data.info,
+            courseHour: response.data.courseHour,
+            classroomid: response.data.classroomid,
+            enrolledStudents: response.data.enrolledStudents
+        };
+
+        setCourse(parsedCourse);
     };
 
     const addCourse = async () => {
@@ -89,7 +97,7 @@ export function StudentCourseDetail() {
                         <p className="text-red-500">{errorMessage}</p>
                     ) : course ? (
                         <>
-                            <h3 className="text-xl font-semibold mb-4">{course.coursename}</h3>
+                            <h3 className="text-xl font-semibold mb-4">{course.courseName}</h3>
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 <tr>
@@ -98,7 +106,7 @@ export function StudentCourseDetail() {
                                 </tr>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Teacher:</th>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.teachername}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.teacherName}</td>
                                 </tr>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Capacity:</th>
@@ -114,7 +122,7 @@ export function StudentCourseDetail() {
                                 </tr>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course Hours:</th>
-                                    <td className="px-6 py-4 whitespace-nowrap">{JSON.stringify(course.coursehour)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{JSON.stringify(course.courseHour)}</td>
                                 </tr>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Classroom ID:</th>
@@ -122,7 +130,7 @@ export function StudentCourseDetail() {
                                 </tr>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Enrolled Students:</th>
-                                    <td className="px-6 py-4 whitespace-nowrap">{JSON.stringify(course.enrolledstudents)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{JSON.stringify(course.enrolledStudents)}</td>
                                 </tr>
                                 </tbody>
                             </table>
