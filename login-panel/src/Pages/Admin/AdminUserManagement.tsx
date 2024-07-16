@@ -12,7 +12,8 @@ export function AdminUserManagement() {
         const [usertype, setUsertype] = useState('');
         const [username, setUsername] = useState('');
         const [password, setPassword] = useState('');
-        const [errorMessage, setErrorMessage] = useState('');
+        const [message, setMessage] = useState('');
+        const [messageType, setMessageType] = useState('');
 
     useEffect(() => {
         // Assuming username and password are stored in localStorage
@@ -35,9 +36,11 @@ export function AdminUserManagement() {
     ) => {
         const response = await sendUserRequest(action, usertype, username, password);
         if (!response.isError) {
-            console.log(`${action} successful`);
+            setMessage(`${action} successful`);
+            setMessageType('success');
         } else {
-            setErrorMessage(`Failed to ${action} user`);
+            setMessage(`Failed to ${action} user`);
+            setMessageType('error');
         }
     };
 
@@ -72,7 +75,9 @@ export function AdminUserManagement() {
                             className="input-field dark:bg-gray-700 dark:text-white"
                         />
                     </div>
-                    {errorMessage && <p className="error">{errorMessage}</p>}
+                    {message && (
+                        <p className={messageType === 'success' ? 'text-green-500' : 'text-red-500'}>{message}</p>
+                    )}
                     <div className="button-group mt-4">
                         <button onClick={() => handleUserAction('register', usertype, username, password)}
                                 className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded transition duration-300">
