@@ -4,11 +4,11 @@ import cats.effect.IO
 import io.circe.generic.auto.*
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.{readDBRows, readDBString}
-import Common.Object.SqlParameter
+import Common.Object.*
 import Common.ServiceUtils.schemaName
 import Common.CourseAPI.getCourseList
 
-case class StudentGetCourseListMessagePlanner(override val planContext: PlanContext) extends Planner[String]:
-  override def plan(using PlanContext): IO[String] = {
+case class StudentGetCourseListMessagePlanner(override val planContext: PlanContext) extends Planner[List[Course]]:
+  override def plan(using PlanContext): IO[List[Course]] = {
       getCourseList()
   }

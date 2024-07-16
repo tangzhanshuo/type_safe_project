@@ -1,12 +1,12 @@
 import { AdminMessage } from 'Plugins/AdminAPI/AdminMessage';
 
 export class AdminDeleteStudentFromCourseMessage extends AdminMessage {
-    courseID: number;
+    courseid: number;
     studentUsername: string;
 
-    constructor(courseID: number, studentUsername: string) {
+    constructor(courseid: number, studentUsername: string) {
         super();
-        this.courseID = courseID;
+        this.courseid = courseid;
         this.studentUsername = studentUsername;
     }
 }

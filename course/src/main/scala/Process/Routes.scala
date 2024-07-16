@@ -15,27 +15,27 @@ object Routes:
       case "AddCourseMessage" =>
         IO(decode[AddCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddCourseMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case "DeleteCourseMessage" =>
         IO(decode[DeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for DeleteCourseMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case "GetCourseMessage" =>
         IO(decode[GetCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCourseMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case "GetCourseListMessage" =>
         IO(decode[GetCourseListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCourseListMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case "UpdateCourseMessage" =>
         IO(decode[UpdateCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UpdateCourseMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case "AddStudent2CourseMessage" =>
         IO(decode[AddStudent2CourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddStudent2CourseMessage")))
@@ -78,7 +78,7 @@ object Routes:
             m.fullPlan.map(_.asJson.noSpaces)
           }
       case "IsStudentEnrolledMessage" =>
-        IO(decode[DeleteStudentFromCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for IsStudentEnrolledMessage")))
+        IO(decode[IsStudentEnrolledMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for IsStudentEnrolledMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
@@ -95,22 +95,22 @@ object Routes:
       case "GetClassroomMessage" =>
         IO(decode[GetClassroomMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetClassroomMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case "GetClassroomListMessage" =>
         IO(decode[GetClassroomListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetClassroomListMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case "GetAvailableClassroomByCapacityHourMessage" =>
         IO(decode[GetAvailableClassroomByCapacityHourMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetAvailableClassroomByCapacityHourMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case "ReorderStudentsByCourseIDMessage" =>
         IO(decode[ReorderStudentsByCourseIDMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetAvailableClassroomByCapacityHourMessage")))
           .flatMap { m =>
-            m.fullPlan.map(_.asJson.toString)
+            m.fullPlan.map(_.asJson.noSpaces)
           }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))

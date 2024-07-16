@@ -1,10 +1,10 @@
 import { AdminMessage } from 'Plugins/AdminAPI/AdminMessage';
 
 export class AdminDeleteClassroomMessage extends AdminMessage {
-    classroomID: number;
+    classroomid: number;
 
-    constructor(classroomID: number) {
+    constructor(classroomid: number) {
         super();
-        this.classroomID = classroomID;
+        this.classroomid = classroomid;
     }
 }

@@ -4,57 +4,62 @@ import cats.effect.IO
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import io.circe.Json
-import io.circe.parser.parse
+import io.circe.parser.decode
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.readDBRows
-import Common.Object.SqlParameter
+import Common.Object.{SqlParameter, Course, WaitingCourse, EnrolledStudent, AllStudent}
+import cats.implicits.*
 
-case class GetWaitingCoursesByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[String] {
-  override def plan(using planContext: PlanContext): IO[String] = {
+case class GetWaitingCoursesByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[List[WaitingCourse]] {
+  override def plan(using planContext: PlanContext): IO[List[WaitingCourse]] = {
     val queryAllStudents = """
-      SELECT * FROM course 
-      WHERE allstudents @> ?::jsonb
+      SELECT * FROM course
+      WHERE all_students @> ?::jsonb
     """
-    val searchJson = Json.obj("studentusername" -> Json.fromString(studentUsername)).noSpaces
+    val searchJson = Json.obj("studentUsername" -> Json.fromString(studentUsername)).noSpaces
 
     readDBRows(queryAllStudents, List(SqlParameter("jsonb", s"[$searchJson]"))).flatMap { rows =>
       val waitingCoursesWithPosition = rows.flatMap { row =>
-        val capacity = row.hcursor.get[Int]("capacity").getOrElse(0)
-        val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledstudents").getOrElse("[]")
-        val allStudentsJsonString = row.hcursor.get[String]("allstudents").getOrElse("[]")
-        val enrolledStudents = parse(enrolledStudentsJsonString).flatMap(_.as[List[Map[String, Json]]]).getOrElse(Nil)
-        val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[Map[String, Json]]]).getOrElse(Nil)
-
-        // 检查学生是否在enrolledstudents中
-        val isEnrolled = enrolledStudents.exists(_("studentusername").as[String].contains(studentUsername))
-        if (!isEnrolled) {
-          // 按time字段排序
-          val sortedAllStudents = allStudents.sortBy(_("time").as[Int].getOrElse(Int.MaxValue))
-          // 找到学生在allstudents中的位置
-          val positionInAllStudents = sortedAllStudents.indexWhere(_("studentusername").as[String].contains(studentUsername))
-          if (positionInAllStudents >= 0) {
-            // 计算等待位置
-            val waitingPosition = positionInAllStudents - capacity
-            Some((row, waitingPosition))
+        val cursor = row.hcursor
+        for {
+          capacity <- cursor.get[Int]("capacity").toOption
+          enrolledStudentsStr <- cursor.get[String]("enrolledStudents").toOption
+          allStudentsStr <- cursor.get[String]("allStudents").toOption
+          enrolledStudents <- decode[List[EnrolledStudent]](enrolledStudentsStr).toOption
+          allStudents <- decode[List[AllStudent]](allStudentsStr).toOption
+          courseID <- cursor.get[Int]("courseid").toOption
+          courseName <- cursor.get[String]("courseName").toOption
+          teacherUsername <- cursor.get[String]("teacherUsername").toOption
+          teacherName <- cursor.get[String]("teacherName").toOption
+          info <- cursor.get[String]("info").toOption
+          courseHourStr <- cursor.get[String]("courseHour").toOption
+          courseHour <- decode[List[Int]](courseHourStr).toOption
+          classroomID <- cursor.get[Int]("classroomid").toOption
+          credits <- cursor.get[Int]("credits").toOption
+        } yield {
+          val isEnrolled = enrolledStudents.exists(_.studentUsername == studentUsername)
+          if (!isEnrolled) {
+            val sortedAllStudents = allStudents.sortBy(_.time)
+            val positionInAllStudents = sortedAllStudents.indexWhere(_.studentUsername == studentUsername)
+            if (positionInAllStudents >= 0) {
+              val waitingPosition = positionInAllStudents - capacity
+              Some(WaitingCourse(
+                Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents),
+                waitingPosition
+              ))
+            } else {
+              None
+            }
           } else {
             None
           }
-        } else {
-          None
         }
-      }
+      }.flatten
 
-      waitingCoursesWithPosition match {
-        case Nil => IO.raiseError(new NoSuchElementException(s"No waiting courses found with student username: $studentUsername"))
-        case _ =>
-          // 将结果转化为包含课程信息和等待位置的JSON对象列表
-          val result = waitingCoursesWithPosition.map { case (row, waitingPosition) =>
-            Json.obj(
-              "course" -> row.asJson,
-              "waitingPosition" -> Json.fromInt(waitingPosition)
-            )
-          }
-          IO.pure(result.asJson.noSpaces)
+      if (waitingCoursesWithPosition.isEmpty) {
+        IO.raiseError(new NoSuchElementException(s"No waiting courses found with student username: $studentUsername"))
+      } else {
+        IO.pure(waitingCoursesWithPosition)
       }
     }
   }

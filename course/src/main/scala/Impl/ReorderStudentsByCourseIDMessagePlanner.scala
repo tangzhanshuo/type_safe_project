@@ -10,20 +10,20 @@ import Common.DBAPI.*
 import Common.Object.SqlParameter
 import scala.util.Random
 
-case class ReorderStudentsByCourseIDMessagePlanner(courseID: Int, override val planContext: PlanContext) extends Planner[String] {
+case class ReorderStudentsByCourseIDMessagePlanner(courseid: Int, override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
     val checkCourseExistsQuery = "SELECT EXISTS(SELECT 1 FROM course WHERE courseid = ?)"
-    val checkCourseExistsParams = List(SqlParameter("int", courseID.toString))
+    val checkCourseExistsParams = List(SqlParameter("int", courseid.toString))
 
-    val getCourseInfoQuery = "SELECT capacity, enrolledstudents, allstudents FROM course WHERE courseid = ?"
-    val getCourseInfoParams = List(SqlParameter("int", courseID.toString))
+    val getCourseInfoQuery = "SELECT capacity, enrolled_students, all_students FROM course WHERE courseid = ?"
+    val getCourseInfoParams = List(SqlParameter("int", courseid.toString))
 
-    val updateStudentsQuery = "UPDATE course SET enrolledstudents = ?, allstudents = ? WHERE courseid = ?"
+    val updateStudentsQuery = "UPDATE course SET enrolled_students = ?, all_students = ? WHERE courseid = ?"
 
     // 检查课程是否存在
     val courseExistsIO = readDBBoolean(checkCourseExistsQuery, checkCourseExistsParams)
       .flatMap(courseExists =>
-        if (!courseExists) IO.raiseError(new Exception(s"Course with ID $courseID does not exist"))
+        if (!courseExists) IO.raiseError(new Exception(s"Course with id $courseid does not exist"))
         else IO.pure(())
       )
 
@@ -33,12 +33,12 @@ case class ReorderStudentsByCourseIDMessagePlanner(courseID: Int, override val p
         rows.headOption match {
           case Some(row) =>
             val capacity = row.hcursor.get[Int]("capacity").toOption.getOrElse(0)
-            val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledstudents").toOption.orElse(Some("[]")).get
-            val allStudentsJsonString = row.hcursor.get[String]("allstudents").toOption.orElse(Some("[]")).get
+            val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledStudents").toOption.orElse(Some("[]")).get
+            val allStudentsJsonString = row.hcursor.get[String]("allStudents").toOption.orElse(Some("[]")).get
             val enrolledStudents = parse(enrolledStudentsJsonString).flatMap(_.as[List[Map[String, Json]]]).getOrElse(Nil)
             val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[Map[String, Json]]]).getOrElse(Nil)
             IO.pure((capacity, enrolledStudents, allStudents))
-          case None => IO.raiseError(new Exception(s"Course with ID $courseID not found"))
+          case None => IO.raiseError(new Exception(s"Course with id $courseid not found"))
         }
       }
 
@@ -67,8 +67,8 @@ case class ReorderStudentsByCourseIDMessagePlanner(courseID: Int, override val p
         writeDB(updateStudentsQuery, List(
           SqlParameter("jsonb", finalEnrolledStudentsJsonString),
           SqlParameter("jsonb", updatedAllStudentsJsonString),
-          SqlParameter("int", courseID.toString)
-        )).map(_ => s"Students reordered and enrolled for course $courseID")
+          SqlParameter("int", courseid.toString)
+        )).map(_ => s"Students reordered and enrolled for course $courseid")
       }
     }
   }

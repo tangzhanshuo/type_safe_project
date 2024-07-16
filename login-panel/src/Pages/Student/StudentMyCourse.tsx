@@ -10,8 +10,8 @@ import { FaSync, FaTrash, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa'
 
 interface Course {
     courseid: number;
-    coursename: string;
-    teachername: string;
+    courseName: string;
+    teacherName: string;
     capacity: number;
     credits: number;
     info: string;
@@ -46,13 +46,14 @@ export function StudentMyCourse() {
             }
             return;
         }
-        try {
-            const parsedCourses: Course[] = JSON.parse(response.data);
-            setSelectedCourses(parsedCourses);
-            setErrorMessage('');
-        } catch (error) {
-            setErrorMessage('Error parsing course data');
-        }
+        setSelectedCourses(response.data.map((course: any) => ({
+            courseid: course.courseid,
+            courseName: course.courseName,
+            teacherName: course.teacherName,
+            capacity: course.capacity,
+            credits: course.credits,
+            info: course.info,
+        })));
     };
 
     const deleteCourseWithId = async (courseid: number) => {
@@ -90,14 +91,14 @@ export function StudentMyCourse() {
                 case 'ID':
                     return course.courseid.toString().includes(lowerSearchTerm);
                 case 'Name':
-                    return course.coursename.toLowerCase().includes(lowerSearchTerm);
+                    return course.courseName.toLowerCase().includes(lowerSearchTerm);
                 case 'Teacher':
-                    return course.teachername.toLowerCase().includes(lowerSearchTerm);
+                    return course.teacherName.toLowerCase().includes(lowerSearchTerm);
                 case 'All':
                     return (
                         course.courseid.toString().includes(lowerSearchTerm) ||
-                        course.coursename.toLowerCase().includes(lowerSearchTerm) ||
-                        course.teachername.toLowerCase().includes(lowerSearchTerm)
+                        course.courseName.toLowerCase().includes(lowerSearchTerm) ||
+                        course.teacherName.toLowerCase().includes(lowerSearchTerm)
                     );
                 default:
                     return true;
@@ -168,8 +169,8 @@ export function StudentMyCourse() {
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     {renderSortableHeader('courseid', 'Course ID')}
-                                    {renderSortableHeader('coursename', 'Course Name')}
-                                    {renderSortableHeader('teachername', 'Teacher')}
+                                    {renderSortableHeader('courseName', 'Course Name')}
+                                    {renderSortableHeader('teacherName', 'Teacher')}
                                     {renderSortableHeader('capacity', 'Capacity')}
                                     {renderSortableHeader('credits', 'Credits')}
                                     {renderSortableHeader('info', 'Info')}
@@ -184,8 +185,8 @@ export function StudentMyCourse() {
                                                 {course.courseid}
                                             </Link>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.coursename}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.teachername}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{course.courseName}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{course.teacherName}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>

@@ -1,10 +1,10 @@
 import { AdminMessage } from 'Plugins/AdminAPI/AdminMessage';
 
 export class AdminReorderStudentsByCourseIDMessage extends AdminMessage {
-    courseID: number;
+    courseid: number;
 
-    constructor(courseID: number) {
+    constructor(courseid: number) {
         super();
-        this.courseID = courseID;
+        this.courseid = courseid;
     }
 }

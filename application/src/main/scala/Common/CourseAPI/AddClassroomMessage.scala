@@ -1,11 +1,12 @@
 package Common.CourseAPI
 
 import Common.API.API
+import Common.Object.*
 import Global.ServiceCenter.courseServiceCode
 
 case class AddClassroomMessage(
-                                classroomID: Int,
+                                classroomid: Int,
                                 classroomName: String,
                                 capacity: Int,
-                                enrolledCoursesJson: String, // JSON represented as String
-                              ) extends API[String](courseServiceCode)
+                                enrolledCourses: Map[Int, List[Int]], // JSON represented as String
+                              ) extends API[Classroom](courseServiceCode)
