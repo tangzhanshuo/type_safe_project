@@ -9,19 +9,43 @@ interface AdminLayoutProps {
     children: ReactNode;
 }
 
+interface MenuItem {
+    path: string;
+    name: string;
+    icon: React.ElementType;
+    children?: MenuItem[];
+}
+
 export function AdminLayout({ children }: AdminLayoutProps) {
     const location = useLocation();
     useAuth('admin');
     const { toggleDarkMode } = useContext(ThemeContext);
     const history = useHistory();
 
-    const menuItems = [
+    const menuItems: MenuItem[] = [
         { path: '/admin/dashboard', name: 'Dashboard', icon: FaHome },
         { path: '/admin/userManagement', name: 'User Management', icon: FaUsers },
         { path: '/admin/course', name: 'Course Management', icon: FaBook },
         { path: '/admin/classroom', name: 'Classroom Management', icon: FaChalkboardTeacher },
         { path: '/admin/application', name: 'Applications', icon: FaClipboardList },
     ];
+
+    const renderMenuItems = (items: MenuItem[], level = 0) => {
+        return items.map((item) => (
+            <React.Fragment key={item.path}>
+                <Link
+                    to={item.path}
+                    className={`flex items-center py-3 px-${6 + level * 2} text-indigo-100 dark:text-gray-300 hover:bg-indigo-700 dark:hover:bg-gray-700 transition-colors duration-200 ${
+                        location.pathname === item.path ? 'bg-indigo-700 dark:bg-gray-700' : ''
+                    }`}
+                >
+                    <item.icon className="mr-3" />
+                    {item.name}
+                </Link>
+                {item.children && renderMenuItems(item.children, level + 1)}
+            </React.Fragment>
+        ));
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
