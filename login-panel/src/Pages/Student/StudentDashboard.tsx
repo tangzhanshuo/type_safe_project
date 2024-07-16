@@ -11,7 +11,8 @@ import { FaSync } from 'react-icons/fa';
 
 export function StudentDashboard() {
     const [studentUsername, setStudentUsername] = useState('');
-    const [studentInfo, setStudentInfo] = useState('');
+    const [studentName, setStudentName] = useState('');
+    const [studentAddress, setStudentAddress] = useState('');
     const [selectedCoursesCount, setSelectedCoursesCount] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
     const history = useHistory();
@@ -27,9 +28,12 @@ export function StudentDashboard() {
         const response = await sendPostRequest(new StudentGetInfoMessage());
         if (response.isError) {
             setErrorMessage(response.error);
-            setStudentInfo('');
+            setStudentName('');
+            setStudentAddress('');
         } else {
-            setStudentInfo(JSON.stringify(response.data));
+            const info = response.data;
+            setStudentName(info.name || '');
+            setStudentAddress(info.address || '');
             setErrorMessage('');
         }
     };
@@ -56,19 +60,18 @@ export function StudentDashboard() {
     }
 
     const handleSaveInfo = async () => {
-        try {
-            const parsedInfo = JSON.parse(studentInfo);
-            const response = await sendPostRequest(new StudentSetInfoMessage(parsedInfo));
-            if (response.isError) {
-                setErrorMessage(response.error);
-            } else {
-                console.log('Student info saved successfully');
-                setErrorMessage('');
-                // Refresh the student info after saving
-                await fetchStudentInfo();
-            }
-        } catch (error) {
-            setErrorMessage('Error parsing student info. Please ensure it is valid JSON.');
+        const updatedInfo = {
+            name: studentName,
+            address: studentAddress
+        };
+        const response = await sendPostRequest(new StudentSetInfoMessage(updatedInfo));
+        if (response.isError) {
+            setErrorMessage(response.error);
+        } else {
+            console.log('Student info saved successfully');
+            setErrorMessage('');
+            // Refresh the student info after saving
+            await fetchStudentInfo();
         }
     }
 
@@ -84,15 +87,44 @@ export function StudentDashboard() {
 
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                     <h3 className="text-xl font-semibold mb-4">Student Information</h3>
-                    <textarea
-                        value={studentInfo}
-                        onChange={(e) => setStudentInfo(e.target.value)}
-                        className="w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                        rows={5}
-                    />
+                    <p className="mb-4 text-gray-600 dark:text-gray-400">
+                        Please review and update your personal information below. This information is used for official university communications and records.
+                    </p>
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Name:
+                            </label>
+                            <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                                Enter your full legal name as it appears on official documents.
+                            </p>
+                            <input
+                                id="name"
+                                type="text"
+                                value={studentName}
+                                onChange={(e) => setStudentName(e.target.value)}
+                                className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Address:
+                            </label>
+                            <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                                Provide your current mailing address. This will be used for any physical correspondence from the university.
+                            </p>
+                            <input
+                                id="address"
+                                type="text"
+                                value={studentAddress}
+                                onChange={(e) => setStudentAddress(e.target.value)}
+                                className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            />
+                        </div>
+                    </div>
                     <button
                         onClick={handleSaveInfo}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                        className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
                     >
                         Save Info
                     </button>

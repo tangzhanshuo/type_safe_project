@@ -70,7 +70,7 @@ object ApplicationExecutor {
         case Right(hours) => IO.pure(hours)
         case Left(e) => IO.raiseError(new Exception(s"Failed to parse courseHour as List[Int]: ${e.getMessage}"))
       }
-      classroomid <- IO.fromOption(info.hcursor.downField("classroomid").as[Int].toOption)(new Exception("classroomid not found in info"))
+      classroomid <- IO.fromOption(info.hcursor.downField("classroomID").as[Int].toOption)(new Exception("classroomid not found in info"))
       credits <- IO.fromOption(info.hcursor.downField("credits").as[Int].toOption)(new Exception("credits not found in info"))
       course <- addCourse(
         courseName = courseName,

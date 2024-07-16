@@ -17,12 +17,12 @@ interface Approver {
 }
 
 interface Application {
-    applicationid: string;
+    applicationID: string;
     usertype: string;
     username: string;
-    applicationtype: string;
+    applicationType: string;
     info: string;
-    approver: string;
+    approver: Approver[];
     status: string;
 }
 
@@ -42,8 +42,8 @@ export function AdminApplication() {
         }
     }, [history]);
 
-    const handleDelete = async (applicationId: string) => {
-        const message = new AdminDeleteApplicationMessage(applicationId);
+    const handleDelete = async (applicationID: string) => {
+        const message = new AdminDeleteApplicationMessage(applicationID);
 
         const response = await sendPostRequest(message);
         if (!response.isError) {
@@ -61,9 +61,9 @@ export function AdminApplication() {
 
         const response = await sendPostRequest(message);
         if (!response.isError) {
-            // Sort applications by applicationid
+            // Sort applications by applicationID
             const sortedApplications = response.data.sort((a: Application, b: Application) =>
-                a.applicationid.localeCompare(b.applicationid)
+                a.applicationID.localeCompare(b.applicationID)
             );
             setApplications(sortedApplications);
             setSuccessMessage('Applications retrieved successfully');
@@ -80,8 +80,8 @@ export function AdminApplication() {
         }
     };
 
-    const handleApprove = async (applicationId: string) => {
-        const message = new AdminApproveApplicationMessage(applicationId);
+    const handleApprove = async (applicationID: string) => {
+        const message = new AdminApproveApplicationMessage(applicationID);
 
         const response = await sendPostRequest(message);
         if (!response.isError) {
@@ -94,8 +94,8 @@ export function AdminApplication() {
         }
     };
 
-    const handleReject = async (applicationId: string) => {
-        const message = new AdminRejectApplicationMessage(applicationId);
+    const handleReject = async (applicationID: string) => {
+        const message = new AdminRejectApplicationMessage(applicationID);
 
         const response = await sendPostRequest(message);
         if (!response.isError) {
@@ -108,17 +108,12 @@ export function AdminApplication() {
         }
     };
 
-    const parseApprovers = (approverString: string): Approver[] => {
-        try {
-            return JSON.parse(approverString);
-        } catch (error) {
-            console.error('Error parsing approver data:', error);
-            return [];
-        }
+    const parseApprovers = (approvers: Approver[]): Approver[] => {
+        return approvers || [];
     };
 
     const renderApproverCell = (approver: Approver | undefined) => {
-        if (!approver) return <td></td>;
+        if (!approver) return <td>No approver</td>;
         return (
             <td>
                 {approver.usertype}: {approver.username}
@@ -161,26 +156,26 @@ export function AdminApplication() {
                             </thead>
                             <tbody>
                             {applications.map((app) => {
-                                const approvers = parseApprovers(app.approver);
+                                const approvers = app.approver;
                                 return (
-                                    <tr key={app.applicationid}>
-                                        <td>{app.applicationid}</td>
+                                    <tr key={app.applicationID}>
+                                        <td>{app.applicationID}</td>
                                         <td>{app.usertype}</td>
                                         <td>{app.username}</td>
-                                        <td>{app.applicationtype}</td>
+                                        <td>{app.applicationType}</td>
                                         <td>{app.info}</td>
                                         <td>{app.status}</td>
                                         {renderApproverCell(approvers[0])}
                                         {renderApproverCell(approvers[1])}
                                         {renderApproverCell(approvers[2])}
                                         <td>
-                                            <button onClick={() => handleApprove(app.applicationid)} className="approve-button">
+                                            <button onClick={() => handleApprove(app.applicationID)} className="approve-button">
                                                 Approve
                                             </button>
-                                            <button onClick={() => handleReject(app.applicationid)} className="reject-button">
+                                            <button onClick={() => handleReject(app.applicationID)} className="reject-button">
                                                 Reject
                                             </button>
-                                            <button onClick={() => handleDelete(app.applicationid)} className="delete-button">
+                                            <button onClick={() => handleDelete(app.applicationID)} className="delete-button">
                                                 Delete
                                             </button>
                                         </td>
