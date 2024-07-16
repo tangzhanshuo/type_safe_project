@@ -95,7 +95,7 @@ export function TeacherDashboard() {
                             <FaSync />
                         </button>
                     </div>
-                    <p>You have selected {selectedCoursesCount} course(s).</p>
+                    <p>You are teaching {selectedCoursesCount} course(s).</p>
                 </div>
 
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}
