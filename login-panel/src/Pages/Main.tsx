@@ -7,18 +7,19 @@ import { FaLaptopCode, FaUserGraduate, FaChalkboardTeacher, FaUserShield } from 
 export function Main() {
     const history = useHistory();
     const { toggleDarkMode } = useContext(ThemeContext);
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 text-gray-900  dark:from-gray-800 dark:to-gray-900 dark:text-white">
+        <div
+            className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 text-gray-900  dark:from-gray-800 dark:to-gray-900 dark:text-white">
             <header className="py-6 px-8 flex justify-between items-center bg-white bg-opacity-30 dark:bg-gray-800">
                 <div className="flex items-center space-x-4">
-                    <FaLaptopCode className="w-10 h-10 text-blue-500 dark:text-white" />
+                    <FaLaptopCode className="w-10 h-10 text-blue-500 dark:text-white"/>
                     <h1 className="text-2xl font-bold">Course Selection System</h1>
                 </div>
                 <nav className="flex items-center">
                     <ul className="flex space-x-6 mr-6">
                         <li><a href="#about" className="hover:text-indigo-600 dark:hover:text-indigo-300">About</a></li>
-                        <li><a href="#contact" className="hover:text-indigo-600 dark:hover:text-indigo-300">Contact</a></li>
+                        <li><a href="#contact" className="hover:text-indigo-600 dark:hover:text-indigo-300">Contact</a>
+                        </li>
                         <li><a href="#help" className="hover:text-indigo-600 dark:hover:text-indigo-300">Help</a></li>
                     </ul>
                     <button
@@ -38,21 +39,21 @@ export function Main() {
 
                     <div className="flex justify-center space-x-6 mb-12">
                         <div className="text-center">
-                            <FaUserGraduate className="w-20 h-20 mx-auto mb-2 text-blue-500"/>
+                            <FaUserGraduate className="w-20 h-20 mx-auto mb-2 text-blue-500 dark:text-blue-600"/>
                             <button onClick={() => history.push('/login/student')}
                                     className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
                                 I'm a Student
                             </button>
                         </div>
                         <div className="text-center">
-                            <FaChalkboardTeacher className="w-20 h-20 mx-auto mb-2 text-green-500"/>
+                            <FaChalkboardTeacher className="w-20 h-20 mx-auto mb-2 text-green-500 dark:text-green-600"/>
                             <button onClick={() => history.push('/login/teacher')}
                                     className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
                                 I'm a Teacher
                             </button>
                         </div>
                         <div className="text-center">
-                            <FaUserShield className="w-20 h-20 mx-auto mb-2 text-purple-500"/>
+                            <FaUserShield className="w-20 h-20 mx-auto mb-2 text-purple-500 dark:text-purple-600"/>
                             <button onClick={() => history.push('/login/admin')}
                                     className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
                                 I'm an Admin
@@ -79,7 +80,7 @@ export function Main() {
                 <section className="text-center mb-16">
                     <h3 className="text-2xl font-bold mb-4">Experience the Future of Education</h3>
                     <button onClick={() => history.push('/114514')}
-                            className="bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">
+                            className="bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full hover:scale-105">
                         Take a Tour
                     </button>
                 </section>
@@ -88,10 +89,10 @@ export function Main() {
                     <button
                         onClick={() => {
                             sendUserRequest("register", "admin", "a", "a");
-                            sendUserRequest("register","teacher","a","a");
-                            sendUserRequest("register","student","a","a");
+                            sendUserRequest("register", "teacher", "a", "a");
+                            sendUserRequest("register", "student", "a", "a");
                         }}
-                        className="bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                        className="bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transform hover:scale-105"
                     >
                         Register test accounts
                     </button>
@@ -107,17 +108,30 @@ export function Main() {
                     <div className="w-full md:w-1/3 text-center mb-4 md:mb-0">
                         <h4 className="text-lg font-semibold mb-2">Quick Links</h4>
                         <ul>
-                            <li><a href="#about" className="hover:text-indigo-600 dark:hover:text-indigo-300">About</a></li>
-                            <li><a href="#contact" className="hover:text-indigo-600 dark:hover:text-indigo-300">Contact</a></li>
-                            <li><a href="#privacy" className="hover:text-indigo-600 dark:hover:text-indigo-300">Privacy Policy</a></li>
+                            <li><a href="#about" className="hover:text-indigo-600 dark:hover:text-indigo-300">About</a>
+                            </li>
+                            <li><a href="#contact"
+                                   className="hover:text-indigo-600 dark:hover:text-indigo-300">Contact</a></li>
+                            <li><a href="#privacy" className="hover:text-indigo-600 dark:hover:text-indigo-300">Privacy
+                                Policy</a></li>
                         </ul>
                     </div>
                     <div className="w-full md:w-1/3 text-center md:text-right">
+                        <i className="fab fa-weixin"></i>
                         <h4 className="text-lg font-semibold mb-2">Connect With Us</h4>
                         <div className="flex justify-center md:justify-end space-x-4">
-                            <a href="#" className="text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-300"><i className="fab fa-facebook"></i></a>
-                            <a href="#" className="text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-300"><i className="fab fa-twitter"></i></a>
-                            <a href="#" className="text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-300"><i className="fab fa-instagram"></i></a>
+                            <a href="https://facebook.com" target="_blank"
+                               className="text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-300">
+                                <i className="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://twitter.com" target="_blank"
+                               className="text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-300">
+                                <i className="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://instagram.com" target="_blank"
+                               className="text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-300">
+                                <i className="fab fa-instagram"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
