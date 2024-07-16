@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
+import {FaLaptopCode} from "react-icons/fa";
 
 export function NotFoundPage() {
     const history = useHistory();
@@ -9,7 +10,7 @@ export function NotFoundPage() {
         <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 text-gray-900 dark:from-gray-800 dark:to-gray-900 dark:text-white">
             <header className="py-6 px-8 flex justify-between items-center bg-white bg-opacity-30 dark:bg-gray-800">
                 <div className="flex items-center space-x-4">
-                    <img src="/logo.svg" alt="Logo" className="w-10 h-10" />
+                    <FaLaptopCode className="w-10 h-10 text-blue-500 dark:text-white" />
                     <h1 className="text-2xl font-bold">Page Not Found ️</h1>
                 </div>
                 <button

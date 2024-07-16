@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { sendUserRequest } from 'Plugins/CommonUtils/UserManager';
 import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
+import { FaLaptopCode, FaUserGraduate, FaChalkboardTeacher, FaUserShield } from 'react-icons/fa';
 
 export function Main() {
     const history = useHistory();
@@ -11,7 +12,7 @@ export function Main() {
         <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 text-gray-900  dark:from-gray-800 dark:to-gray-900 dark:text-white">
             <header className="py-6 px-8 flex justify-between items-center bg-white bg-opacity-30 dark:bg-gray-800">
                 <div className="flex items-center space-x-4">
-                    <img src="/logo.svg" alt="Logo" className="w-10 h-10" />
+                    <FaLaptopCode className="w-10 h-10 text-blue-500 dark:text-white" />
                     <h1 className="text-2xl font-bold">Course Selection System</h1>
                 </div>
                 <nav className="flex items-center">
@@ -36,15 +37,27 @@ export function Main() {
                     <p className="text-xl mb-8">Streamline your academic journey with our cutting-edge system</p>
 
                     <div className="flex justify-center space-x-6 mb-12">
-                        <button onClick={() => history.push('/login/student')} className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
-                            I'm a Student
-                        </button>
-                        <button onClick={() => history.push('/login/teacher')} className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
-                            I'm a Teacher
-                        </button>
-                        <button onClick={() => history.push('/login/admin')} className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
-                            I'm an Admin
-                        </button>
+                        <div className="text-center">
+                            <FaUserGraduate className="w-20 h-20 mx-auto mb-2 text-blue-500"/>
+                            <button onClick={() => history.push('/login/student')}
+                                    className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
+                                I'm a Student
+                            </button>
+                        </div>
+                        <div className="text-center">
+                            <FaChalkboardTeacher className="w-20 h-20 mx-auto mb-2 text-green-500"/>
+                            <button onClick={() => history.push('/login/teacher')}
+                                    className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
+                                I'm a Teacher
+                            </button>
+                        </div>
+                        <div className="text-center">
+                            <FaUserShield className="w-20 h-20 mx-auto mb-2 text-purple-500"/>
+                            <button onClick={() => history.push('/login/admin')}
+                                    className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
+                                I'm an Admin
+                            </button>
+                        </div>
                     </div>
                 </section>
 
@@ -65,7 +78,8 @@ export function Main() {
 
                 <section className="text-center mb-16">
                     <h3 className="text-2xl font-bold mb-4">Experience the Future of Education</h3>
-                    <button onClick={() => history.push('/114514')} className="bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">
+                    <button onClick={() => history.push('/114514')}
+                            className="bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">
                         Take a Tour
                     </button>
                 </section>
@@ -73,7 +87,7 @@ export function Main() {
                 <div className="text-center">
                     <button
                         onClick={() => {
-                            sendUserRequest("register","admin","a","a");
+                            sendUserRequest("register", "admin", "a", "a");
                             sendUserRequest("register","teacher","a","a");
                             sendUserRequest("register","student","a","a");
                         }}

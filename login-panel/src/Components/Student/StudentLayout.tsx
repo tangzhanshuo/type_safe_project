@@ -2,7 +2,7 @@ import React, { ReactNode, useContext } from 'react';
 import {Link, useHistory, useLocation} from 'react-router-dom';
 import { useAuth } from 'Hooks/UseAuth';
 import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
-import { FaHome, FaBook, FaList, FaSignOutAlt } from 'react-icons/fa';
+import {FaHome, FaBook, FaList, FaSignOutAlt} from 'react-icons/fa';
 import {logout} from "Plugins/CommonUtils/UserManager";
 
 interface StudentLayoutProps {
