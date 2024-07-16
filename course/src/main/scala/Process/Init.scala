@@ -75,6 +75,33 @@ object Init {
            |ON CONFLICT (classroomid) DO NOTHING
          """.stripMargin, List()
       )
+      _ <- writeDB(
+        s"""
+           |CREATE TABLE IF NOT EXISTS plan (
+           |  planid INT PRIMARY KEY,
+           |  plan_name TEXT,
+           |  credits_limits JSONB DEFAULT '{"1": {"min": 6, "max": 26}, "2": {"min": 6, "max": 26}, "3": {"min": 6, "max": 30}, "4": {"min": 6, "max": 114514}}'::jsonb,
+           |  priority JSONB DEFAULT '{"1": {"-1": 2}, "4": {"1": 2}}'::jsonb
+           |)
+         """.stripMargin, List()
+      )
+      _ <- writeDB(
+        s"""
+           |INSERT INTO plan (
+           |  planid,
+           |  plan_name,
+           |  credits_limits,
+           |  priority
+           |)
+           |VALUES (
+           |  1,
+           |  'Computer Science Plan',
+           |  '{"1": {"min": 6, "max": 26}, "2": {"min": 6, "max": 26}, "3": {"min": 6, "max": 30}, "4": {"min": 6, "max": 114514}}'::jsonb,
+           |  '{"1": {"-1": 2}, "4": {"1": 2}}'::jsonb
+           |)
+           |ON CONFLICT (planid) DO NOTHING
+         """.stripMargin, List()
+      )
     } yield ()
   }
 }
