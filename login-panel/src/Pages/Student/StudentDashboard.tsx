@@ -92,9 +92,6 @@ export function StudentDashboard() {
                     </p>
                     <div className="space-y-4">
                         <div>
-                            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Name:
-                            </label>
                             <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
                                 Enter your full legal name as it appears on official documents.
                             </p>
@@ -107,9 +104,6 @@ export function StudentDashboard() {
                             />
                         </div>
                         <div>
-                            <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Address:
-                            </label>
                             <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
                                 Provide your current mailing address. This will be used for any physical correspondence from the university.
                             </p>
