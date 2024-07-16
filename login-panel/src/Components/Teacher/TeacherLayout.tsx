@@ -2,7 +2,7 @@ import React, { ReactNode, useContext } from 'react';
 import {Link, useHistory, useLocation} from 'react-router-dom';
 import { useAuth } from 'Hooks/UseAuth';
 import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
-import { FaHome, FaBook, FaList, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaBook, FaList, FaSignOutAlt, FaPlus} from 'react-icons/fa';
 import {logout} from "Plugins/CommonUtils/UserManager";
 
 interface TeacherLayoutProps {
@@ -17,7 +17,10 @@ export function TeacherLayout({ children }: TeacherLayoutProps) {
 
     const menuItems = [
         { path: '/teacher/dashboard', name: 'Dashboard', icon: FaHome },
-        { path: '/teacher/course', name: 'My Courses', icon: FaBook },
+        { path: '/teacher/course', name: 'My courses', icon: FaBook },
+        { path: '/teacher/course/add', name: 'Add Course', icon: FaPlus },
+        { path: '/teacher/course', name: 'Courses list', icon: FaList },
+
     ];
 
     return (
