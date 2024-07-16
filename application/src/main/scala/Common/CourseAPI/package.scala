@@ -1,7 +1,7 @@
 package Common
 
 import Common.API.{API, PlanContext, TraceID}
-import Common.Object._
+import Common.Object.*
 import Global.ServiceCenter.courseServiceCode
 import cats.effect.IO
 import io.circe.Json
@@ -95,4 +95,22 @@ package object CourseAPI {
   def reorderStudentsByCourseID(classroomid: Int)(using PlanContext): IO[String] =
     ReorderStudentsByCourseIDMessage(classroomid).send
 
+  def addPlan(plan: Plan)(using PlanContext): IO[Plan] =
+    AddPlanMessage(plan).send
+
+  def updatePlan(
+                  planid: Int,
+                  planName: Option[String],
+                  creditsLimits: Option[Map[Int, CreditsLimits]],
+                  priority: Option[Map[Int, Map[Int, Int]]]
+                )(using PlanContext): IO[Plan] =
+    UpdatePlanMessage(planid, planName, creditsLimits, priority ).send
+  
+
+  def getPriorityByPlanIDYearCourseID(
+                                       planid: Int,
+                                       year: Int,
+                                       courseid: Int
+                                     )(using PlanContext): IO[Int] =
+    GetPriorityByPlanIDYearCourseIDMessage(planid, year, courseid).send
 }

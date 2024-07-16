@@ -3,7 +3,7 @@ package Impl
 import cats.effect.IO
 import io.circe.syntax._
 import io.circe.parser.parse
-import io.circe.generic.semiauto._
+import io.circe.generic.auto._
 import io.circe.{Decoder, Encoder, Json}
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.{writeDB, readDBBoolean, readDBInt, readDBString}
@@ -11,9 +11,7 @@ import Common.Object.{SqlParameter, EnrolledStudent, AllStudent, Course}
 import Common.DBAPI.WriteDBMessage
 
 // Define the encoder for WriteDBMessage
-object WriteDBMessage {
-  implicit val writeDBMessageEncoder: Encoder[WriteDBMessage] = deriveEncoder
-}
+
 
 case class AddCourseMessagePlanner(
                                     courseName: String,
@@ -28,7 +26,6 @@ case class AddCourseMessagePlanner(
                                     allStudents: List[AllStudent],
                                     override val planContext: PlanContext
                                   ) extends Planner[Course] {
-  import WriteDBMessage.writeDBMessageEncoder
 
   override def plan(using planContext: PlanContext): IO[Course] = {
     val checkClassroomExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM classroom WHERE classroomid = ?)",

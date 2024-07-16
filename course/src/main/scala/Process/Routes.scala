@@ -112,6 +112,21 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
+      case "AddPlanMessage" =>
+        IO(decode[AddPlanMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddPlanMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "UpdatePlanMessage" =>
+        IO(decode[UpdatePlanMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UpdatePlanMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "GetPriorityByPlanIDYearCourseIDMessage" =>
+        IO(decode[GetPriorityByPlanIDYearCourseIDMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UpdatePlanMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

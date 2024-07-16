@@ -3,7 +3,7 @@ package Common
 import Common.API.{PlanContext, TraceID}
 import Common.Object.{ParameterList, SqlParameter}
 import cats.effect.*
-import io.circe.{Decoder, Encoder, HCursor, Json}
+import io.circe.{Decoder, Encoder, HCursor, Json, parser}
 import io.circe.generic.auto.*
 import org.joda.time.DateTime
 import io.circe.parser.decode
@@ -72,6 +72,12 @@ package object DBAPI {
       resultParam: String<- ReadDBValueMessage(sqlQuery, parameters).send
       convertedResult = resultParam.startsWith("t")
     } yield convertedResult
+
+  def readDBJson(sqlQuery: String, parameters: List[SqlParameter])(using context: PlanContext): IO[Json] =
+    for {
+      resultParam: String <- ReadDBValueMessage(sqlQuery, parameters).send
+      parsedJson <- IO.fromEither(parser.parse(resultParam))
+    } yield parsedJson
 
   def writeDB(sqlQuery: String, parameters: List[SqlParameter])(using Encoder[WriteDBMessage], PlanContext): IO[String] = WriteDBMessage(sqlQuery, parameters).send
 

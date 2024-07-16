@@ -32,11 +32,11 @@ export function TeacherAddCourse() {
     }, [history]);
 
     const addCourse = async () => {
-        if (!courseName || !teacherName || !capacity || !info || !courseHourJson || !classroomID || !credits || !allStudentsJson) {
+        if (!courseName || !teacherName || !capacity || !courseHourJson || !classroomID || !credits || !allStudentsJson) {
             setAddCourseResponse('Please ensure all fields are correctly filled.');
             return;
         }
-
+        console.log(+courseID, courseName, teacherName, +capacity, info, courseHourJson, +classroomID, +credits, allStudentsJson)
         const response = await sendPostRequest(new TeacherAddCourseMessage(+courseID, courseName, teacherName, +capacity, info, courseHourJson, +classroomID, +credits, allStudentsJson));
         if (response.isError) {
             setAddCourseResponse(response.error);
@@ -49,25 +49,44 @@ export function TeacherAddCourse() {
     return (
         <TeacherLayout>
             <div className="space-y-6">
-                <h1 className="text-2xl font-bold">Add New Course</h1>
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                     <form className="space-y-4">
-                        <input id="courseName" type="text" value={courseName} onChange={(e) => setCourseName(e.target.value)} placeholder="Course Name" className="input-field" />
-                        <input id="teacherName" type="text" value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Teacher Name" className="input-field" />
-                        <input id="capacity" type="text" value={capacity || ''} onChange={(e) => setCapacity(e.target.value)} placeholder="Capacity (e.g., 30)" className="input-field" />
-                        <input id="info" type="text" value={info} onChange={(e) => setInfo(e.target.value)} placeholder="Course Info" className="input-field" />
-                        <input id="courseHourJson" type="text" value={courseHourJson} onChange={(e) => setCourseHourJson(e.target.value)} placeholder="Course Hour JSON (e.g. [12,32])" className="input-field" />
-                        <input id="classroomID" type="text" value={classroomID || ''} onChange={(e) => setClassroomID(e.target.value)} placeholder="Classroom ID (e.g. 101, -1 for no classroom)" className="input-field" />
-                        <input id="credits" type="text" value={credits || ''} onChange={(e) => setCredits(e.target.value)} placeholder="Credits (e.g., 3)" className="input-field" />
-                        <input id="allStudentsJson" type="text" value={allStudentsJson} onChange={(e) => setAllStudentsJson(e.target.value)} placeholder="Enrolled Student JSON (e.g.,['a'])" className="input-field" />
+                        <input id="courseName" type="string" value={courseName}
+                               onChange={(e) => setCourseName(e.target.value)} placeholder="Course Name"
+                               className="input-field w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+                        <input id="teacherName" type="string" value={teacherName}
+                               onChange={(e) => setTeacherName(e.target.value)} placeholder="Teacher Name"
+                               className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+                        <input id="capacity" type="number" value={capacity || ''}
+                               onChange={(e) => setCapacity(e.target.value)} placeholder="Capacity (e.g., 30)"
+                               className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+                        <input id="info" type="string" value={info} onChange={(e) => setInfo(e.target.value)}
+                               placeholder="Course Info" className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+                        <input id="courseHourJson" type="string" value={courseHourJson}
+                               onChange={(e) => setCourseHourJson(e.target.value)}
+                               placeholder="Course Hour JSON (e.g. [12,32])" className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+                        <input id="classroomID" type="number" value={classroomID || ''}
+                               onChange={(e) => setClassroomID(e.target.value)}
+                               placeholder="Classroom ID (e.g. 101, -1 for no classroom)" className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+                        <input id="credits" type="number" value={credits || ''}
+                               onChange={(e) => setCredits(e.target.value)} placeholder="Credits (e.g., 3)"
+                               className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+                        <input id="allStudentsJson" type="string" value={allStudentsJson}
+                               onChange={(e) => setAllStudentsJson(e.target.value)}
+                               placeholder="Enrolled Student JSON (e.g.,['a'])" className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
                     </form>
+
                     <div className="button-group">
-                        <button onClick={addCourse} className="button">Register Course</button>
-                        <button onClick={() => history.push('/teacher/course')} className="button">Back To Courses</button>
-                        <button onClick={() => history.push('/teacher/dashboard')} className="button">Back to TeacherMain</button>
-                        <button onClick={() => logout(history)} className="button">Log out</button>
+                        <button onClick={addCourse}
+                                style={{marginTop: '30px'}}
+                                className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
+                            Register Course
+                        </button>
                     </div>
-                    {addCourseResponse && <p className="text-red-500">{addCourseResponse}</p>}
+
+                    <p className={addCourseResponse === 'Course added successfully.' ? 'text-green-500' : 'text-red-500'}>
+                        {addCourseResponse}
+                    </p>
                 </div>
             </div>
         </TeacherLayout>

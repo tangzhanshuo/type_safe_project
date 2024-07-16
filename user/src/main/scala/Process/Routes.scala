@@ -44,6 +44,18 @@ object Routes:
             m.fullPlan.map(_.asJson.toString)
           }
 
+      case "StudentGetInfoMessage" | "TeacherGetInfoMessage" | "AdminGetInfoMessage" =>
+        IO(decode[UserGetInfoMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetInfoMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
+      case "StudentSetInfoMessage" | "TeacherSetInfoMessage" | "AdminSetInfoMessage" =>
+        IO(decode[UserSetInfoMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserSetInfoMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.toString)
+          }
+
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
