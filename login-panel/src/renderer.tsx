@@ -42,7 +42,7 @@ const Layout = () => {
                     <Route path="/teacher/course/:courseid(\d+)" exact component={TeacherCourseDetail} />
                     <Route path="/teacher/courseList" exact component={TeacherCourseList} />
                     <Route path="/admin/dashboard" exact component={AdminDashboard} />
-                    <Route path="/admin/user" exact component={AdminUserManagement} />
+                    <Route path="/admin/userManagement" exact component={AdminUserManagement} />
                     <Route path="/admin/course" exact component={AdminCourse} />
                     <Route path="/admin/application" exact component={AdminApplication} />
                     <Route component={NotFoundPage} />
