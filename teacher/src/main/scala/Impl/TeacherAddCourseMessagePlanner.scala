@@ -22,6 +22,8 @@ case class TeacherAddCourseMessagePlanner(usertype: String,
                                           allStudentsJson: String,
                                           override val planContext: PlanContext) extends Planner[Application] {
   override def plan(using planContext: PlanContext): IO[Application] = {
+    print(usertype,username,courseName,teacherName,capacity,info,courseHourJson,classroomID,credits,allStudentsJson);
+    println()
     val application = Application.create(usertype, username, "TeacherAddCourse")
     application.addInfo("courseName", courseName)
     application.addInfo("teacherName", teacherName)
