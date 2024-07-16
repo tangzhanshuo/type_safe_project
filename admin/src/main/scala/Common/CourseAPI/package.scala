@@ -5,8 +5,8 @@ import Common.Object.*
 import Global.ServiceCenter.courseServiceCode
 import cats.effect.IO
 import io.circe.Json
-import io.circe.generic.auto._
-import io.circe.syntax._
+import io.circe.generic.auto.*
+import io.circe.syntax.*
 import org.http4s.client.Client
 
 package object CourseAPI {
@@ -50,6 +50,9 @@ package object CourseAPI {
   def addStudent2Course(courseid: Int, studentUsername: Option[String], priority: Option[Int])(using PlanContext): IO[String] =
     AddStudent2CourseMessage(courseid, studentUsername, priority).send
 
+  def forceAddStudent2Course(courseid: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
+    ForceAddStudent2CourseMessage(courseid, studentUsername).send
+    
   def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[List[Course]] =
     GetCourseByTeacherUsernameMessage(teacherUsername).send
 

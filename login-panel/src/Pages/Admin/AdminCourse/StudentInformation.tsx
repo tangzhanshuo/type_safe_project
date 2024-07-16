@@ -5,7 +5,9 @@ import { AdminDeleteStudentFromCourseMessage } from 'Plugins/AdminAPI/AdminDelet
 import { AdminGetCourseByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetCourseByStudentUsernameMessage';
 import { AdminGetWaitingCoursesByStudentUsernameMessage } from 'Plugins/AdminAPI/AdminGetWaitingCoursesByStudentUsernameMessage';
 import { AdminGetWaitingPositionByStudentUsernameMessage} from 'Plugins/AdminAPI/AdminGetWaitingPositionByStudentUsernameMessage';
-import { AdminReorderStudentsByCourseIDMessage } from 'Plugins/AdminAPI/AdminReorderStudentsByCourseIDMessage'
+import { AdminReorderStudentsByCourseIDMessage } from 'Plugins/AdminAPI/AdminReorderStudentsByCourseIDMessage';
+import { AdminForceAddStudent2CourseMessage} from 'Plugins/AdminAPI/AdminForceAddStudent2CourseMessage'
+
 interface Props {
     setErrorMessage: (msg: string) => void;
     setSuccessMessage: (msg: string) => void;
@@ -28,6 +30,32 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
             parseInt(studentCourseID, 10),
             studentUsername,
             parseInt(studentPriority, 10)
+        );
+
+        try {
+            const response = await sendPostRequest(message);
+            if (!response.isError) {
+                setSuccessMessage('Student added to course successfully');
+                setErrorMessage('');
+            } else {
+                setErrorMessage('Failed to add student to course');
+                setSuccessMessage('');
+            }
+        } catch (error) {
+            setErrorMessage('Error occurred while adding student to course');
+            setSuccessMessage('');
+        }
+    };
+
+    const handleForceAddStudent2Course = async () => {
+        if (!studentCourseID || !studentUsername) {
+            setErrorMessage('Course ID and Student Username are required');
+            return;
+        }
+
+        const message = new AdminForceAddStudent2CourseMessage(
+            parseInt(studentCourseID, 10),
+            studentUsername
         );
 
         try {
@@ -203,6 +231,9 @@ export const StudentInformation: React.FC<Props> = ({ setErrorMessage, setSucces
             <div className="button-group">
                 <button onClick={handleAddStudent2Course} className="button">
                     Add Student to Course
+                </button>
+                <button onClick={handleForceAddStudent2Course} className="button">
+                    Force Add Student to Course
                 </button>
                 <button onClick={handleDeleteStudentFromCourse} className="button">
                     Delete Student from Course
