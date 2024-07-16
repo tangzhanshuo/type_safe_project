@@ -29,9 +29,10 @@ case class UserRegisterMessagePlanner(usertype: String, username: String, passwo
       result <- if (exists) {
         IO.raiseError(new Exception("User already registered"))
       } else {
-        writeDB(s"INSERT INTO ${dbName} (user_name, password) VALUES (?, ?)",
+        writeDB(s"INSERT INTO ${dbName} (user_name, password, info) VALUES (?, ?, ?)",
           List(SqlParameter("String", username),
-            SqlParameter("String", hashed)
+               SqlParameter("String", hashed),
+               SqlParameter("Jsonb", s"{\"name\": \"${username}\"}")
           ))
       }
     } yield result

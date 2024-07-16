@@ -21,6 +21,7 @@ export const sendUnverifiedPostRequest = async (message: API) => {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log('Response status:', response.status);
+        console.log('Response data type:', typeof response.data)
         console.log('Response body:', response.data);
         returnResponse.data = response.data
     } catch (error) {
