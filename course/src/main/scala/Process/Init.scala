@@ -37,7 +37,7 @@ object Init {
         // h = 1, 2, 3, 4, 5, 6 stands for 第h段时间
       )
 
-      _ <- writeDB(
+      /*_ <- writeDB(
         s"""
            |INSERT INTO course (
            |  course_name,
@@ -54,7 +54,7 @@ object Init {
            |VALUES ('入学', 't', 't', '1', '抢不到就等着退学吧', '[1]', -1, 0, '[]', '[]')
            |ON CONFLICT (courseid) DO NOTHING
          """.stripMargin, List()
-      )
+      )*/
       _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS classroom (
