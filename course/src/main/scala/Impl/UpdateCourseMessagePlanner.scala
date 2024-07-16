@@ -169,21 +169,39 @@ case class UpdateCourseMessagePlanner(
                   removeOldClassroom *> updateNewClassroom
                 }
 
-                writeDB(updateCourseQuery.format(updates), params).flatMap { result =>
-                  updateClassroomsIO.map(_ => result)
-                }.map(_ => Course(
-                  courseid,
-                  updatedCourseName.getOrElse(""),
-                  updatedTeacherUsername.getOrElse(""),
-                  updatedTeacherName.getOrElse(""),
-                  updatedCapacity.getOrElse(0),
-                  updatedInfo.getOrElse(""),
-                  updatedCourseHours.getOrElse(Nil),
-                  updatedClassroomid.getOrElse(0),
-                  updatedCredits.getOrElse(0),
-                  updatedEnrolledStudents.getOrElse(Nil),
-                  updatedAllStudents.getOrElse(Nil)
-                ))
+                val rearrangeStudents = for {
+                  allStudents <- updatedAllStudents.map(IO.pure).getOrElse(IO.pure(List.empty[AllStudent]))
+                  sortedAllStudents = allStudents.sortBy(_.time)
+                  finalEnrolledStudents = sortedAllStudents.take(updatedCapacity.getOrElse(cursor.get[Int]("capacity").getOrElse(0))).map { student =>
+                    EnrolledStudent(student.time, student.priority, student.studentUsername)
+                  }
+                  finalEnrolledStudentsJsonString = finalEnrolledStudents.asJson.noSpaces
+                } yield (finalEnrolledStudents, finalEnrolledStudentsJsonString)
+
+                rearrangeStudents.flatMap { case (finalEnrolledStudents, finalEnrolledStudentsJsonString) =>
+                  val updateEnrolledStudentsQuery = "UPDATE course SET enrolled_students = ? WHERE courseid = ?"
+                  writeDB(updateCourseQuery.format(updates), params).flatMap { result =>
+                    updateClassroomsIO.map(_ => result)
+                  }.flatMap { _ =>
+                    writeDB(updateEnrolledStudentsQuery, List(
+                      SqlParameter("jsonb", finalEnrolledStudentsJsonString),
+                      SqlParameter("int", courseid.toString)
+                    )).map(_ => Course(
+                      courseid,
+                      updatedCourseName.getOrElse(""),
+                      updatedTeacherUsername.getOrElse(""),
+                      updatedTeacherName.getOrElse(""),
+                      updatedCapacity.getOrElse(0),
+                      updatedInfo.getOrElse(""),
+                      updatedCourseHours.getOrElse(Nil),
+                      updatedClassroomid.getOrElse(0),
+                      updatedCredits.getOrElse(0),
+                      finalEnrolledStudents,
+                      updatedAllStudents.getOrElse(Nil)
+                    ))
+                  }
+                }
+
               }
 
             case (Left(courseHourError), _, _) => IO.raiseError(new Exception(s"Invalid JSON for courseHours: ${courseHourError.getMessage}"))
