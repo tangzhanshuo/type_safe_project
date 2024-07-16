@@ -1,8 +1,9 @@
 package Impl
 
 import Common.API.{PlanContext, Planner}
-import Common.ApplicationAPI.{addApplication, createApplication}
+import Common.ApplicationAPI.{addApplication}
 import cats.effect.IO
+import Common.Object.Application
 
 case class StudentAddApplicationMessagePlanner(
                                               usertype: String,
@@ -13,6 +14,7 @@ case class StudentAddApplicationMessagePlanner(
                                               override val planContext: PlanContext
                                             ) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
-    addApplication(createApplication(usertype, username, applicationType, info, approver))
+    val application = Application.create(usertype, username ,"birb")
+    addApplication(application)
   }
 }

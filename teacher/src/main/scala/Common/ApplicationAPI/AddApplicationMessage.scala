@@ -2,11 +2,8 @@ package Common.ApplicationAPI
 
 import Common.API.API
 import Global.ServiceCenter.applicationServiceCode
+import Common.Object.Application
 
 case class AddApplicationMessage(
-                                usertype: String,
-                                username: String,
-                                applicationType: String,
-                                info: String,
-                                approver: String
+                                application: Application
                               ) extends API[String](applicationServiceCode)

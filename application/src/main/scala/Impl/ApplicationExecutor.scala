@@ -2,8 +2,8 @@ package Impl
 
 import cats.effect.IO
 import Common.DBAPI.*
-import Common.Object.SqlParameter
-import io.circe.parser.parse
+import Common.Object.{SqlParameter, EnrolledStudent, AllStudent, Course}
+import io.circe.parser.{parse, decode}
 import io.circe.{Encoder, Json}
 import Common.CourseAPI.{addCourse, addStudent2Course, deleteCourse}
 import Common.API.PlanContext
@@ -53,9 +53,9 @@ object ApplicationExecutor {
         case Some(value) => IO.pure(Some(value))
         case None => IO.pure(None)  // priority is optional, so we use None if it's not provided
       }
-      _ <- addStudent2Course(courseID, Some(username), priority)
+      result <- addStudent2Course(courseID, Some(username), priority)
       priorityStr = priority.map(p => s" with priority $p").getOrElse("")
-      _ <- IO.println(s"Student $username added to course $courseID$priorityStr")
+      _ <- IO.println(s"Student $username added to course $courseID$priorityStr. Result: $result")
     } yield ()
   }
 
@@ -65,32 +65,34 @@ object ApplicationExecutor {
       teacherName <- IO.fromOption(info.hcursor.downField("teacherName").as[String].toOption)(new Exception("teacherName not found in info"))
       capacity <- IO.fromOption(info.hcursor.downField("capacity").as[Int].toOption)(new Exception("capacity not found in info"))
       infoStr <- IO.fromOption(info.hcursor.downField("info").as[String].toOption)(new Exception("info not found in info"))
-      courseHourJson <- IO.fromOption(info.hcursor.downField("courseHourJson").as[String].toOption)(new Exception("courseHourJson not found in info"))
-      classroomID <- IO.fromOption(info.hcursor.downField("classroomID").as[Int].toOption)(new Exception("classroomID not found in info"))
+      courseHourStr <- IO.fromOption(info.hcursor.downField("courseHour").as[String].toOption)(new Exception("courseHour not found in info"))
+      courseHour <- IO.fromEither(decode[List[Int]](courseHourStr)).attempt.flatMap {
+        case Right(hours) => IO.pure(hours)
+        case Left(e) => IO.raiseError(new Exception(s"Failed to parse courseHour as List[Int]: ${e.getMessage}"))
+      }
+      classroomid <- IO.fromOption(info.hcursor.downField("classroomid").as[Int].toOption)(new Exception("classroomid not found in info"))
       credits <- IO.fromOption(info.hcursor.downField("credits").as[Int].toOption)(new Exception("credits not found in info"))
-      enrolledStudentsJson <- IO.pure("[]") // Start with an empty array for new course
-      allStudentsJson <- IO.pure("[]") // Start with an empty array for new course
-      courseID <- addCourse(
+      course <- addCourse(
         courseName = courseName,
         teacherUsername = username,
         teacherName = teacherName,
         capacity = capacity,
         info = infoStr,
-        courseHourJson = courseHourJson,
-        classroomID = classroomID,
+        courseHour = courseHour,
+        classroomid = classroomid,
         credits = credits,
-        enrolledStudentsJson = enrolledStudentsJson,
-        allStudentsJson = allStudentsJson
+        enrolledStudents = List.empty,
+        allStudents = List.empty
       )
-      _ <- IO.println(s"Course added successfully: $courseName (ID: $courseID) by teacher: $teacherName (Username: $username)")
+      _ <- IO.println(s"Course added successfully: ${course.courseName} (ID: ${course.courseid}) by teacher: ${course.teacherName} (Username: ${course.teacherUsername})")
     } yield ()
   }
 
   private def executeTeacherDeleteCourse(info: Json)(using planContext: PlanContext): IO[Unit] = {
     for {
       courseID <- IO.fromOption(info.hcursor.downField("courseID").as[Int].toOption)(new Exception("courseID not found in info"))
-      _ <- deleteCourse(courseID)
-      _ <- IO.println(s"Course with ID $courseID deleted successfully")
+      result <- deleteCourse(courseID)
+      _ <- IO.println(s"Course with ID $courseID deleted successfully. Result: $result")
     } yield ()
   }
 }

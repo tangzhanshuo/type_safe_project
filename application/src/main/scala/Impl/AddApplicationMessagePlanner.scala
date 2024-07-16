@@ -6,26 +6,18 @@ import io.circe.parser.parse
 import io.circe.syntax.*
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.*
-import Common.Object.SqlParameter
+import Common.Object.{SqlParameter, Application, Approver}
 import java.util.UUID
 
 case class AddApplicationMessagePlanner(
-                                       usertype: String,
-                                       username: String,
-                                       applicationType: String,
-                                       info: String,
-                                       approver: String,
-                                       override val planContext: PlanContext
-                                     ) extends Planner[String] {
-  override def plan(using planContext: PlanContext): IO[String] = {
-    val infoJsonValidation = parse(info).left.map(e => new Exception(s"Invalid JSON for info: ${e.getMessage}"))
-    val approverJsonValidation = parse(approver).left.map(e => new Exception(s"Invalid JSON for approver: ${e.getMessage}"))
+                                         application: Application,
+                                         override val planContext: PlanContext
+                                       ) extends Planner[Application] {
+  override def plan(using planContext: PlanContext): IO[Application] = {
+    val infoJsonValidation = parse(application.info).left.map(e => new Exception(s"Invalid JSON for info: ${e.getMessage}"))
 
-    (infoJsonValidation, approverJsonValidation) match {
-      case (Right(_), Right(_)) =>
-        // Proceed with DB operation if both JSON strings are valid
-        val applicationID = UUID.randomUUID().toString
-        println(approver)
+    infoJsonValidation match {
+      case Right(_) =>
         writeDB(
           s"""
              |INSERT INTO application (
@@ -33,18 +25,17 @@ case class AddApplicationMessagePlanner(
              |) VALUES (?, ?, ?, ?, ?, ?, ?)
                """.stripMargin,
           List(
-            SqlParameter("string", applicationID),
-            SqlParameter("string", usertype),
-            SqlParameter("string", username),
-            SqlParameter("string", applicationType),
-            SqlParameter("jsonb", info),
-            SqlParameter("jsonb", approver),
-            SqlParameter("string", "pending")
+            SqlParameter("string", application.applicationID),
+            SqlParameter("string", application.usertype),
+            SqlParameter("string", application.username),
+            SqlParameter("string", application.applicationType),
+            SqlParameter("jsonb", application.info),
+            SqlParameter("jsonb", application.approver.asJson.noSpaces),
+            SqlParameter("string", application.status)
           )
-        ).map(_ => applicationID)
+        ).map(_ => application)
 
-      case (Left(error), _) => IO.raiseError(error)
-      case (_, Left(error)) => IO.raiseError(error)
+      case Left(error) => IO.raiseError(error)
     }
   }
 }

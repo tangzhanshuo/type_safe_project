@@ -9,7 +9,7 @@ export class TeacherAddCourseMessage extends TeacherMessage {
     courseHourJson: String;
     classroomID: number;
     credits: number;
-    kwargsJson: String;
+    allStudentsJson: String;
 
     constructor(courseID: number, courseName: string, teacherName: string, capacity: number, info: string, courseHourJson: String,
                 classroomID: number,
@@ -24,6 +24,6 @@ export class TeacherAddCourseMessage extends TeacherMessage {
         this.courseHourJson = courseHourJson;
         this.classroomID = classroomID;
         this.credits = credits;
-        this.kwargsJson = kwargsJson;
+        this.allStudentsJson = kwargsJson;
     }
 }
