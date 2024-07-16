@@ -14,7 +14,7 @@ export class TeacherAddCourseMessage extends TeacherMessage {
     constructor(courseID: number, courseName: string, teacherName: string, capacity: number, info: string, courseHourJson: String,
                 classroomID: number,
                 credits: number,
-                kwargsJson: String) {
+                allStudentsJson: String) {
         super();
         this.courseID = courseID;
         this.courseName = courseName;
@@ -24,6 +24,6 @@ export class TeacherAddCourseMessage extends TeacherMessage {
         this.courseHourJson = courseHourJson;
         this.classroomID = classroomID;
         this.credits = credits;
-        this.allStudentsJson = kwargsJson;
+        this.allStudentsJson = allStudentsJson;
     }
 }

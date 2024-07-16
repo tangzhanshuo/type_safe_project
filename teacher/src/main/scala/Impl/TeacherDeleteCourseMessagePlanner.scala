@@ -11,8 +11,8 @@ import Common.ApplicationAPI.{addApplication}
 case class TeacherDeleteCourseMessagePlanner(usertype: String,
                                           username: String,
                                           courseID: Int,
-                                          override val planContext: PlanContext) extends Planner[String] {
-  override def plan(using planContext: PlanContext): IO[String] = {
+                                          override val planContext: PlanContext) extends Planner[Application] {
+  override def plan(using planContext: PlanContext): IO[Application] = {
     val application = Application.create(usertype, username, "TeacherDeleteCourse")
     application.addInfo("courseID", courseID)
     application.addApprover("admin")
