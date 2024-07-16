@@ -17,7 +17,6 @@ export function TeacherAddCourse() {
     const [courseHourJson, setCourseHourJson] = useState('');
     const [classroomID, setClassroomID] = useState('');
     const [credits, setCredits] = useState('');
-    const [allStudentsJson, setAllStudentsJson] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [addCourseResponse, setAddCourseResponse] = useState('');
 
@@ -32,12 +31,12 @@ export function TeacherAddCourse() {
     }, [history]);
 
     const addCourse = async () => {
-        if (!courseName || !teacherName || !capacity || !courseHourJson || !classroomID || !credits || !allStudentsJson) {
+        if (!courseName || !teacherName || !capacity || !courseHourJson || !classroomID || !credits) {
             setAddCourseResponse('Please ensure all fields are correctly filled.');
             return;
         }
-        console.log(+courseID, courseName, teacherName, +capacity, info, courseHourJson, +classroomID, +credits, allStudentsJson)
-        const response = await sendPostRequest(new TeacherAddCourseMessage(+courseID, courseName, teacherName, +capacity, info, courseHourJson, +classroomID, +credits, allStudentsJson));
+        console.log(+courseID, courseName, teacherName, +capacity, info, courseHourJson, +classroomID, +credits)
+        const response = await sendPostRequest(new TeacherAddCourseMessage(+courseID, courseName, teacherName, +capacity, info, courseHourJson, +classroomID, +credits));
         if (response.isError) {
             setAddCourseResponse(response.error);
             return;
@@ -71,9 +70,6 @@ export function TeacherAddCourse() {
                         <input id="credits" type="number" value={credits || ''}
                                onChange={(e) => setCredits(e.target.value)} placeholder="Credits (e.g., 3)"
                                className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
-                        <input id="allStudentsJson" type="string" value={allStudentsJson}
-                               onChange={(e) => setAllStudentsJson(e.target.value)}
-                               placeholder="Enrolled Student JSON (e.g.,['a'])" className="input-field w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
                     </form>
 
                     <div className="button-group">

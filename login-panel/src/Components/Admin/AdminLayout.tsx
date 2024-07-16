@@ -17,7 +17,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
     const menuItems = [
         { path: '/admin/dashboard', name: 'Dashboard', icon: FaHome },
-        { path: '/admin/user', name: 'User Management', icon: FaUsers },
+        { path: '/admin/userManagement', name: 'User Management', icon: FaUsers },
         { path: '/admin/course', name: 'Course Management', icon: FaBook },
         { path: '/admin/classroom', name: 'Classroom Management', icon: FaChalkboardTeacher },
         { path: '/admin/application', name: 'Applications', icon: FaClipboardList },
