@@ -6,4 +6,4 @@ import Common.Object.Application
 
 case class AddApplicationMessage(
                                 application: Application
-                              ) extends API[String](applicationServiceCode)
+                              ) extends API[Application](applicationServiceCode)

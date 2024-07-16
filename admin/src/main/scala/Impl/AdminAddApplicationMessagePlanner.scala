@@ -12,8 +12,8 @@ case class AdminAddApplicationMessagePlanner(
                                               info: String,
                                               approver: String,
                                               override val planContext: PlanContext
-                                            ) extends Planner[String] {
-  override def plan(using planContext: PlanContext): IO[String] = {
+                                            ) extends Planner[Application] {
+  override def plan(using planContext: PlanContext): IO[Application] = {
     val application = Application.create(usertype, username, "a")
     addApplication(application)
   }

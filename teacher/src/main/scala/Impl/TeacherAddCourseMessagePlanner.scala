@@ -20,8 +20,8 @@ case class TeacherAddCourseMessagePlanner(usertype: String,
                                           classroomID: Int,
                                           credits: Int,
                                           allStudentsJson: String,
-                                          override val planContext: PlanContext) extends Planner[String] {
-  override def plan(using planContext: PlanContext): IO[String] = {
+                                          override val planContext: PlanContext) extends Planner[Application] {
+  override def plan(using planContext: PlanContext): IO[Application] = {
     val application = Application.create(usertype, username, "TeacherAddCourse")
     application.addInfo("courseName", courseName)
     application.addInfo("teacherName", teacherName)

@@ -12,16 +12,16 @@ import io.circe.{Json, parser}
 package object ApplicationAPI {
 
   // Modified addApplication function
-  def addApplication(application: Application)(using PlanContext): IO[String] =
+  def addApplication(application: Application)(using PlanContext): IO[Application] =
     AddApplicationMessage(application).send
 
-  def getApplicationByID(applicationID: String)(using PlanContext): IO[String] =
+  def getApplicationByID(applicationID: String)(using PlanContext): IO[Application] =
     GetApplicationByIDMessage(applicationID).send
 
-  def getApplicationByApprover(usertype: String, username: String)(using PlanContext): IO[String] =
+  def getApplicationByApprover(usertype: String, username: String)(using PlanContext): IO[List[Application]] =
     GetApplicationByApproverMessage(usertype, username).send
 
-  def getApplicationByApplicant(usertype: String, username: String)(using PlanContext): IO[String] =
+  def getApplicationByApplicant(usertype: String, username: String)(using PlanContext): IO[List[Application]] =
     GetApplicationByApplicantMessage(usertype, username).send
 
   def approveApplication(usertype: String, username: String, applicationID: String)(using PlanContext): IO[String] =

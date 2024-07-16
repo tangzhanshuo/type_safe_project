@@ -55,12 +55,7 @@ object Routes:
       case "StudentGetApplicationFromApplicantMessage" =>
         IO(decode[StudentGetApplicationFromApplicantMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for StudentGetApplicationFromApplicantMessage")))
           .flatMap { m =>
-            m.fullPlan.flatMap { jsonString =>
-              parse(jsonString) match {
-                case Right(json) => IO.pure(json.noSpaces) // Ensure the response is a JSON string
-                case Left(error) => IO.raiseError(new Exception(s"Failed to parse JSON: ${error.getMessage}"))
-              }
-            }
+            m.fullPlan.map(_.asJson.toString)
           }
 
       case _ =>
