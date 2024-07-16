@@ -9,13 +9,13 @@ import 'Pages/css/Main.css';
 
 interface Course {
     courseid: number;
-    coursename: string;
+    courseName: string;
     capacity: number;
     credits: number;
     info: string;
-    coursehour: string;
+    courseHour: string;
     classroomid: number;
-    enrolledstudents: string;
+    enrolledStudents: string;
 }
 
 export function TeacherCourse(): JSX.Element {
@@ -45,7 +45,7 @@ export function TeacherCourse(): JSX.Element {
             return;
         }
         try {
-            const parsedCourses: Course[] = JSON.parse(response.data);
+            const parsedCourses: Course[] = response.data;
             setCourses(parsedCourses);
         } catch (error) {
             setErrorMessage('Error parsing course data');
@@ -97,13 +97,13 @@ export function TeacherCourse(): JSX.Element {
                                             {course.courseid}
                                         </Link>
                                     </td>
-                                    <td>{course.coursename}</td>
+                                    <td>{course.courseName}</td>
                                     <td>{course.capacity}</td>
                                     <td>{course.credits}</td>
                                     <td>{course.info}</td>
-                                    <td>{course.coursehour}</td>
+                                    <td>{course.courseHour}</td>
                                     <td>{course.classroomid}</td>
-                                    <td>{course.enrolledstudents}</td>
+                                    <td>{course.enrolledStudents}</td>
                                     <td>
                                         <button
                                             onClick={() => deleteCourse(course.courseid)}

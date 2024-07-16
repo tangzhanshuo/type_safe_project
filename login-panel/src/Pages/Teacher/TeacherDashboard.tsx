@@ -50,7 +50,7 @@ export function TeacherDashboard() {
             return;
         }
         try {
-            const parsedCourses = JSON.parse(response.data);
+            const parsedCourses = response.data;
             setSelectedCoursesCount(parsedCourses.length);
             setErrorMessage('');
         } catch (error) {

@@ -10,14 +10,14 @@ import 'Pages/css/Main.css';
 
 interface Course {
     courseid: number;
-    coursename: string;
+    courseName: string;
     capacity: number;
     credits: number;
     info: string;
-    coursehour: string;
+    courseHour: string;
     classroomid: number;
-    enrolledstudents: string[];
-    teachername: string;
+    enrolledStudents: string;
+    teacherName: string;
 }
 
 export function TeacherCourseDetail() {
@@ -53,7 +53,7 @@ export function TeacherCourseDetail() {
             return;
         }
         try {
-            const parsedCourse: Course = JSON.parse(response.data);
+            const parsedCourse: Course = response.data;
             setCourse(parsedCourse);
         } catch (error) {
             setErrorMessage('Error parsing course data');
@@ -90,7 +90,7 @@ export function TeacherCourseDetail() {
                         <p>Loading course details...</p>
                     ) : course ? (
                         <>
-                            <h2>{course.coursename}</h2>
+                            <h2>{course.courseName}</h2>
                             <table className="details-table">
                                 <tbody>
                                 <tr>
@@ -99,7 +99,7 @@ export function TeacherCourseDetail() {
                                 </tr>
                                 <tr>
                                     <th>Teacher:</th>
-                                    <td>{course.teachername}</td>
+                                    <td>{course.teacherName}</td>
                                 </tr>
                                 <tr>
                                     <th>Capacity:</th>
@@ -115,7 +115,7 @@ export function TeacherCourseDetail() {
                                 </tr>
                                 <tr>
                                     <th>Course Hours:</th>
-                                    <td>{course.coursehour}</td>
+                                    <td>{course.courseHour}</td>
                                 </tr>
                                 <tr>
                                     <th>Classroom ID:</th>
@@ -123,7 +123,7 @@ export function TeacherCourseDetail() {
                                 </tr>
                                 <tr>
                                     <th>Enrolled Students:</th>
-                                    <td>{course.enrolledstudents}</td>
+                                    <td>{course.enrolledStudents}</td>
                                 </tr>
                                 </tbody>
                             </table>
