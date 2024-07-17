@@ -38,9 +38,10 @@ object Init {
         // h = 1, 2, 3, 4, 5, 6 stands for 第h段时间
       )
 
-      /*_ <- writeDB(
+      _ <- writeDB(
         s"""
            |INSERT INTO course (
+           |  courseid,
            |  course_name,
            |  teacher_username,
            |  teacher_name,
@@ -50,12 +51,33 @@ object Init {
            |  classroomid,
            |  credits,
            |  enrolled_students,
-           |  all_students
+           |  all_students,
+           |  status
            |)
-           |VALUES ('入学', 't', 't', '1', '抢不到就等着退学吧', '[1]', -1, 0, '[]', '[]')
+           |VALUES (1, 'a', 'a', 'a', 2, 'a', '[1]', -1, 1, '[]', '[]', 'preregister')
            |ON CONFLICT (courseid) DO NOTHING
          """.stripMargin, List()
-      )*/
+      )
+      _ <- writeDB(
+        s"""
+           |INSERT INTO course (
+           |  courseid,
+           |  course_name,
+           |  teacher_username,
+           |  teacher_name,
+           |  capacity,
+           |  info,
+           |  course_hour,
+           |  classroomid,
+           |  credits,
+           |  enrolled_students,
+           |  all_students,
+           |  status
+           |)
+           |VALUES (2, 'b', 'a', 'a', 2, 'b', '[1]', -1, 1, '[]', '[]', 'open')
+           |ON CONFLICT (courseid) DO NOTHING
+         """.stripMargin, List()
+      )
       _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS classroom (

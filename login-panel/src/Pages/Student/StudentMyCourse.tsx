@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
-import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage';
+import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { logout } from 'Plugins/CommonUtils/UserManager';
@@ -15,9 +15,10 @@ interface Course {
     capacity: number;
     credits: number;
     info: string;
+    status: string;
 }
 
-type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'All';
+type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
 export function StudentMyCourse() {
     const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
@@ -35,7 +36,7 @@ export function StudentMyCourse() {
     }, []);
 
     const fetchSelectedCourses = async () => {
-        const response = await sendPostRequest(new StudentGetCourseByUsernameMessage(Auth.getState().username));
+        const response = await sendPostRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
         if (response.isError) {
             if (response.error.startsWith("No courses found")) {
                 setErrorMessage('');
@@ -53,6 +54,7 @@ export function StudentMyCourse() {
             capacity: course.capacity,
             credits: course.credits,
             info: course.info,
+            status: course.status || 'Not available',
         })));
     };
 
@@ -94,11 +96,14 @@ export function StudentMyCourse() {
                     return course.courseName.toLowerCase().includes(lowerSearchTerm);
                 case 'Teacher':
                     return course.teacherName.toLowerCase().includes(lowerSearchTerm);
+                case 'Status':
+                    return course.status.toLowerCase().includes(lowerSearchTerm);
                 case 'All':
                     return (
                         course.courseid.toString().includes(lowerSearchTerm) ||
                         course.courseName.toLowerCase().includes(lowerSearchTerm) ||
-                        course.teacherName.toLowerCase().includes(lowerSearchTerm)
+                        course.teacherName.toLowerCase().includes(lowerSearchTerm) ||
+                        course.status.toLowerCase().includes(lowerSearchTerm)
                     );
                 default:
                     return true;
@@ -149,6 +154,7 @@ export function StudentMyCourse() {
                         <option value="ID">ID</option>
                         <option value="Name">Name</option>
                         <option value="Teacher">Teacher</option>
+                        <option value="Status">Status</option>
                     </select>
                     <div className="relative flex-grow">
                         <input
@@ -174,6 +180,7 @@ export function StudentMyCourse() {
                                     {renderSortableHeader('capacity', 'Capacity')}
                                     {renderSortableHeader('credits', 'Credits')}
                                     {renderSortableHeader('info', 'Info')}
+                                    {renderSortableHeader('status', 'Status')}
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
                                 </tr>
                                 </thead>
@@ -190,6 +197,7 @@ export function StudentMyCourse() {
                                         <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{course.status}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <button
                                                 onClick={() => deleteCourseWithId(course.courseid)}

@@ -16,9 +16,10 @@ interface Course {
     capacity: number;
     credits: number;
     info: string;
+    status: string;
 }
 
-type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'All';
+type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
 export function StudentCourseList() {
     const [studentUsername, setStudentUsername] = useState<string>('');
@@ -83,6 +84,7 @@ export function StudentCourseList() {
                 capacity: course.capacity,
                 credits: course.credits,
                 info: course.info,
+                status: course.status || 'Not available',
             }));
             setCourses(parsedCourses);
             setErrorMessage('');
@@ -90,7 +92,6 @@ export function StudentCourseList() {
             setErrorMessage('Error parsing course data');
         }
     };
-
 
     const handleSort = (column: keyof Course) => {
         if (column === sortColumn) {
@@ -118,11 +119,14 @@ export function StudentCourseList() {
                     return course.courseName.toLowerCase().includes(lowerSearchTerm);
                 case 'Teacher':
                     return course.teacherName.toLowerCase().includes(lowerSearchTerm);
+                case 'Status':
+                    return course.status.toLowerCase().includes(lowerSearchTerm);
                 case 'All':
                     return (
                         course.courseid.toString().includes(lowerSearchTerm) ||
                         course.courseName.toLowerCase().includes(lowerSearchTerm) ||
-                        course.teacherName.toLowerCase().includes(lowerSearchTerm)
+                        course.teacherName.toLowerCase().includes(lowerSearchTerm) ||
+                        course.status.toLowerCase().includes(lowerSearchTerm)
                     );
                 default:
                     return true;
@@ -173,6 +177,7 @@ export function StudentCourseList() {
                         <option value="ID">ID</option>
                         <option value="Name">Name</option>
                         <option value="Teacher">Teacher</option>
+                        <option value="Status">Status</option>
                     </select>
                     <div className="relative flex-grow">
                         <input
@@ -199,6 +204,7 @@ export function StudentCourseList() {
                                     {renderSortableHeader('capacity', 'Capacity')}
                                     {renderSortableHeader('credits', 'Credits')}
                                     {renderSortableHeader('info', 'Info')}
+                                    {renderSortableHeader('status', 'Status')}
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
                                 </tr>
                                 </thead>
@@ -215,6 +221,7 @@ export function StudentCourseList() {
                                         <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{course.status}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {!selectedCourses.some(selectedCourse => selectedCourse.courseid === course.courseid) && (
                                                 <button

@@ -39,10 +39,8 @@ package object CourseAPI {
                     courseHour: Option[List[Int]],
                     classroomid: Option[Int],
                     credits: Option[Int],
-                    enrolledStudents: Option[List[EnrolledStudent]],
-                    allStudents: Option[List[AllStudent]]
                   )(using PlanContext): IO[Course] =
-    UpdateCourseMessage(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, enrolledStudents, allStudents).send
+    UpdateCourseMessage(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits).send
 
   def addStudent2Course(courseid: Int, studentUsername: Option[String], priority: Option[Int])(using PlanContext): IO[String] =
     AddStudent2CourseMessage(courseid, studentUsername, priority).send

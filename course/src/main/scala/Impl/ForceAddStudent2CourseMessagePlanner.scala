@@ -14,25 +14,13 @@ import cats.implicits._
 case class ForceAddStudent2CourseMessagePlanner(courseid: Int, studentUsername: Option[String], override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
     val priority = Some(10)
-    val checkCourseExistsQuery = "SELECT EXISTS(SELECT 1 FROM course WHERE courseid = ?)"
-    val checkCourseExistsParams = List(SqlParameter("int", courseid.toString))
-
-    val getCourseInfoQuery = "SELECT enrolled_students, all_students FROM course WHERE courseid = ?"
+    val getCourseInfoQuery = "SELECT enrolled_students, all_students, status, capacity FROM course WHERE courseid = ?"
     val getCourseInfoParams = List(SqlParameter("int", courseid.toString))
 
-    val updateStudentsQuery = "UPDATE course SET enrolled_students = ?, all_students = ? WHERE courseid = ?"
+    val updateCourseQuery = "UPDATE course SET enrolled_students = ?, all_students = ?, capacity = ?, status = ? WHERE courseid = ?"
 
-    // 获取当前时间
     def getCurrentTime: Int = Instant.now.getEpochSecond.toInt
 
-    // 检查课程是否存在
-    val courseExistsIO = readDBBoolean(checkCourseExistsQuery, checkCourseExistsParams)
-      .flatMap(courseExists =>
-        if (!courseExists) IO.raiseError(new Exception(s"Course with id $courseid does not exist"))
-        else IO.pure(())
-      )
-
-    // 获取课程信息 (enrolledStudents 列表，和 allStudents 列表)
     val courseInfoIO = readDBRows(getCourseInfoQuery, getCourseInfoParams)
       .flatMap { rows =>
         rows.headOption match {
@@ -40,16 +28,19 @@ case class ForceAddStudent2CourseMessagePlanner(courseid: Int, studentUsername: 
             val cursor = row.hcursor
             val enrolledStudentsJsonString = cursor.get[String]("enrolledStudents").getOrElse("[]")
             val allStudentsJsonString = cursor.get[String]("allStudents").getOrElse("[]")
+            val status = cursor.get[String]("status").getOrElse("")
+            val capacity = cursor.get[Int]("capacity").getOrElse(0)
             val enrolledStudents = parse(enrolledStudentsJsonString).flatMap(_.as[List[EnrolledStudent]]).getOrElse(Nil)
             val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[AllStudent]]).getOrElse(Nil)
-            IO.pure((enrolledStudents, allStudents))
+            IO.pure((enrolledStudents, allStudents, status, capacity))
           case None => IO.raiseError(new Exception(s"Course with id $courseid not found"))
         }
       }
 
-    // 组合检查和更新操作
-    courseExistsIO.flatMap { _ =>
-      courseInfoIO.flatMap { case (enrolledStudents, allStudents) =>
+    courseInfoIO.flatMap { case (enrolledStudents, allStudents, status, capacity) =>
+      if (status == "preregister") {
+        IO.raiseError(new Exception(s"Cannot force add student. Course status is preregister"))
+      } else {
         (studentUsername, priority) match {
           case (Some(username), Some(pri)) =>
             val isEnrolled = enrolledStudents.exists(_.studentUsername == username)
@@ -57,27 +48,29 @@ case class ForceAddStudent2CourseMessagePlanner(courseid: Int, studentUsername: 
 
             if (isEnrolled) {
               IO.pure(s"Student $username is already enrolled in course $courseid")
-            } else if (isAllStudent) {
-              val updatedEnrolledStudents = enrolledStudents :+ EnrolledStudent(time = getCurrentTime, priority = pri, studentUsername = username)
-              val updatedEnrolledStudentsJsonString = updatedEnrolledStudents.asJson.noSpaces
-
-              writeDB(updateStudentsQuery, List(
-                SqlParameter("jsonb", updatedEnrolledStudentsJsonString),
-                SqlParameter("jsonb", allStudents.asJson.noSpaces),
-                SqlParameter("int", courseid.toString)
-              )).map(_ => s"Student $username successfully added to enrolled students in course $courseid")
             } else {
               val newStudent = AllStudent(time = getCurrentTime, priority = pri, studentUsername = username)
-              val updatedAllStudents = allStudents :+ newStudent
+              val updatedAllStudents = if (isAllStudent) allStudents else allStudents :+ newStudent
               val updatedEnrolledStudents = enrolledStudents :+ EnrolledStudent(time = getCurrentTime, priority = pri, studentUsername = username)
+
+              val newCapacity = math.max(capacity, updatedEnrolledStudents.size)
+              val newStatus = if (updatedEnrolledStudents.size == newCapacity) "closed" else "open"
+
               val updatedAllStudentsJsonString = updatedAllStudents.asJson.noSpaces
               val updatedEnrolledStudentsJsonString = updatedEnrolledStudents.asJson.noSpaces
 
-              writeDB(updateStudentsQuery, List(
+              writeDB(updateCourseQuery, List(
                 SqlParameter("jsonb", updatedEnrolledStudentsJsonString),
                 SqlParameter("jsonb", updatedAllStudentsJsonString),
+                SqlParameter("int", newCapacity.toString),
+                SqlParameter("string", newStatus),
                 SqlParameter("int", courseid.toString)
-              )).map(_ => s"Student $username successfully registered and added to course $courseid")
+              )).map(_ =>
+                if (isAllStudent)
+                  s"Student $username successfully added to enrolled students in course $courseid. New capacity: $newCapacity, New status: $newStatus"
+                else
+                  s"Student $username successfully registered and added to course $courseid. New capacity: $newCapacity, New status: $newStatus"
+              )
             }
 
           case _ => IO.raiseError(new Exception("Student username and priority must be provided"))
