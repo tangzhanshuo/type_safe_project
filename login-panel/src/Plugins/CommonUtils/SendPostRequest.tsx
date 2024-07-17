@@ -54,6 +54,46 @@ export class Course {
     }
 }
 
+export class Approver {
+    approved: boolean;
+    username: string;
+    usertype: 'admin' | 'teacher' | 'student';
+
+    constructor(approved: boolean, username: string, usertype: 'admin' | 'teacher' | 'student') {
+        this.approved = approved;
+        this.username = username;
+        this.usertype = usertype;
+    }
+}
+
+export class Application {
+    applicationID: string;
+    usertype: string;
+    username: string;
+    applicationType: string;
+    info: string;
+    approver: Approver[];
+    status: string;
+
+    constructor(
+        applicationID: string,
+        usertype: string,
+        username: string,
+        applicationType: string,
+        info: string,
+        approver: Approver[],
+        status: string
+    ) {
+        this.applicationID = applicationID;
+        this.usertype = usertype;
+        this.username = username;
+        this.applicationType = applicationType;
+        this.info = info;
+        this.approver = approver;
+        this.status = status;
+    }
+}
+
 export const sendUnverifiedPostRequest = async (message: API) => {
     const returnResponse = new Response()
     try {
@@ -163,6 +203,63 @@ export const sendCourseListRequest = async (message: API) => {
 
         // Replace the response.data with the new array of Course objects
         response.data = courseList;
+    }
+    return response;
+};
+
+export const sendApplicationRequest = async (message: API) => {
+    const response = await sendPostRequest(message);
+
+    if (!response.isError && response.data) {
+        const applicationData = response.data;
+
+        // Convert approver array to Approver objects
+        const approvers = applicationData.approver.map((approverData: any) =>
+            new Approver(approverData.approved, approverData.username, approverData.usertype)
+        );
+
+        // Create a new Application object
+        const application = new Application(
+            applicationData.applicationID,
+            applicationData.usertype,
+            applicationData.username,
+            applicationData.applicationType,
+            applicationData.info,
+            approvers,
+            applicationData.status
+        );
+
+        // Replace the response.data with the new Application object
+        response.data = application;
+    }
+    return response;
+};
+
+export const sendApplicationListRequest = async (message: API) => {
+    const response = await sendPostRequest(message);
+
+    if (!response.isError && Array.isArray(response.data)) {
+        // Convert each application in the response to an Application object
+        const applicationList: Application[] = response.data.map((applicationData: any) => {
+            // Convert approver array to Approver objects
+            const approvers = applicationData.approver.map((approverData: any) =>
+                new Approver(approverData.approved, approverData.username, approverData.usertype)
+            );
+
+            // Create and return a new Application object
+            return new Application(
+                applicationData.applicationID,
+                applicationData.usertype,
+                applicationData.username,
+                applicationData.applicationType,
+                applicationData.info,
+                approvers,
+                applicationData.status
+            );
+        });
+
+        // Replace the response.data with the new array of Application objects
+        response.data = applicationList;
     }
     return response;
 };

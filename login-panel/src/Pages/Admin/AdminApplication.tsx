@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
 import 'Pages/css/Main.css';
 import Auth from 'Plugins/CommonUtils/AuthState'
@@ -8,23 +7,7 @@ import { AdminDeleteApplicationMessage } from 'Plugins/AdminAPI/AdminDeleteAppli
 import { AdminGetApplicationFromApproverMessage } from 'Plugins/AdminAPI/AdminGetApplicationFromApproverMessage'
 import { AdminApproveApplicationMessage } from 'Plugins/AdminAPI/AdminApproveApplicationMessage'
 import { AdminRejectApplicationMessage } from 'Plugins/AdminAPI/AdminRejectApplicationMessage'
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
-
-interface Approver {
-    approved: boolean;
-    username: string;
-    usertype: 'admin' | 'teacher' | 'student';
-}
-
-interface Application {
-    applicationID: string;
-    usertype: string;
-    username: string;
-    applicationType: string;
-    info: string;
-    approver: Approver[];
-    status: string;
-}
+import { sendPostRequest, sendApplicationListRequest, Application, Approver } from 'Plugins/CommonUtils/SendPostRequest'
 
 export function AdminApplication() {
     const history = useHistory();
@@ -59,7 +42,7 @@ export function AdminApplication() {
     const handleGetFromApprover = async () => {
         const message = new AdminGetApplicationFromApproverMessage();
 
-        const response = await sendPostRequest(message);
+        const response = await sendApplicationListRequest(message);
         if (!response.isError) {
             // Sort applications by applicationID
             const sortedApplications = response.data.sort((a: Application, b: Application) =>
@@ -108,10 +91,6 @@ export function AdminApplication() {
         }
     };
 
-    const parseApprovers = (approvers: Approver[]): Approver[] => {
-        return approvers || [];
-    };
-
     const renderApproverCell = (approver: Approver | undefined) => {
         if (!approver) return <td>No approver</td>;
         return (
@@ -155,33 +134,30 @@ export function AdminApplication() {
                             </tr>
                             </thead>
                             <tbody>
-                            {applications.map((app) => {
-                                const approvers = app.approver;
-                                return (
-                                    <tr key={app.applicationID}>
-                                        <td>{app.applicationID}</td>
-                                        <td>{app.usertype}</td>
-                                        <td>{app.username}</td>
-                                        <td>{app.applicationType}</td>
-                                        <td>{app.info}</td>
-                                        <td>{app.status}</td>
-                                        {renderApproverCell(approvers[0])}
-                                        {renderApproverCell(approvers[1])}
-                                        {renderApproverCell(approvers[2])}
-                                        <td>
-                                            <button onClick={() => handleApprove(app.applicationID)} className="approve-button">
-                                                Approve
-                                            </button>
-                                            <button onClick={() => handleReject(app.applicationID)} className="reject-button">
-                                                Reject
-                                            </button>
-                                            <button onClick={() => handleDelete(app.applicationID)} className="delete-button">
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
+                            {applications.map((app) => (
+                                <tr key={app.applicationID}>
+                                    <td>{app.applicationID}</td>
+                                    <td>{app.usertype}</td>
+                                    <td>{app.username}</td>
+                                    <td>{app.applicationType}</td>
+                                    <td>{app.info}</td>
+                                    <td>{app.status}</td>
+                                    {renderApproverCell(app.approver[0])}
+                                    {renderApproverCell(app.approver[1])}
+                                    {renderApproverCell(app.approver[2])}
+                                    <td>
+                                        <button onClick={() => handleApprove(app.applicationID)} className="approve-button">
+                                            Approve
+                                        </button>
+                                        <button onClick={() => handleReject(app.applicationID)} className="reject-button">
+                                            Reject
+                                        </button>
+                                        <button onClick={() => handleDelete(app.applicationID)} className="delete-button">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
                             </tbody>
                         </table>
                     </div>
