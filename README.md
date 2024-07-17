@@ -6,6 +6,7 @@
 ### In Progress
 - [ ] Functionality: 预选-正选切换
 - [ ] Student: add manual select functionality (application)
+
 ### Completed
 - [x] Functionality: Auto student priority from plan
 - [x] ObjectType for application types
