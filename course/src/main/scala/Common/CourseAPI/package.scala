@@ -54,7 +54,7 @@ package object CourseAPI {
   def isStudentEnrolled(courseid: Int, studentUsername: Option[String])(using PlanContext): IO[Boolean] =
     IsStudentEnrolledMessage(courseid, studentUsername).send
 
-  def getCourseList()(using PlanContext): IO[List[Course]] =
+  def getCourseList()(using PlanContext): IO[Option[List[Course]]] =
     GetCourseListMessage().send
 
   def getCourseByCourseID(courseid: Int)(using PlanContext): IO[Course] =
@@ -63,19 +63,19 @@ package object CourseAPI {
   def getCourseByCourseName(courseName: String)(using PlanContext): IO[List[Course]] =
     GetCourseByCourseNameMessage(courseName).send
 
-  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[List[Course]] =
+  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[Option[List[Course]]] =
     GetCourseByTeacherUsernameMessage(teacherUsername).send
 
-  def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[List[Course]] =
+  def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[Option[List[Course]]] =
     GetCourseByStudentUsernameMessage(studentUsername).send
 
-  def getAllCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[List[Course]] =
+  def getAllCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[Option[List[Course]]] =
     GetAllCoursesByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingPositionByStudentUsername(studentUsername: String)(using PlanContext): IO[List[CourseWaitingPosition]] =
+  def getWaitingPositionByStudentUsername(studentUsername: String)(using PlanContext): IO[Option[List[CourseWaitingPosition]]] =
     GetWaitingPositionByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[List[WaitingCourse]] =
+  def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[Option[List[WaitingCourse]]] =
     GetWaitingCoursesByStudentUsernameMessage(studentUsername).send
 
   def getCreditsByStudentUsername(studentUsername: String)(using PlanContext): IO[Int] =

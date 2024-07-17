@@ -20,8 +20,10 @@ package object CourseAPI {
                  courseHour: List[Int],
                  classroomid: Int,
                  credits: Int,
+                 enrolledStudents: List[EnrolledStudent],
+                 allStudents: List[AllStudent]
                )(using PlanContext): IO[Course] = {
-    AddCourseMessage(courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits).send
+    AddCourseMessage(courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, enrolledStudents, allStudents).send
   }
 
   def deleteCourse(courseid: Int)(using PlanContext): IO[String] =
@@ -37,10 +39,8 @@ package object CourseAPI {
                     courseHour: Option[List[Int]],
                     classroomid: Option[Int],
                     credits: Option[Int],
-                    enrolledStudents: Option[List[EnrolledStudent]],
-                    allStudents: Option[List[AllStudent]]
                   )(using PlanContext): IO[Course] =
-    UpdateCourseMessage(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, enrolledStudents, allStudents).send
+    UpdateCourseMessage(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits).send
 
   def addStudent2Course(courseid: Int, studentUsername: Option[String], priority: Option[Int])(using PlanContext): IO[String] =
     AddStudent2CourseMessage(courseid, studentUsername, priority).send
@@ -54,7 +54,7 @@ package object CourseAPI {
   def isStudentEnrolled(courseid: Int, studentUsername: Option[String])(using PlanContext): IO[Boolean] =
     IsStudentEnrolledMessage(courseid, studentUsername).send
 
-  def getCourseList()(using PlanContext): IO[List[Course]] =
+  def getCourseList()(using PlanContext): IO[Option[List[Course]]] =
     GetCourseListMessage().send
 
   def getCourseByCourseID(courseid: Int)(using PlanContext): IO[Course] =
@@ -63,19 +63,19 @@ package object CourseAPI {
   def getCourseByCourseName(courseName: String)(using PlanContext): IO[List[Course]] =
     GetCourseByCourseNameMessage(courseName).send
 
-  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[List[Course]] =
+  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[Option[List[Course]]] =
     GetCourseByTeacherUsernameMessage(teacherUsername).send
 
-  def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[List[Course]] =
+  def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[Option[List[Course]]] =
     GetCourseByStudentUsernameMessage(studentUsername).send
 
-  def getAllCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[List[Course]] =
+  def getAllCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[Option[List[Course]]] =
     GetAllCoursesByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingPositionByStudentUsername(studentUsername: String)(using PlanContext): IO[List[CourseWaitingPosition]] =
+  def getWaitingPositionByStudentUsername(studentUsername: String)(using PlanContext): IO[Option[List[CourseWaitingPosition]]] =
     GetWaitingPositionByStudentUsernameMessage(studentUsername).send
 
-  def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[List[WaitingCourse]] =
+  def getWaitingCoursesByStudentUsername(studentUsername: String)(using PlanContext): IO[Option[List[WaitingCourse]]] =
     GetWaitingCoursesByStudentUsernameMessage(studentUsername).send
 
   def getCreditsByStudentUsername(studentUsername: String)(using PlanContext): IO[Int] =
@@ -124,6 +124,9 @@ package object CourseAPI {
   def getPlanList()(using PlanContext): IO[List[Plan]] =
     GetPlanListMessage().send
 
-  def UpdateCoursePriority(planid: Int, year: Int, courseid: Int, priority: Int)(using PlanContext): IO[Plan] =
+  def updateCoursePriority(planid: Int, year: Int, courseid: Int, priority: Int)(using PlanContext): IO[Plan] =
     UpdateCoursePriorityMessage(planid, year, courseid, priority).send
+
+  def endPreRegister(courseid: Int)(using PlanContext): IO[String] =
+    EndPreRegisterMessage(courseid).send
 }

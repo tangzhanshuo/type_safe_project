@@ -7,14 +7,13 @@ import cats.effect.IO
 import io.circe.generic.auto.*
 import io.circe.parser.decode
 import io.circe.syntax.*
-import io.circe.Json
 import cats.implicits.*
 
-case class GetCourseListMessagePlanner(override val planContext: PlanContext) extends Planner[List[Course]] {
-  override def plan(using planContext: PlanContext): IO[List[Course]] = {
+case class GetCourseListMessagePlanner(override val planContext: PlanContext) extends Planner[Option[List[Course]]] {
+  override def plan(using planContext: PlanContext): IO[Option[List[Course]]] = {
     val query = "SELECT * FROM course ORDER BY courseid"
     readDBRows(query, List()).flatMap { rows =>
-      if (rows.isEmpty) IO.raiseError(new NoSuchElementException(s"No courses found"))
+      if (rows.isEmpty) IO.pure(None)
       else {
         val coursesIO = rows.map { row =>
           val cursor = row.hcursor
@@ -38,7 +37,7 @@ case class GetCourseListMessagePlanner(override val planContext: PlanContext) ex
         }
         coursesIO.sequence match {
           case Left(error) => IO.raiseError(error)
-          case Right(courses) => IO.pure(courses)
+          case Right(courses) => IO.pure(Some(courses))
         }
       }
     }

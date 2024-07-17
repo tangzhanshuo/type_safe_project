@@ -9,13 +9,13 @@ import Common.API.{PlanContext, Planner}
 import Common.DBAPI._
 import Common.Object.{SqlParameter, CourseWaitingPosition, Course}
 
-case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[List[CourseWaitingPosition]] {
-  override def plan(using planContext: PlanContext): IO[List[CourseWaitingPosition]] = {
+case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[Option[List[CourseWaitingPosition]]] {
+  override def plan(using planContext: PlanContext): IO[Option[List[CourseWaitingPosition]]] = {
     val getCoursesQuery = "SELECT * FROM course"
     val getCoursesParams = List.empty[SqlParameter]
 
     readDBRows(getCoursesQuery, getCoursesParams).flatMap { rows =>
-      if (rows.isEmpty) IO.raiseError(new NoSuchElementException("No courses found"))
+      if (rows.isEmpty) IO.pure(None)
       else {
         val result = rows.flatMap { row =>
           val courseid = row.hcursor.get[Int]("courseid").getOrElse(0)
@@ -43,7 +43,7 @@ case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: St
 
             if (isEnrolled) {
               // If the student is in enrolledstudents, position is 0
-              Some(CourseWaitingPosition(course, List.fill(9)(0), 0))
+              List(CourseWaitingPosition(course, List.fill(9)(0), 0))
             } else if (isInAllStudents) {
               // Calculate the student's position in the waiting list
               val waitingList = allStudents.filterNot(student => enrolledStudents.exists(_("studentUsername") == student("studentUsername")))
@@ -53,17 +53,17 @@ case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: St
               val priorityCounts = waitingList.groupBy(_("priority").as[Int].getOrElse(0)).mapValues(_.size).toMap
               val priorityList = (0 to 8).map(priorityCounts.getOrElse(_, 0)).toList
 
-              Some(CourseWaitingPosition(course, priorityList, position))
+              List(CourseWaitingPosition(course, priorityList, position))
             } else {
-              None
+              List.empty[CourseWaitingPosition]
             }
           } else {
-            None
+            List.empty[CourseWaitingPosition]
           }
         }
 
-        if (result.isEmpty) IO.raiseError(new NoSuchElementException(s"No waiting courses found with student username: $studentUsername"))
-        else IO.pure(result)
+        if (result.isEmpty) IO.pure(None)
+        else IO.pure(Some(result))
       }
     }
   }

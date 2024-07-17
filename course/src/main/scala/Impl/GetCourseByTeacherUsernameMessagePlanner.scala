@@ -9,8 +9,8 @@ import Common.DBAPI.readDBRows
 import Common.Object.{Course, EnrolledStudent, AllStudent, SqlParameter}
 import cats.implicits.*
 
-case class GetCourseByTeacherUsernameMessagePlanner(teacherUsername: String, override val planContext: PlanContext) extends Planner[List[Course]] {
-  override def plan(using planContext: PlanContext): IO[List[Course]] = {
+case class GetCourseByTeacherUsernameMessagePlanner(teacherUsername: String, override val planContext: PlanContext) extends Planner[Option[List[Course]]] {
+  override def plan(using planContext: PlanContext): IO[Option[List[Course]]] = {
     val query = "SELECT * FROM course WHERE teacher_username = ?"
     readDBRows(query, List(SqlParameter("string", teacherUsername))).flatMap { rows =>
       if (rows.nonEmpty) {
@@ -36,10 +36,10 @@ case class GetCourseByTeacherUsernameMessagePlanner(teacherUsername: String, ove
         }
         coursesIO.sequence match {
           case Left(error) => IO.raiseError(error)
-          case Right(courses) => IO.pure(courses)
+          case Right(courses) => IO.pure(Some(courses))
         }
       } else {
-        IO.raiseError(new NoSuchElementException(s"No courses found with teacherUsername: $teacherUsername"))
+        IO.pure(None)
       }
     }
   }

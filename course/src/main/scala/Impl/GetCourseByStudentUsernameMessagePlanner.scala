@@ -10,15 +10,15 @@ import Common.Object.{Course, EnrolledStudent, AllStudent, SqlParameter}
 import io.circe.Json
 import cats.implicits.*
 
-case class GetCourseByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[List[Course]] {
-  override def plan(using planContext: PlanContext): IO[List[Course]] = {
+case class GetCourseByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[Option[List[Course]]] {
+  override def plan(using planContext: PlanContext): IO[Option[List[Course]]] = {
     val query = """
       SELECT * FROM course
       WHERE enrolled_students @> ?::jsonb
     """
     val searchJson = Json.obj("studentUsername" -> Json.fromString(studentUsername)).noSpaces
     readDBRows(query, List(SqlParameter("jsonb", s"[$searchJson]"))).flatMap { rows =>
-      if (rows.isEmpty) IO.raiseError(new NoSuchElementException(s"No courses found with student username: $studentUsername"))
+      if (rows.isEmpty) IO.pure(None)
       else {
         val coursesIO = rows.map { row =>
           val cursor = row.hcursor
@@ -42,7 +42,7 @@ case class GetCourseByStudentUsernameMessagePlanner(studentUsername: String, ove
         }
         coursesIO.sequence match {
           case Left(error) => IO.raiseError(error)
-          case Right(courses) => IO.pure(courses)
+          case Right(courses) => IO.pure(Some(courses))
         }
       }
     }

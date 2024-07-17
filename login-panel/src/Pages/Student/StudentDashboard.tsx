@@ -50,14 +50,18 @@ export function StudentDashboard() {
             }
             return;
         }
-        try {
-            const parsedCourses = response.data;
-            setSelectedCoursesCount(parsedCourses.length);
-            setErrorMessage('');
-        } catch (error) {
-            setErrorMessage('Error parsing course data');
+        if (response.data) {
+            try {
+                const parsedCourses = response.data;
+                setSelectedCoursesCount(parsedCourses.length);
+                setErrorMessage('');
+            } catch (error) {
+                setErrorMessage('Error parsing course data');
+            }
+        } else {
+            setSelectedCoursesCount(0);
         }
-    }
+    };
 
     const handleSaveInfo = async () => {
         const updatedInfo = {
@@ -73,12 +77,12 @@ export function StudentDashboard() {
             // Refresh the student info after saving
             await fetchStudentInfo();
         }
-    }
+    };
 
     const handleRefresh = () => {
         fetchStudentInfo();
         fetchSelectedCoursesCount(studentUsername);
-    }
+    };
 
     return (
         <StudentLayout>

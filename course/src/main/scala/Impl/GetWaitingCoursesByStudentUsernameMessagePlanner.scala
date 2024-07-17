@@ -10,8 +10,8 @@ import Common.DBAPI.readDBRows
 import Common.Object.{SqlParameter, Course, WaitingCourse, EnrolledStudent, AllStudent}
 import cats.implicits.*
 
-case class GetWaitingCoursesByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[List[WaitingCourse]] {
-  override def plan(using planContext: PlanContext): IO[List[WaitingCourse]] = {
+case class GetWaitingCoursesByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[Option[List[WaitingCourse]]] {
+  override def plan(using planContext: PlanContext): IO[Option[List[WaitingCourse]]] = {
     val queryAllStudents = """
       SELECT * FROM course
       WHERE all_students @> ?::jsonb
@@ -58,9 +58,9 @@ case class GetWaitingCoursesByStudentUsernameMessagePlanner(studentUsername: Str
       }.flatten
 
       if (waitingCoursesWithPosition.isEmpty) {
-        IO.raiseError(new NoSuchElementException(s"No waiting courses found with student username: $studentUsername"))
+        IO.pure(None)
       } else {
-        IO.pure(waitingCoursesWithPosition)
+        IO.pure(Some(waitingCoursesWithPosition))
       }
     }
   }

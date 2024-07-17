@@ -39,7 +39,11 @@ export function StudentMyCourse() {
             }
             return;
         }
-        setSelectedCourses(response.data);
+        if (response.data) {
+            setSelectedCourses(response.data);
+        } else {
+            setSelectedCourses([]);
+        }
     };
 
     const deleteCourseWithId = async (courseid: number) => {
