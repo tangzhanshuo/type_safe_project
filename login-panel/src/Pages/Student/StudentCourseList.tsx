@@ -3,11 +3,12 @@ import { StudentLayout } from 'Components/Student/StudentLayout';
 import { useHistory, Link } from 'react-router-dom';
 import { sendPostRequest, sendCourseListRequest, Course } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourseListMessage';
-import { logout } from 'Plugins/CommonUtils/UserManager';
-import Auth from 'Plugins/CommonUtils/AuthState';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
+import { StudentManualSelectCourseMessage } from 'Plugins/StudentAPI/StudentManualSelectCourseMessage';
 import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
-import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
+import Auth from 'Plugins/CommonUtils/AuthState';
+import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch, FaHandPaper } from 'react-icons/fa';
+import { ManualSelectBox } from 'Components/Student/ManualSelectBox';
 
 type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
@@ -22,6 +23,8 @@ export function StudentCourseList() {
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchColumn, setSearchColumn] = useState<SearchColumn>('All');
+    const [showManualSelectionPopup, setShowManualSelectionPopup] = useState(false);
+    const [selectedCourseForManual, setSelectedCourseForManual] = useState<Course | null>(null);
     const history = useHistory();
 
     useEffect(() => {
@@ -134,6 +137,31 @@ export function StudentCourseList() {
         </th>
     );
 
+    const handleManualSelection = (course: Course) => {
+        setSelectedCourseForManual(course);
+        setShowManualSelectionPopup(true);
+    };
+
+    const confirmManualSelection = async (reason: string) => {
+        if (selectedCourseForManual) {
+            const response = await sendPostRequest(new StudentManualSelectCourseMessage(selectedCourseForManual.courseid, reason));
+            if (response.isError) {
+                setErrorMessage(response.error);
+            } else {
+                setAddCourseResponse(`Manual selection request for course ${selectedCourseForManual.courseid} sent successfully`);
+                setShowAddResponse(true);
+                setTimeout(() => setShowAddResponse(false), 2000);
+            }
+            setShowManualSelectionPopup(false);
+            setSelectedCourseForManual(null);
+        }
+    };
+
+    const cancelManualSelection = () => {
+        setShowManualSelectionPopup(false);
+        setSelectedCourseForManual(null);
+    };
+
     return (
         <StudentLayout>
             <div className="space-y-6">
@@ -193,7 +221,8 @@ export function StudentCourseList() {
                                 {filteredAndSortedCourses.map((course) => (
                                     <tr key={course.courseid}>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/student/course/${course.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                            <Link to={`/student/course/${course.courseid}`}
+                                                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                                 {course.courseid}
                                             </Link>
                                         </td>
@@ -204,13 +233,15 @@ export function StudentCourseList() {
                                         <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.status}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <button
-                                                onClick={() => addCourseWithId(course.courseid)}
-                                                className="text-green-600 hover:text-green-900 dark:hover:text-green-400"
-                                                title="Select course"
-                                            >
-                                                <FaPlus />
-                                            </button>
+                                            {(course.status === 'preregister' || course.status === 'open' || course.status === 'closed') && (
+                                                <button
+                                                    onClick={() => course.status === 'closed' ? handleManualSelection(course) : addCourseWithId(course.courseid)}
+                                                    className="text-green-600 hover:text-green-900 dark:hover:text-green-400"
+                                                    title={course.status === 'closed' ? 'Manual Selection' : 'Select course'}
+                                                >
+                                                    <FaPlus />
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
@@ -218,7 +249,8 @@ export function StudentCourseList() {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No available courses found matching your search criteria.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No available courses found matching your search
+                            criteria.</p>
                     )}
                 </div>
 
@@ -230,6 +262,13 @@ export function StudentCourseList() {
                     </div>
                 )}
 
+                {showManualSelectionPopup && selectedCourseForManual && (
+                    <ManualSelectBox
+                        course={selectedCourseForManual}
+                        onConfirm={confirmManualSelection}
+                        onCancel={cancelManualSelection}
+                    />
+                )}
             </div>
         </StudentLayout>
     );
