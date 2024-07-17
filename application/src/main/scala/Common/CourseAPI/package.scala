@@ -39,10 +39,8 @@ package object CourseAPI {
                     courseHour: Option[List[Int]],
                     classroomid: Option[Int],
                     credits: Option[Int],
-                    enrolledStudents: Option[List[EnrolledStudent]],
-                    allStudents: Option[List[AllStudent]]
                   )(using PlanContext): IO[Course] =
-    UpdateCourseMessage(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, enrolledStudents, allStudents).send
+    UpdateCourseMessage(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits).send
 
   def addStudent2Course(courseid: Int, studentUsername: Option[String], priority: Option[Int])(using PlanContext): IO[String] =
     AddStudent2CourseMessage(courseid, studentUsername, priority).send
@@ -126,6 +124,9 @@ package object CourseAPI {
   def getPlanList()(using PlanContext): IO[List[Plan]] =
     GetPlanListMessage().send
 
-  def UpdateCoursePriority(planid: Int, year: Int, courseid: Int, priority: Int)(using PlanContext): IO[Plan] =
+  def updateCoursePriority(planid: Int, year: Int, courseid: Int, priority: Int)(using PlanContext): IO[Plan] =
     UpdateCoursePriorityMessage(planid, year, courseid, priority).send
+
+  def endPreRegister(courseid: Int)(using PlanContext): IO[String] =
+    EndPreRegisterMessage(courseid).send
 }

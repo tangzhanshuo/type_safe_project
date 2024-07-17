@@ -152,6 +152,11 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
+      case "EndPreRegisterMessage"=>
+        IO(decode[EndPreRegisterMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for EndPreRegisterMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

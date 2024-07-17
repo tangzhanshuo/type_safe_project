@@ -14,6 +14,4 @@ case class UpdateCourseMessage(
                                 courseHours: Option[List[Int]], // 直接使用 List[Int] 类型
                                 classroomid: Option[Int],
                                 credits: Option[Int],
-                                enrolledStudents: Option[List[EnrolledStudent]], // 直接使用 List[EnrolledStudent] 类型
-                                allStudents: Option[List[AllStudent]] // JSON represented as String
                               ) extends API[Course](courseServiceCode)

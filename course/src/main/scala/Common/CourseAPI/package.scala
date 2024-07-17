@@ -124,6 +124,9 @@ package object CourseAPI {
   def getPlanList()(using PlanContext): IO[List[Plan]] =
     GetPlanListMessage().send
 
-  def UpdateCoursePriority(planid: Int, year: Int, courseid: Int, priority: Int)(using PlanContext): IO[Plan] =
+  def updateCoursePriority(planid: Int, year: Int, courseid: Int, priority: Int)(using PlanContext): IO[Plan] =
     UpdateCoursePriorityMessage(planid, year, courseid, priority).send
+
+  def endPreRegister(courseid: Int)(using PlanContext): IO[String] =
+    EndPreRegisterMessage(courseid).send
 }
