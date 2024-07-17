@@ -1,6 +1,6 @@
 import { AdminMessage } from 'Plugins/AdminAPI/AdminMessage';
 
-export class AdminGetCourseMessage extends AdminMessage {
+export class AdminGetCourseByCourseIDMessage extends AdminMessage {
     courseid: number;
 
     constructor(courseid: number) {

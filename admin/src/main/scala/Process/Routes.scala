@@ -22,8 +22,18 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
-      case "AdminGetCourseMessage" =>
-        IO(decode[AdminGetCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetCourseMessage")))
+      case "AdminGetCourseByCourseIDMessage" =>
+        IO(decode[AdminGetCourseByCourseIDMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetCourseByCourseIDMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "AdminGetCourseByCourseNameMessage" =>
+        IO(decode[AdminGetCourseByCourseNameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetCourseByCourseNameMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "AdminGetCourseByTeacherUsernameMessage" =>
+        IO(decode[AdminGetCourseByTeacherUsernameMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AdminGetCourseByTeacherUsernameMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }

@@ -1,7 +1,7 @@
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { AdminAddCourseMessage } from 'Plugins/AdminAPI/AdminAddCourseMessage';
-import { AdminGetCourseMessage } from 'Plugins/AdminAPI/AdminGetCourseMessage';
+import { AdminGetCourseByCourseIDMessage } from 'Plugins/AdminAPI/AdminGetCourseByCourseIDMessage';
 import { AdminUpdateCourseMessage } from 'Plugins/AdminAPI/AdminUpdateCourseMessage';
 import { AdminDeleteCourseMessage } from 'Plugins/AdminAPI/AdminDeleteCourseMessage';
 import { AdminGetAvailableClassroomByCapacityHourMessage } from 'Plugins/AdminAPI/AdminGetAvailableClassroomByCapacityHourMessage';
@@ -67,7 +67,7 @@ export const CourseInformation: React.FC<Props> = ({ setErrorMessage, setSuccess
             return;
         }
 
-        const message = new AdminGetCourseMessage(parseInt(courseID, 10));
+        const message = new AdminGetCourseByCourseIDMessage(parseInt(courseID, 10));
 
         try {
             const response = await sendPostRequest(message);

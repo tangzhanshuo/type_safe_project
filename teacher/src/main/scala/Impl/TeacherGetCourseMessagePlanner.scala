@@ -1,7 +1,7 @@
 package Impl
 
 import Common.API.{PlanContext, Planner}
-import Common.CourseAPI.getCourse
+import Common.CourseAPI.{getCourse, getCourseByCourseID}
 import Common.DBAPI.writeDB
 import Common.Object.*
 import cats.effect.IO
@@ -13,6 +13,6 @@ case class TeacherGetCourseMessagePlanner(
                                           courseID: Int,
                                           override val planContext: PlanContext) extends Planner[Course] {
   override def plan(using planContext: PlanContext): IO[Course] = {
-    getCourse(courseID)
+    getCourseByCourseID(courseID)
   }
 }
