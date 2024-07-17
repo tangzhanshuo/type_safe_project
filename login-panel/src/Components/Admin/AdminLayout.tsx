@@ -5,10 +5,14 @@ import { FaHome, FaBook, FaList, FaPlus, FaUsers, FaSearch, FaChalkboardTeacher,
 const adminMenuItems = [
     { path: '/admin/dashboard', name: 'Dashboard', icon: FaHome },
     { path: '/admin/userManagement', name: 'User Management', icon: FaUsers },
-    { path: '/admin/course', name: 'Course Management', icon: FaBook, children: [
-            { path: '/admin/course/addCourse', name: 'Add Course', icon: FaPlus },
-            { path: '/admin/course/searchCourse', name: 'Search Course', icon: FaSearch }
-        ]},
+    {
+        name: 'Course Management',
+        icon: FaBook,
+        subItems: [
+            { path: '/admin/course/add', name: 'Add Course', icon: FaPlus },
+            { path: '/admin/course/list', name: 'Course List', icon: FaList },
+        ],
+    },
     { path: '/admin/classroom', name: 'Classroom Management', icon: FaChalkboardTeacher },
     { path: '/admin/application', name: 'Applications', icon: FaClipboardList },
 ];

@@ -1,15 +1,16 @@
-import React, { ReactNode, useContext } from 'react';
+import React, { ReactNode, useContext, useState } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { useAuth } from 'Hooks/UseAuth';
 import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
-import { FaSignOutAlt } from 'react-icons/fa';
+import { FaSignOutAlt, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { logout } from "Plugins/CommonUtils/UserManager";
 import { IconType } from 'react-icons';
 
 interface MenuItem {
-    path: string;
+    path?: string;
     name: string;
     icon: IconType;
+    subItems?: MenuItem[];
 }
 
 interface DashboardLayoutProps {
@@ -18,11 +19,76 @@ interface DashboardLayoutProps {
     role: 'student' | 'teacher' | 'admin';
 }
 
-export function DashboardLayout({ children, menuItems, role }: DashboardLayoutProps) {
+function SidebarItem({ item, depth = 0 }: { item: MenuItem; depth?: number }) {
+    const [isExpanded, setIsExpanded] = useState(false);
     const location = useLocation();
-    useAuth(role);
+    const isActive = item.path ? location.pathname === item.path : false;
+
+    const toggleExpand = (e: React.MouseEvent) => {
+        if (item.subItems) {
+            e.preventDefault();
+            setIsExpanded(!isExpanded);
+        }
+    };
+
+    const content = (
+        <>
+            <item.icon className="mr-3" />
+            <span>{item.name}</span>
+            {item.subItems && (
+                <span className="ml-auto">
+                    {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
+                </span>
+            )}
+        </>
+    );
+
+    const commonClasses = `flex items-center py-3 px-6 cursor-pointer text-blue-100 dark:text-gray-300 hover:bg-blue-600 dark:hover:bg-gray-700 transition-colors duration-200 ${
+        isActive ? 'bg-blue-600 dark:bg-gray-700' : ''
+    }`;
+
+    return (
+        <>
+            {item.subItems ? (
+                <div
+                    className={commonClasses}
+                    style={{ paddingLeft: `${depth * 1.5 + 1.5}rem` }}
+                    onClick={toggleExpand}
+                >
+                    {content}
+                </div>
+            ) : item.path ? (
+                <Link
+                    to={item.path}
+                    className={commonClasses}
+                    style={{ paddingLeft: `${depth * 1.5 + 1.5}rem` }}
+                >
+                    {content}
+                </Link>
+            ) : (
+                <div
+                    className={commonClasses}
+                    style={{ paddingLeft: `${depth * 1.5 + 1.5}rem` }}
+                >
+                    {content}
+                </div>
+            )}
+            {isExpanded && item.subItems && (
+                <div>
+                    {item.subItems.map((subItem, index) => (
+                        <SidebarItem key={subItem.path || `${item.name}-${index}`} item={subItem} depth={depth + 1} />
+                    ))}
+                </div>
+            )}
+        </>
+    );
+}
+
+export function DashboardLayout({ children, menuItems, role }: DashboardLayoutProps) {
     const { toggleDarkMode } = useContext(ThemeContext);
     const history = useHistory();
+    const location = useLocation();
+    useAuth(role);
 
     const capitalizedRole = role.charAt(0).toUpperCase() + role.slice(1);
 
@@ -35,17 +101,8 @@ export function DashboardLayout({ children, menuItems, role }: DashboardLayoutPr
                 </div>
 
                 <nav className="mt-6 flex-grow">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`flex items-center py-3 px-6 text-blue-100 dark:text-gray-300 hover:bg-blue-600 dark:hover:bg-gray-700 transition-colors duration-200 ${
-                                location.pathname === item.path ? 'bg-blue-600 dark:bg-gray-700' : ''
-                            }`}
-                        >
-                            <item.icon className="mr-3" />
-                            {item.name}
-                        </Link>
+                    {menuItems.map((item, index) => (
+                        <SidebarItem key={item.path || `${item.name}-${index}`} item={item} />
                     ))}
                 </nav>
 
