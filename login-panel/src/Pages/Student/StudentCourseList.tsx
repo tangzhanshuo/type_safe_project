@@ -243,7 +243,7 @@ export function StudentCourseList() {
                             whiteSpace: 'pre-wrap'
                         }}
                     >
-                    {'max\ncredits:\n' + maxCredits}
+                    {'maximum\ncredits:\n' + maxCredits}
                 </span>
                 </div>
                 <div className="w-full h-6 bg-gray-200 rounded-l-full relative">
