@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { CourseInformation } from 'Pages/Admin/AdminCourse/CourseInformation';
 import { StudentInformation } from 'Pages/Admin/AdminCourse/StudentInformation';
-import { ClassroomInformation } from 'Pages/Admin/AdminCourse/ClassroomInformation';
+import { AdminClassroomInformation } from 'Pages/Admin/AdminClassroomInformation';
 import { AdminLayout } from 'Components/Admin/AdminLayout'; // Step 1: Import AdminLayout
 import Auth from 'Plugins/CommonUtils/AuthState';
 import 'Pages/css/AdminCourse.css';
@@ -50,9 +50,6 @@ export function AdminCourse() {
                         <button onClick={() => setActiveSection('student')} className="button">
                             Student Information
                         </button>
-                        <button onClick={() => setActiveSection('classroom')} className="button">
-                            Classroom Information
-                        </button>
                     </div>
                     {activeSection === 'course' && (
                         <CourseInformation
@@ -69,7 +66,7 @@ export function AdminCourse() {
                         />
                     )}
                     {activeSection === 'classroom' && (
-                        <ClassroomInformation
+                        <AdminClassroomInformation
                             setErrorMessage={setErrorMessage}
                             setSuccessMessage={setSuccessMessage}
                             setClassroomDetails={setClassroomDetails}

@@ -3,14 +3,14 @@ import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { AdminAddClassroomMessage } from 'Plugins/AdminAPI/AdminAddClassroomMessage';
 import { AdminGetClassroomMessage } from 'Plugins/AdminAPI/AdminGetClassroomMessage';
 import { AdminDeleteClassroomMessage } from 'Plugins/AdminAPI/AdminDeleteClassroomMessage';
-
+import { AdminLayout } from 'Components/Admin/AdminLayout';
 interface Props {
     setErrorMessage: (msg: string) => void;
     setSuccessMessage: (msg: string) => void;
     setClassroomDetails: (details: any) => void;
 }
 
-export const ClassroomInformation: React.FC<Props> = ({ setErrorMessage, setSuccessMessage, setClassroomDetails }) => {
+export const AdminClassroomInformation: React.FC<Props> = ({ setErrorMessage, setSuccessMessage, setClassroomDetails }) => {
     const [classroomID, setClassroomID] = useState('');
     const [classroomName, setClassroomName] = useState('');
     const [capacity, setCapacity] = useState('');
@@ -92,61 +92,63 @@ export const ClassroomInformation: React.FC<Props> = ({ setErrorMessage, setSucc
     };
 
     return (
-        <section className="classroom-info">
-            <h2>Classroom Information</h2>
-            <div className="input-group">
-                <div className="input-container">
-                    <input
-                        type="text"
-                        placeholder="Classroom ID (Number)"
-                        value={classroomID}
-                        onChange={(e) => setClassroomID(e.target.value)}
-                        className="input-field"
-                    />
-                    <label>Classroom ID (Number)</label>
+        <AdminLayout> {/* Wrap content with AdminLayout */}
+            <section className="classroom-info">
+                <h2>Classroom Information</h2>
+                <div className="input-group">
+                    <div className="input-container">
+                        <input
+                            type="text"
+                            placeholder="Classroom ID (Number)"
+                            value={classroomID}
+                            onChange={(e) => setClassroomID(e.target.value)}
+                            className="input-field dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        />
+                        <label>Classroom ID (Number)</label>
+                    </div>
+                    <div className="input-container">
+                        <input
+                            type="text"
+                            placeholder="Classroom Name (Text)"
+                            value={classroomName}
+                            onChange={(e) => setClassroomName(e.target.value)}
+                            className="input-field dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        />
+                        <label>Classroom Name (Text)</label>
+                    </div>
+                    <div className="input-container">
+                        <input
+                            type="text"
+                            placeholder="Capacity (Number)"
+                            value={capacity}
+                            onChange={(e) => setCapacity(e.target.value)}
+                            className="input-field dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        />
+                        <label>Capacity (Number)</label>
+                    </div>
+                    <div className="input-container">
+                        <input
+                            type="text"
+                            placeholder="Enrolled Courses (JSON Dict[List[Number]])"
+                            value={enrolledCoursesJson}
+                            onChange={(e) => setEnrolledCoursesJson(e.target.value)}
+                            className="input-field dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        />
+                        <label>Enrolled Courses (JSON Dict[List[Number]])</label>
+                    </div>
                 </div>
-                <div className="input-container">
-                    <input
-                        type="text"
-                        placeholder="Classroom Name (Text)"
-                        value={classroomName}
-                        onChange={(e) => setClassroomName(e.target.value)}
-                        className="input-field"
-                    />
-                    <label>Classroom Name (Text)</label>
+                <div className="button-group">
+                    <button onClick={handleAddClassroom} className="button">
+                        Add Classroom
+                    </button>
+                    <button onClick={handleGetClassroom} className="button">
+                        Get Classroom Details
+                    </button>
+                    <button onClick={handleDeleteClassroom} className="button">
+                        Delete Classroom
+                    </button>
                 </div>
-                <div className="input-container">
-                    <input
-                        type="text"
-                        placeholder="Capacity (Number)"
-                        value={capacity}
-                        onChange={(e) => setCapacity(e.target.value)}
-                        className="input-field"
-                    />
-                    <label>Capacity (Number)</label>
-                </div>
-                <div className="input-container">
-                    <input
-                        type="text"
-                        placeholder="Enrolled Courses (JSON Dict[List[Number]])"
-                        value={enrolledCoursesJson}
-                        onChange={(e) => setEnrolledCoursesJson(e.target.value)}
-                        className="input-field"
-                    />
-                    <label>Enrolled Courses (JSON Dict[List[Number]])</label>
-                </div>
-            </div>
-            <div className="button-group">
-                <button onClick={handleAddClassroom} className="button">
-                    Add Classroom
-                </button>
-                <button onClick={handleGetClassroom} className="button">
-                    Get Classroom Details
-                </button>
-                <button onClick={handleDeleteClassroom} className="button">
-                    Delete Classroom
-                </button>
-            </div>
-        </section>
+            </section>
+        </AdminLayout>
     );
-};
+}
