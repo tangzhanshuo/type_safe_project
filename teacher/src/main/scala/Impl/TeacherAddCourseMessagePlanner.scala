@@ -17,19 +17,17 @@ case class TeacherAddCourseMessagePlanner(usertype: String,
                                           teacherName: String,
                                           capacity: Int,
                                           info: String,
-                                          courseHour: String,
+                                          courseHour: List[Int],
                                           classroomID: Int,
                                           credits: Int,
                                           override val planContext: PlanContext) extends Planner[Application] {
   override def plan(using planContext: PlanContext): IO[Application] = {
-    print(usertype,username,courseName,teacherName,capacity,info,courseHour,classroomID,credits);
-    println()
     val application = Application.create(usertype, username, "TeacherAddCourse")
     application.addInfo("courseName", courseName)
     application.addInfo("teacherName", teacherName)
     application.addInfo("capacity", capacity)
     application.addInfo("info", info)
-    application.addInfo("courseHour", courseHour)
+    application.addInfo("courseHour", courseHour.asJson.noSpaces)
     application.addInfo("classroomID", classroomID)
     application.addInfo("credits", credits)
     application.addApprover("admin")

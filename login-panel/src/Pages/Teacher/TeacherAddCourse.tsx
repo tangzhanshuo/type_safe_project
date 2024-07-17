@@ -2,20 +2,40 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { TeacherAddCourseMessage } from 'Plugins/TeacherAPI/TeacherAddCourseMessage';
+import { TeacherGetInfoMessage } from 'Plugins/TeacherAPI/TeacherGetInfoMessage';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { TeacherLayout } from 'Components/Teacher/TeacherLayout';
 
-export function TeacherAddCourse() {
+interface CourseHour {
+    weekday: string;
+    hours: string[];
+}
+
+export function TeacherAddCourse(): JSX.Element {
     const history = useHistory();
-    const [courseName, setCourseName] = useState('');
-    const [capacity, setCapacity] = useState('');
-    const [info, setInfo] = useState('');
-    const [courseHourJson, setCourseHourJson] = useState('');
-    const [classroomID, setClassroomID] = useState('');
-    const [credits, setCredits] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const [addCourseResponse, setAddCourseResponse] = useState('');
+    const [courseName, setCourseName] = useState<string>('');
+    const [capacity, setCapacity] = useState<number | null>(null);
+    const [info, setInfo] = useState<string>('');
+    const [classroomID, setClassroomID] = useState<number | null>(null);
+    const [credits, setCredits] = useState<number | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [addCourseResponse, setAddCourseResponse] = useState<string>('');
+
+    const [semesterHalf, setSemesterHalf] = useState<string>('2'); // Default to whole semester
+    const [courseHours, setCourseHours] = useState<CourseHour[]>([{ weekday: '0', hours: [] }]);
+
+    const [teacherName, setTeacherName] = useState<string>('');
+
+    const weekdays: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const timeSlots: string[] = [
+        "8:00-9:35",
+        "9:50-12:15",
+        "13:30-15:05",
+        "15:20-16:05",
+        "19:20-20:55",
+        "21:00-21:45"
+    ];
 
     useEffect(() => {
         const { usertype, username, token } = Auth.getState();
@@ -24,15 +44,74 @@ export function TeacherAddCourse() {
             history.push('/login');
         } else if (usertype !== 'teacher') {
             history.push('/');
+        } else {
+            fetchTeacherInfo();
         }
     }, [history]);
 
-    const addCourse = async () => {
-        if (!courseName || !capacity || !courseHourJson || !classroomID || !credits) {
+    const fetchTeacherInfo = async () => {
+        const response = await sendPostRequest(new TeacherGetInfoMessage());
+        if (response.isError) {
+            setErrorMessage(response.error);
+            setTeacherName('');
+        } else {
+            const info = response.data;
+            setTeacherName(info.name || '');
+            setErrorMessage('');
+        }
+    };
+
+    const addCourseHourSet = (): void => {
+        const availableWeekday: number = weekdays.findIndex((_, index) =>
+            !courseHours.some(ch => ch.weekday === index.toString())
+        );
+        if (availableWeekday !== -1) {
+            setCourseHours([...courseHours, { weekday: availableWeekday.toString(), hours: [] }]);
+            setErrorMessage('');
+        } else {
+            setErrorMessage('All weekdays have been selected.');
+        }
+    }
+
+    const updateCourseHour = (index: number, field: keyof CourseHour, value: string | string[]): void => {
+        const updatedCourseHours: CourseHour[] = [...courseHours];
+        updatedCourseHours[index][field] = value as never; // Type assertion needed due to union type
+        setCourseHours(updatedCourseHours);
+    }
+
+    const deleteCourseHourSet = (index: number): void => {
+        const updatedCourseHours: CourseHour[] = courseHours.filter((_, i) => i !== index);
+        setCourseHours(updatedCourseHours);
+        setErrorMessage('');
+    }
+
+    const calculateCourseHourArray = (): number[] => {
+        return courseHours.flatMap(({ weekday, hours }) => {
+            const baseHours: number[] = hours.map(h => 6 * parseInt(weekday) + parseInt(h));
+            if (semesterHalf === '2') {
+                // Whole semester
+                return baseHours.flatMap(h => [h, h + 42]);
+            } else {
+                return baseHours.map(h => h + 42 * parseInt(semesterHalf));
+            }
+        });
+    }
+
+    const addCourse = async (): Promise<void> => {
+        if (!courseName || capacity === null || courseHours.length === 0 || classroomID === null || credits === null) {
             setAddCourseResponse('Please ensure all fields are correctly filled.');
             return;
         }
-        const response = await sendPostRequest(new TeacherAddCourseMessage(courseName, parseInt(capacity), info, courseHourJson, classroomID, credits));
+        const courseHourArray: number[] = calculateCourseHourArray();
+        const response = await sendPostRequest(new TeacherAddCourseMessage(
+            courseName,
+            teacherName,
+            capacity,
+            info,
+            courseHourArray,
+            classroomID,
+            credits
+        ));
         if (response.isError) {
             setAddCourseResponse(response.error);
             return;
@@ -49,50 +128,116 @@ export function TeacherAddCourse() {
                             id="courseName"
                             type="text"
                             value={courseName}
-                            onChange={(e) => setCourseName(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCourseName(e.target.value)}
                             placeholder="Course Name"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         />
                         <input
                             id="capacity"
                             type="number"
-                            value={capacity}
-                            onChange={(e) => setCapacity(e.target.value)}
+                            value={capacity === null ? '' : capacity}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                const value = e.target.value;
+                                setCapacity(value === '' ? null : parseInt(value));
+                            }}
                             placeholder="Capacity (e.g., 30)"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                        />
-                        <input
-                            id="info"
-                            type="text"
-                            value={info}
-                            onChange={(e) => setInfo(e.target.value)}
-                            placeholder="Course Info"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                        />
-                        <input
-                            id="courseHourJson"
-                            type="text"
-                            value={courseHourJson}
-                            onChange={(e) => setCourseHourJson(e.target.value)}
-                            placeholder="Course Hour JSON (e.g. [12,32])"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         />
                         <input
                             id="classroomID"
                             type="number"
-                            value={classroomID}
-                            onChange={(e) => setClassroomID(e.target.value)}
+                            value={classroomID === null ? '' : classroomID}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                const value = e.target.value;
+                                setClassroomID(value === '' ? null : parseInt(value));
+                            }}
                             placeholder="Classroom ID (e.g. 101, -1 for no classroom)"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         />
                         <input
                             id="credits"
                             type="number"
-                            value={credits}
-                            onChange={(e) => setCredits(e.target.value)}
+                            value={credits === null ? '' : credits}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                const value = e.target.value;
+                                setCredits(value === '' ? null : parseInt(value));
+                            }}
                             placeholder="Credits (e.g., 3)"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                         />
+                        <textarea
+                            id="info"
+                            value={info}
+                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInfo(e.target.value)}
+                            placeholder="Course Info"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            rows={4}
+                        />
+                        <select
+                            value={semesterHalf}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSemesterHalf(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                        >
+                            <option value="2">Whole Semester</option>
+                            <option value="0">First Half of Semester</option>
+                            <option value="1">Second Half of Semester</option>
+                        </select>
+                        {courseHours.map((courseHour: CourseHour, index: number) => (
+                            <div key={index} className="space-y-2 border-t pt-2">
+                                <div className="flex justify-between items-center">
+                                    <select
+                                        value={courseHour.weekday}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateCourseHour(index, 'weekday', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                                    >
+                                        {weekdays.map((day: string, dayIndex: number) => (
+                                            <option
+                                                key={dayIndex}
+                                                value={dayIndex.toString()}
+                                                disabled={courseHours.some((ch: CourseHour, i: number) => i !== index && ch.weekday === dayIndex.toString())}
+                                            >
+                                                {day}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {index > 0 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => deleteCourseHourSet(index)}
+                                            className="ml-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out"
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {timeSlots.map((slot: string, hour: number) => (
+                                        <label key={hour} className="inline-flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={courseHour.hours.includes(hour.toString())}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                    const updatedHours: string[] = e.target.checked
+                                                        ? [...courseHour.hours, hour.toString()]
+                                                        : courseHour.hours.filter((h: string) => h !== hour.toString());
+                                                    updateCourseHour(index, 'hours', updatedHours);
+                                                }}
+                                                className="form-checkbox h-5 w-5 text-blue-600"
+                                            />
+                                            <span className="ml-2 text-gray-700 dark:text-gray-300">{slot}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={addCourseHourSet}
+                            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out"
+                        >
+                            Add Another Course Hour Set
+                        </button>
+                        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                     </form>
 
                     <div className="mt-6">

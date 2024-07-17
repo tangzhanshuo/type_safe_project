@@ -34,50 +34,10 @@ object Init {
          """.stripMargin, List()
         // The course_hour should be a list of Ints with value 42*w + 6*d + h where
         // w = 0, 1 stands for 前八周，后八周
-        // d = 1, 2, 3, 4, 5, 6, 7 stands for 星期d
-        // h = 1, 2, 3, 4, 5, 6 stands for 第h段时间
+        // d = 0, 1, 2, 3, 4, 5, 6 stands for 星期d
+        // h = 0, 1, 2, 3, 4, 5 stands for 第h段时间
       )
 
-      _ <- writeDB(
-        s"""
-           |INSERT INTO course (
-           |  courseid,
-           |  course_name,
-           |  teacher_username,
-           |  teacher_name,
-           |  capacity,
-           |  info,
-           |  course_hour,
-           |  classroomid,
-           |  credits,
-           |  enrolled_students,
-           |  all_students,
-           |  status
-           |)
-           |VALUES (1, 'a', 'a', 'a', 3, 'a', '[]', -1, 1, '[]', '[]', 'preregister')
-           |ON CONFLICT (courseid) DO NOTHING
-         """.stripMargin, List()
-      )
-      _ <- writeDB(
-        s"""
-           |INSERT INTO course (
-           |  courseid,
-           |  course_name,
-           |  teacher_username,
-           |  teacher_name,
-           |  capacity,
-           |  info,
-           |  course_hour,
-           |  classroomid,
-           |  credits,
-           |  enrolled_students,
-           |  all_students,
-           |  status
-           |)
-           |VALUES (2, 'b', 'a', 'a', 2, 'b', '[]', -1, 1, '[]', '[]', 'open')
-           |ON CONFLICT (courseid) DO NOTHING
-         """.stripMargin, List()
-      )
       _ <- writeDB(
         s"""
            |CREATE TABLE IF NOT EXISTS classroom (
