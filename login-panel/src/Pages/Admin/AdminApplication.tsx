@@ -9,23 +9,7 @@ import { AdminGetApplicationFromApproverMessage } from 'Plugins/AdminAPI/AdminGe
 import { AdminApproveApplicationMessage } from 'Plugins/AdminAPI/AdminApproveApplicationMessage'
 import { AdminRejectApplicationMessage } from 'Plugins/AdminAPI/AdminRejectApplicationMessage'
 import { AdminLayout } from 'Components/Admin/AdminLayout';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
-
-interface Approver {
-    approved: boolean;
-    username: string;
-    usertype: 'admin' | 'teacher' | 'student';
-}
-
-interface Application {
-    applicationID: string;
-    usertype: string;
-    username: string;
-    applicationType: string;
-    info: string;
-    approver: Approver[];
-    status: string;
-}
+import { sendPostRequest, sendApplicationListRequest, Application, Approver } from 'Plugins/CommonUtils/SendPostRequest'
 
 export function AdminApplication() {
     const history = useHistory();
@@ -46,7 +30,7 @@ export function AdminApplication() {
     const handleDelete = async (applicationID: string) => {
         const message = new AdminDeleteApplicationMessage(applicationID);
 
-        const response = await sendPostRequest(message);
+        const response = await sendApplicationListRequest(message);
         if (!response.isError) {
             setSuccessMessage('Application deleted successfully');
             setErrorMessage('');
@@ -155,7 +139,6 @@ export function AdminApplication() {
                                 </thead>
                                 <tbody>
                                 {applications.map((app) => {
-                                    const approvers = app.approver;
                                     return (
                                         <tr key={app.applicationID}>
                                             <td>{app.usertype}</td>
@@ -163,9 +146,9 @@ export function AdminApplication() {
                                             <td>{app.applicationType}</td>
                                             <td>{app.info}</td>
                                             <td>{app.status}</td>
-                                            {renderApproverCell(approvers[0])}
-                                            {renderApproverCell(approvers[1])}
-                                            {renderApproverCell(approvers[2])}
+                                            {renderApproverCell(app.approver[0])}
+                                            {renderApproverCell(app.approver[1])}
+                                            {renderApproverCell(app.approver[2])}
                                             <td>
                                                 <button onClick={() => handleApprove(app.applicationID)} className="approve-button bg-green-500 dark:bg-green-700 text-white">
                                                     Approve
