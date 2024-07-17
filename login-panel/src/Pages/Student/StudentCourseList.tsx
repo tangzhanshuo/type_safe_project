@@ -6,6 +6,8 @@ import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourse
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
 import { StudentManualSelectCourseMessage } from 'Plugins/StudentAPI/StudentManualSelectCourseMessage';
 import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
+import { StudentGetCreditsMessage } from 'Plugins/StudentAPI/StudentGetCreditsMessage';
+import { StudentGetPlanMessage } from 'Plugins/StudentAPI/StudentGetPlanMessage';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch, FaHandPaper } from 'react-icons/fa';
 import { ManualSelectBox } from 'Components/Student/ManualSelectBox';
@@ -15,6 +17,8 @@ type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 export function StudentCourseList() {
     const [studentUsername, setStudentUsername] = useState<string>('');
     const [courses, setCourses] = useState<Course[]>([]);
+    const [credits, setCredits] = useState<number | null>(null);
+    const [plan, setPlan] = useState<any>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [addCourseResponse, setAddCourseResponse] = useState<string>('');
     const [selectedCourseIds, setSelectedCourseIds] = useState<number[]>([]);
@@ -31,6 +35,8 @@ export function StudentCourseList() {
         getCourseList();
         fetchSelectedCourses();
         setStudentUsername(Auth.getState().username);
+        getCredits();
+        getPlan();
     }, []);
 
     const fetchSelectedCourses = async () => {
@@ -74,6 +80,34 @@ export function StudentCourseList() {
             setErrorMessage('');
         } catch (error) {
             setErrorMessage('Error parsing course data');
+        }
+    };
+
+    const getCredits = async () => {
+        const response = await sendPostRequest(new StudentGetCreditsMessage());
+        if (response.isError) {
+            setErrorMessage(response.error);
+            return;
+        }
+        try {
+            setCredits(response.data);
+            setErrorMessage('');
+        } catch (error) {
+            setErrorMessage('Error parsing credits data');
+        }
+    };
+
+    const getPlan = async () => {
+        const response = await sendPostRequest(new StudentGetPlanMessage());
+        if (response.isError) {
+            setErrorMessage(response.error);
+            return;
+        }
+        try {
+            setPlan(response.data);
+            setErrorMessage('');
+        } catch (error) {
+            setErrorMessage('Error parsing plan data');
         }
     };
 
@@ -162,9 +196,92 @@ export function StudentCourseList() {
         setSelectedCourseForManual(null);
     };
 
+    const renderProgressBar = () => {
+        const defaultMinCredits = 6;
+        const defaultMaxCredits = 26;
+
+        const minCredits = plan ? plan.creditsLimits[Object.keys(plan.creditsLimits)[0]].min : defaultMinCredits;
+        const maxCredits = plan ? plan.creditsLimits[Object.keys(plan.creditsLimits)[0]].max : defaultMaxCredits;
+        const Credits = credits || 0;
+        const maxCreditsPlusOne = maxCredits + 6;
+
+        const creditsPercentage = (Credits / maxCreditsPlusOne) * 100;
+        const minCreditsPercentage = (minCredits / maxCreditsPlusOne) * 100;
+        const maxCreditsPercentage = (maxCredits / maxCreditsPlusOne) * 100;
+
+        let message = '';
+        if (Credits < minCredits) {
+            message = '你上的课太少，你要被退学了';
+        } else if (Credits > maxCredits && Credits <= maxCredits + 6) {
+            message = '你选得有点多';
+        } else if (Credits > maxCredits + 6) {
+            message = '进度条都放不下了，少卷点好不好';
+        }
+
+        return (
+            <div className="relative w-full mt-8"> {/* 增加顶部外边距 */}
+                <div className="relative w-full mb-4 text-xs text-gray-600">
+                <span
+                    style={{
+                        position: 'absolute',
+                        left: `${minCreditsPercentage}%`,
+                        transform: 'translateX(-50%)',
+                        bottom: '100%',
+                        textAlign: 'center',
+                        whiteSpace: 'pre-wrap'
+                    }}
+                >
+                    {'minimum\ncredits:\n' + minCredits}
+                </span>
+                    <span
+                        style={{
+                            position: 'absolute',
+                            left: `${maxCreditsPercentage}%`,
+                            transform: 'translateX(-50%)',
+                            bottom: '100%',
+                            textAlign: 'center',
+                            whiteSpace: 'pre-wrap'
+                        }}
+                    >
+                    {'max\ncredits:\n' + maxCredits}
+                </span>
+                </div>
+                <div className="w-full h-6 bg-gray-200 rounded-l-full relative">
+                    <div className="absolute left-0 top-0 h-full bg-red-500 rounded-l-full" style={{ width: `${minCreditsPercentage}%` }}></div>
+                    <div className="absolute left-0 top-0 h-full bg-green-500" style={{ width: `${maxCreditsPercentage - minCreditsPercentage}%`, left: `${minCreditsPercentage}%` }}></div>
+                    <div className="absolute left-0 top-0 h-full bg-blue-500 bg-opacity-50 rounded-l-full" style={{ width: `${creditsPercentage}%`, borderRadius: creditsPercentage > 0 ? '9999px 0 0 9999px' : '9999px' }}></div>
+                    <div className="absolute top-0 h-full border-l-2 border-blue-500" style={{ left: `${creditsPercentage}%` }}></div>
+                    <div className="absolute top-0 h-full bg-red-500" style={{ width: `${100 - maxCreditsPercentage}%`, left: `${maxCreditsPercentage}%`, borderRadius: '0 9999px 9999px 0' }}></div>
+                </div>
+                <div className="relative w-full mt-2 text-xs text-gray-600">
+                <span
+                    style={{
+                        position: 'absolute',
+                        left: `${creditsPercentage}%`,
+                        transform: 'translateX(-50%)',
+                        top: '100%',
+                        textAlign: 'center',
+                        whiteSpace: 'pre-wrap'
+                    }}
+                >
+                    {'selected\ncredits:\n' + Credits}
+                </span>
+                </div>
+                {message && (
+                    <div className="mt-4 text-center text-red-500">
+                        {message}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+
+
     return (
         <StudentLayout>
             <div className="space-y-6">
+                {renderProgressBar()}
                 <div className="flex justify-between items-center">
                     <h2 className="text-2xl font-bold">Course List</h2>
                     <button
@@ -249,8 +366,7 @@ export function StudentCourseList() {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No available courses found matching your search
-                            criteria.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No available courses found matching your search criteria.</p>
                     )}
                 </div>
 

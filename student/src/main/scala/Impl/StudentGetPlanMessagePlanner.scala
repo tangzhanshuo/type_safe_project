@@ -10,18 +10,18 @@ import io.circe.parser._
 import Common.Object.SqlParameter
 
 case class StudentGetPlanMessagePlanner(
-                                         StudentUsername: String,
+                                         username: String,
                                          override val planContext: PlanContext
                                        ) extends Planner[io.circe.Json] {
   override def plan(using planContext: PlanContext): IO[io.circe.Json] = {
     val getStudentQuery = "SELECT info FROM student WHERE user_name = ?"
-    val getStudentParams = List(SqlParameter("string", StudentUsername))
+    val getStudentParams = List(SqlParameter("string", username))
 
     for {
       studentRows <- readDBRows(getStudentQuery, getStudentParams)
       studentRow <- studentRows.headOption match {
         case Some(row) => IO.pure(row)
-        case None => IO.raiseError(new Exception(s"Student with username $StudentUsername not found"))
+        case None => IO.raiseError(new Exception(s"Student with username $username not found"))
       }
       infoJson <- IO.fromEither(studentRow.hcursor.get[String]("info").left.map(e => new Exception(s"Failed to get info: ${e.getMessage}")))
       info <- IO.fromEither(parse(infoJson).left.map(e => new Exception(s"Failed to parse info JSON: ${e.getMessage}")))

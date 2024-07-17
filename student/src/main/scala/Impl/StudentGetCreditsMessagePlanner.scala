@@ -8,7 +8,7 @@ import Common.ServiceUtils.schemaName
 import cats.effect.IO
 import io.circe.generic.auto.*
 
-case class StudentGetCreditsMessagePlanner(StudentUsername: String, override val planContext: PlanContext) extends Planner[Int]:
+case class StudentGetCreditsMessagePlanner(username: String, override val planContext: PlanContext) extends Planner[Int]:
   override def plan(using PlanContext): IO[Int] = {
-    getCreditsByStudentUsername(StudentUsername)
+    getCreditsByStudentUsername(username)
   }
