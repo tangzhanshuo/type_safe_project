@@ -1,7 +1,7 @@
 package Impl
 
 import Common.API.{PlanContext, Planner}
-import Common.CourseAPI.getCourse
+import Common.CourseAPI.getCourseByCourseID
 import Common.DBAPI.{readDBRows, readDBString}
 import Common.Object.*
 import Common.ServiceUtils.schemaName
@@ -10,5 +10,5 @@ import io.circe.generic.auto.*
 
 case class StudentGetCourseMessagePlanner(courseID: Int, override val planContext: PlanContext) extends Planner[Course]:
   override def plan(using PlanContext): IO[Course] = {
-      getCourse(courseID)
+      getCourseByCourseID(courseID)
   }

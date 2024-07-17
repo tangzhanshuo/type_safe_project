@@ -1,8 +1,8 @@
-import React, { ReactNode, useContext } from 'react';
+import React, { useState, ReactNode, useContext } from 'react';
 import {Link, useHistory, useLocation} from 'react-router-dom';
 import { useAuth } from 'Hooks/UseAuth';
 import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
-import { FaHome, FaUsers, FaBook, FaChalkboardTeacher, FaClipboardList, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaUsers, FaBook, FaChalkboardTeacher, FaClipboardList, FaSignOutAlt, FaPlus, FaSearch } from 'react-icons/fa';
 import {logout} from "Plugins/CommonUtils/UserManager";
 
 interface AdminLayoutProps {
@@ -14,6 +14,7 @@ interface MenuItem {
     name: string;
     icon: React.ElementType;
     children?: MenuItem[];
+    isOpen?: boolean;
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
@@ -22,51 +23,76 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     const { toggleDarkMode } = useContext(ThemeContext);
     const history = useHistory();
 
-    const menuItems: MenuItem[] = [
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([
         { path: '/admin/dashboard', name: 'Dashboard', icon: FaHome },
         { path: '/admin/userManagement', name: 'User Management', icon: FaUsers },
-        { path: '/admin/course', name: 'Course Management', icon: FaBook },
+        { path: '/admin/course', name: 'Course Management', icon: FaBook, children: [
+                { path: '/admin/course/addCourse', name: 'Add Course', icon: FaPlus },
+                { path: '/admin/course/searchCourse', name: 'Search Course', icon: FaSearch }
+            ]},
         { path: '/admin/classroom', name: 'Classroom Management', icon: FaChalkboardTeacher },
         { path: '/admin/application', name: 'Applications', icon: FaClipboardList },
-    ];
+    ]);
+    const [activeSubMenu, setActiveSubMenu] = useState<MenuItem | null>(null);
 
-    const renderMenuItems = (items: MenuItem[], level = 0) => {
-        return items.map((item) => (
-            <React.Fragment key={item.path}>
-                <Link
-                    to={item.path}
-                    className={`flex items-center py-3 px-${6 + level * 2} text-indigo-100 dark:text-gray-300 hover:bg-indigo-700 dark:hover:bg-gray-700 transition-colors duration-200 ${
-                        location.pathname === item.path ? 'bg-indigo-700 dark:bg-gray-700' : ''
-                    }`}
-                >
-                    <item.icon className="mr-3" />
-                    {item.name}
-                </Link>
-                {item.children && renderMenuItems(item.children, level + 1)}
-            </React.Fragment>
-        ));
+    const mainContentMarginLeft = activeSubMenu ? 'calc(64px + 64px)' : '64px';
+
+    const renderActiveSubMenu = (menuItem: MenuItem) => {
+        if (!menuItem.children || menuItem.children.length === 0) {
+            return null;
+        }
+        return (
+            <div className="sub-menu-column">
+                {menuItem.children.map((subItem, index) => (
+                    <Link
+                        key={index}
+                        to={subItem.path}
+                        className="sub-menu-item"
+                    >
+                        {React.createElement(subItem.icon, { className: "mr-3" })}
+                        {subItem.name}
+                    </Link>
+                ))}
+            </div>
+        );
+    };
+
+    const handleMenuItemClick = (item: MenuItem) => {
+        if (item.children && item.children.length > 0) {
+            setActiveSubMenu(item);
+        } else {
+            setActiveSubMenu(null);
+        }
     };
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
             {/* Sidebar */}
-            <div className="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-indigo-600 to-indigo-800 dark:from-gray-800 dark:to-gray-900 shadow-md overflow-y-auto flex flex-col">
+            <div
+                className="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-blue-500 to-blue-700 dark:from-gray-800 dark:to-gray-900 shadow-md overflow-y-auto flex flex-col">
                 <div className="p-6">
                     <h2 className="text-2xl font-semibold text-white">Admin Portal</h2>
                 </div>
 
                 <nav className="mt-6 flex-grow">
                     {menuItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`flex items-center py-3 px-6 text-indigo-100 dark:text-gray-300 hover:bg-indigo-700 dark:hover:bg-gray-700 transition-colors duration-200 ${
-                                location.pathname === item.path ? 'bg-indigo-700 dark:bg-gray-700' : ''
-                            }`}
-                        >
-                            <item.icon className="mr-3" />
-                            {item.name}
-                        </Link>
+                        <div key={item.path} className="menu-item-wrapper">
+                            <Link
+                                to={item.path}
+                                className={`flex items-center py-3 px-6 text-blue-100 dark:text-gray-300 hover:bg-blue-600 dark:hover:bg-gray-700 transition-colors duration-200 ${
+                                    location.pathname === item.path ? 'bg-blue-600 dark:bg-gray-700' : ''
+                                }`}
+                                onClick={() => handleMenuItemClick(item)}
+                            >
+                                <item.icon className="mr-3" />
+                                {item.name}
+                                {item.children && item.children.length > 0 && (
+                                    <span className="ml-auto">
+                                        {/* Icon or indicator for sub-menu items */}
+                                    </span>
+                                )}
+                            </Link>
+                        </div>
                     ))}
                 </nav>
 
@@ -82,7 +108,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
             </div>
 
-            {/* Main content */}
             <div className="ml-64 flex flex-col min-h-screen">
                 <header className="bg-white dark:bg-gray-800 shadow">
                     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -99,9 +124,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     </div>
                 </header>
                 <main className="flex-grow max-w-7xl w-full mx-auto py-6 sm:px-6 lg:px-8">
+                    {activeSubMenu && renderActiveSubMenu(activeSubMenu)}
                     {children}
                 </main>
             </div>
         </div>
     );
 }
+

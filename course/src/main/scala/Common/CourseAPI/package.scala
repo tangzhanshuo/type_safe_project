@@ -5,8 +5,8 @@ import Common.Object.*
 import Global.ServiceCenter.courseServiceCode
 import cats.effect.IO
 import io.circe.Json
-import io.circe.generic.auto._
-import io.circe.syntax._
+import io.circe.generic.auto.*
+import io.circe.syntax.*
 import org.http4s.client.Client
 
 package object CourseAPI {
@@ -29,9 +29,6 @@ package object CourseAPI {
   def deleteCourse(courseid: Int)(using PlanContext): IO[String] =
     DeleteCourseMessage(courseid).send
 
-  def getCourse(courseid: Int)(using PlanContext): IO[Course] =
-    GetCourseMessage(courseid).send
-
   def updateCourse(
                     courseid: Int,
                     courseName: Option[String],
@@ -53,9 +50,6 @@ package object CourseAPI {
   def forceAddStudent2Course(courseid: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
     ForceAddStudent2CourseMessage(courseid, studentUsername).send
 
-  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[List[Course]] =
-    GetCourseByTeacherUsernameMessage(teacherUsername).send
-
   def deleteStudentFromCourse(courseid: Int, studentUsername: Option[String])(using PlanContext): IO[String] =
     DeleteStudentFromCourseMessage(courseid, studentUsername).send
 
@@ -64,6 +58,15 @@ package object CourseAPI {
 
   def getCourseList()(using PlanContext): IO[List[Course]] =
     GetCourseListMessage().send
+
+  def getCourseByCourseID(courseid: Int)(using PlanContext): IO[Course] =
+    GetCourseByCourseIDMessage(courseid).send
+    
+  def getCourseByCourseName(courseName: String)(using PlanContext): IO[List[Course]] =
+    GetCourseByCourseNameMessage(courseName).send
+
+  def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[List[Course]] =
+    GetCourseByTeacherUsernameMessage(teacherUsername).send
 
   def getCourseByStudentUsername(studentUsername: String)(using PlanContext): IO[List[Course]] =
     GetCourseByStudentUsernameMessage(studentUsername).send

@@ -9,7 +9,7 @@ import Common.DBAPI.readDBRows
 import Common.Object.{Course, EnrolledStudent, AllStudent, SqlParameter}
 import cats.implicits.*
 
-case class GetCourseMessagePlanner(courseid: Int, override val planContext: PlanContext) extends Planner[Course] {
+case class GetCourseByCourseIDMessagePlanner(courseid: Int, override val planContext: PlanContext) extends Planner[Course] {
   override def plan(using planContext: PlanContext): IO[Course] = {
     val query = "SELECT * FROM course WHERE courseid = ?"
     readDBRows(query, List(SqlParameter("int", courseid.toString))).flatMap { rows =>
