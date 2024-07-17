@@ -1,22 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest, sendCourseListRequest, Course } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import { StudentLayout } from 'Components/Student/StudentLayout';
 import { FaSync, FaTrash, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
-
-interface Course {
-    courseid: number;
-    courseName: string;
-    teacherName: string;
-    capacity: number;
-    credits: number;
-    info: string;
-    status: string;
-}
 
 type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
@@ -36,7 +26,7 @@ export function StudentMyCourse() {
     }, []);
 
     const fetchSelectedCourses = async () => {
-        const response = await sendPostRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
+        const response = await sendCourseListRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
         if (response.isError) {
             if (response.error.startsWith("No courses found")) {
                 setErrorMessage('');
@@ -47,15 +37,7 @@ export function StudentMyCourse() {
             }
             return;
         }
-        setSelectedCourses(response.data.map((course: any) => ({
-            courseid: course.courseid,
-            courseName: course.courseName,
-            teacherName: course.teacherName,
-            capacity: course.capacity,
-            credits: course.credits,
-            info: course.info,
-            status: course.status || 'Not available',
-        })));
+        setSelectedCourses(response.data);
     };
 
     const deleteCourseWithId = async (courseid: number) => {

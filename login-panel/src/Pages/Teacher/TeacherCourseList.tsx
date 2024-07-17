@@ -2,22 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest, sendCourseListRequest, Course } from 'Plugins/CommonUtils/SendPostRequest';
 import { TeacherGetCourseListMessage } from 'Plugins/TeacherAPI/TeacherGetCourseListMessage';
 import { TeacherDeleteCourseMessage } from 'Plugins/TeacherAPI/TeacherDeleteCourseMessage';
 import { TeacherLayout } from 'Components/Teacher/TeacherLayout';
 import { FaSync, FaSort, FaSearch } from 'react-icons/fa';
-
-interface Course {
-    courseid: number;
-    courseName: string;
-    capacity: number;
-    credits: number;
-    info: string;
-    courseHour: string;
-    classroomid: number;
-    enrolledStudents: string;
-}
 
 type SortColumn = keyof Course;
 type SortDirection = 'asc' | 'desc';
@@ -47,18 +36,13 @@ export function TeacherCourseList(): JSX.Element {
 
     const getCourses = async (): Promise<void> => {
         setIsLoading(true);
-        const response = await sendPostRequest(new TeacherGetCourseListMessage());
+        const response = await sendCourseListRequest(new TeacherGetCourseListMessage());
         if (response.isError) {
             setErrorMessage(response.error);
             setIsLoading(false);
             return;
         }
-        try {
-            const parsedCourses: Course[] = response.data;
-            setCourses(parsedCourses);
-        } catch (error) {
-            setErrorMessage('Error parsing course data');
-        }
+        setCourses(response.data);
         setIsLoading(false);
     }
 
@@ -179,7 +163,7 @@ export function TeacherCourseList(): JSX.Element {
                                     <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.courseHour}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.courseHour.join(', ')}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.classroomid}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudents.length}</td>
                                 </tr>

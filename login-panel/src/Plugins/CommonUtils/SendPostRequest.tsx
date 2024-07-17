@@ -14,6 +14,46 @@ export class Response {
     }
 }
 
+export class CourseStudent {
+    studentUsername: string;
+    priority: number;
+    time: number;
+
+    constructor(studentUsername: string, priority: number, time: number) {
+        this.studentUsername = studentUsername;
+        this.priority = priority;
+        this.time = time;
+    }
+}
+
+export class Course {
+    courseid: number;
+    courseName: string;
+    teacherName: string;
+    capacity: number;
+    credits: number;
+    info: string;
+    courseHour: number[];
+    classroomid: number;
+    enrolledStudents: CourseStudent[];
+    allStudents: CourseStudent[];
+    status: string; // New status field
+
+    constructor(courseid: number, courseName: string, teacherName: string, capacity: number, credits: number, info: string, courseHour: number[], classroomid: number, enrolledStudents: CourseStudent[], allStudents: CourseStudent[], status: string) {
+        this.courseid = courseid;
+        this.courseName = courseName;
+        this.teacherName = teacherName;
+        this.capacity = capacity;
+        this.credits = credits;
+        this.info = info;
+        this.courseHour = courseHour;
+        this.classroomid = classroomid;
+        this.enrolledStudents = enrolledStudents;
+        this.allStudents = allStudents;
+        this.status = status; // Initialize the new status field
+    }
+}
+
 export const sendUnverifiedPostRequest = async (message: API) => {
     const returnResponse = new Response()
     try {
@@ -54,4 +94,75 @@ export const sendPostRequest = async (message: API) => {
         setToken('');
     }
     return response
+};
+
+export const sendCourseRequest = async (message: API) => {
+    const response = await sendPostRequest(message);
+
+    if (!response.isError && response.data) {
+        const courseData = response.data;
+
+        // Convert enrolledStudents and allStudents to CourseStudent objects
+        const convertToCourseStudent = (student: any): CourseStudent => {
+            return new CourseStudent(student.studentUsername, student.priority, student.time);
+        };
+
+        const enrolledStudents = courseData.enrolledStudents.map(convertToCourseStudent);
+        const allStudents = courseData.allStudents.map(convertToCourseStudent);
+
+        // Create a new Course object
+        const course = new Course(
+            courseData.courseid,
+            courseData.courseName,
+            courseData.teacherName,
+            courseData.capacity,
+            courseData.credits,
+            courseData.info,
+            courseData.courseHour,
+            courseData.classroomid,
+            enrolledStudents,
+            allStudents,
+            courseData.status || '' // Include the new status field, default to empty string if not provided
+        );
+
+        // Replace the response.data with the new Course object
+        response.data = course;
+    }
+    return response;
+};
+
+export const sendCourseListRequest = async (message: API) => {
+    const response = await sendPostRequest(message);
+
+    if (!response.isError && Array.isArray(response.data)) {
+        // Convert each course in the response to a Course object
+        const courseList: Course[] = response.data.map((courseData: any) => {
+            // Convert enrolledStudents and allStudents to CourseStudent objects
+            const convertToCourseStudent = (student: any): CourseStudent => {
+                return new CourseStudent(student.studentUsername, student.priority, student.time);
+            };
+
+            const enrolledStudents = (courseData.enrolledStudents || []).map(convertToCourseStudent);
+            const allStudents = (courseData.allStudents || []).map(convertToCourseStudent);
+
+            // Create and return a new Course object
+            return new Course(
+                courseData.courseid,
+                courseData.courseName,
+                courseData.teacherName,
+                courseData.capacity,
+                courseData.credits,
+                courseData.info,
+                courseData.courseHour,
+                courseData.classroomid,
+                enrolledStudents,
+                allStudents,
+                courseData.status || '' // Include the new status field, default to empty string if not provided
+            );
+        });
+
+        // Replace the response.data with the new array of Course objects
+        response.data = courseList;
+    }
+    return response;
 };

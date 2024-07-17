@@ -1,23 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { StudentLayout } from 'Components/Student/StudentLayout';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest, sendCourseListRequest, Course } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourseListMessage';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
-import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage';
+import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
 import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
-
-interface Course {
-    courseid: number;
-    courseName: string;
-    teacherName: string;
-    capacity: number;
-    credits: number;
-    info: string;
-    status: string;
-}
 
 type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
@@ -26,7 +16,7 @@ export function StudentCourseList() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [addCourseResponse, setAddCourseResponse] = useState<string>('');
-    const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
+    const [selectedCourseIds, setSelectedCourseIds] = useState<number[]>([]);
     const [showAddResponse, setShowAddResponse] = useState<boolean>(false);
     const [sortColumn, setSortColumn] = useState<keyof Course>('courseid');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -41,17 +31,17 @@ export function StudentCourseList() {
     }, []);
 
     const fetchSelectedCourses = async () => {
-        const response = await sendPostRequest(new StudentGetCourseByUsernameMessage(Auth.getState().username));
+        const response = await sendPostRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
         if (response.isError) {
             if (!response.error.startsWith("No courses found")) {
                 setErrorMessage(response.error);
             }
-            setSelectedCourses([]);
+            setSelectedCourseIds([]);
             return;
         }
         try {
-            const parsedCourses: Course[] = response.data;
-            setSelectedCourses(parsedCourses);
+            const selectedCourses: Course[] = response.data;
+            setSelectedCourseIds(selectedCourses.map(course => course.courseid));
             setErrorMessage('');
         } catch (error) {
             setErrorMessage('Error parsing course data');
@@ -71,22 +61,13 @@ export function StudentCourseList() {
     };
 
     const getCourseList = async () => {
-        const response = await sendPostRequest(new StudentGetCourseListMessage());
+        const response = await sendCourseListRequest(new StudentGetCourseListMessage());
         if (response.isError) {
             setErrorMessage(response.error);
             return;
         }
         try {
-            const parsedCourses = response.data.map((course: any) => ({
-                courseid: course.courseid,
-                courseName: course.courseName,
-                teacherName: course.teacherName,
-                capacity: course.capacity,
-                credits: course.credits,
-                info: course.info,
-                status: course.status || 'Not available',
-            }));
-            setCourses(parsedCourses);
+            setCourses(response.data);
             setErrorMessage('');
         } catch (error) {
             setErrorMessage('Error parsing course data');
@@ -134,7 +115,7 @@ export function StudentCourseList() {
         });
     };
 
-    const filteredAndSortedCourses = filterCourses(sortedCourses);
+    const filteredAndSortedCourses = filterCourses(sortedCourses).filter(course => !selectedCourseIds.includes(course.courseid));
 
     const SortIcon = ({ column }: { column: keyof Course }) => {
         if (column !== sortColumn) return null;
@@ -192,7 +173,7 @@ export function StudentCourseList() {
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                    <h3 className="text-xl font-semibold mb-4">All Courses</h3>
+                    <h3 className="text-xl font-semibold mb-4">Available Courses</h3>
                     {filteredAndSortedCourses.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -223,15 +204,13 @@ export function StudentCourseList() {
                                         <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.status}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            {!selectedCourses.some(selectedCourse => selectedCourse.courseid === course.courseid) && (
-                                                <button
-                                                    onClick={() => addCourseWithId(course.courseid)}
-                                                    className="text-green-600 hover:text-green-900 dark:hover:text-green-400"
-                                                    title="Select course"
-                                                >
-                                                    <FaPlus />
-                                                </button>
-                                            )}
+                                            <button
+                                                onClick={() => addCourseWithId(course.courseid)}
+                                                className="text-green-600 hover:text-green-900 dark:hover:text-green-400"
+                                                title="Select course"
+                                            >
+                                                <FaPlus />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -239,7 +218,7 @@ export function StudentCourseList() {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No courses found matching your search criteria.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No available courses found matching your search criteria.</p>
                     )}
                 </div>
 
