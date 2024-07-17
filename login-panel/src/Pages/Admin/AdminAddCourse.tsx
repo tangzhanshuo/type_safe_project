@@ -54,55 +54,107 @@ export function AdminAddCourse() {
         }
     };
 
-    return (
-        <AdminLayout>
-            <form onSubmit={handleAddCourse}>
-                <div className="input-container">
-                    <input type="text" placeholder="Course Name" value={courseName} onChange={(e) => setCourseName(e.target.value)} className="input-field" />
-                    <label>Course Name</label>
+return (
+    <AdminLayout>
+        <div className="space-y-6">
+            <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                <form className="space-y-4" onSubmit={handleAddCourse}>
+                    <input
+                        id="courseName"
+                        type="text"
+                        value={courseName}
+                        onChange={(e) => setCourseName(e.target.value)}
+                        placeholder="Course Name"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="teacherUsername"
+                        type="text"
+                        value={teacherUsername}
+                        onChange={(e) => setTeacherUsername(e.target.value)}
+                        placeholder="Teacher Username"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="teacherName"
+                        type="text"
+                        value={teacherName}
+                        onChange={(e) => setTeacherName(e.target.value)}
+                        placeholder="Teacher Name"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="capacity"
+                        type="number"
+                        value={capacity}
+                        onChange={(e) => setCapacity(e.target.value)}
+                        placeholder="Capacity (e.g., 30)"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="info"
+                        type="text"
+                        value={info}
+                        onChange={(e) => setInfo(e.target.value)}
+                        placeholder="Course Info"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="courseHour"
+                        type="text"
+                        value={courseHour}
+                        onChange={(e) => setCourseHour(e.target.value)}
+                        placeholder="Course Hour"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="classroomID"
+                        type="number"
+                        value={classroomID}
+                        onChange={(e) => setClassroomID(e.target.value)}
+                        placeholder="Classroom ID (e.g., 101, -1 for no classroom)"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="credits"
+                        type="number"
+                        value={credits}
+                        onChange={(e) => setCredits(e.target.value)}
+                        placeholder="Credits (e.g., 3)"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="enrolledStudents"
+                        type="text"
+                        value={enrolledStudents}
+                        onChange={(e) => setEnrolledStudents(e.target.value)}
+                        placeholder="Enrolled Students"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                    <input
+                        id="allStudents"
+                        type="text"
+                        value={allStudents}
+                        onChange={(e) => setAllStudents(e.target.value)}
+                        placeholder="All Students"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    />
+                </form>
+
+                <div className="mt-6">
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700"
+                    >
+                        Add Course
+                    </button>
                 </div>
-                <div className="input-container">
-                    <input type="text" placeholder="Teacher Username" value={teacherUsername} onChange={(e) => setTeacherUsername(e.target.value)} className="input-field" />
-                    <label>Teacher Username</label>
-                </div>
-                <div className="input-container">
-                    <input type="text" placeholder="Teacher Name" value={teacherName} onChange={(e) => setTeacherName(e.target.value)} className="input-field" />
-                    <label>Teacher Name</label>
-                </div>
-                <div className="input-container">
-                    <input type="number" placeholder="Capacity" value={capacity} onChange={(e) => setCapacity(e.target.value)} className="input-field" />
-                    <label>Capacity</label>
-                </div>
-                <div className="input-container">
-                    <input type="text" placeholder="Info" value={info} onChange={(e) => setInfo(e.target.value)} className="input-field" />
-                    <label>Info</label>
-                </div>
-                <div className="input-container">
-                    <input type="text" placeholder="Course Hour" value={courseHour} onChange={(e) => setCourseHour(e.target.value)} className="input-field" />
-                    <label>Course Hour</label>
-                </div>
-                <div className="input-container">
-                    <input type="number" placeholder="Classroom ID" value={classroomID} onChange={(e) => setClassroomID(e.target.value)} className="input-field" />
-                    <label>Classroom ID</label>
-                </div>
-                <div className="input-container">
-                    <input type="number" placeholder="Credits" value={credits} onChange={(e) => setCredits(e.target.value)} className="input-field" />
-                    <label>Credits</label>
-                </div>
-                <div className="input-container">
-                    <input type="text" placeholder="Enrolled Students" value={enrolledStudents} onChange={(e) => setEnrolledStudents(e.target.value)} className="input-field" />
-                    <label>Enrolled Students</label>
-                </div>
-                <div className="input-container">
-                    <input type="text" placeholder="All Students" value={allStudents} onChange={(e) => setAllStudents(e.target.value)} className="input-field" />
-                    <label>All Students</label>
-                </div>
-                <div className="button-group">
-                    <button type="submit" className="button">Add Course</button>
-                </div>
-                {errorMessage && <div className="error-message">{errorMessage}</div>}
-                {successMessage && <div className="success-message">{successMessage}</div>}
-            </form>
-        </AdminLayout>
-    );
+
+                <p className={`mt-4 text-center ${successMessage ? 'text-green-500' : 'text-red-500'}`}>
+                    {successMessage || errorMessage}
+                </p>
+            </div>
+        </div>
+    </AdminLayout>
+);
 }
