@@ -44,13 +44,13 @@ object Routes:
             m.fullPlan.map(_.asJson.toString)
           }
 
-      case "StudentGetInfoMessage" | "TeacherGetInfoMessage" | "AdminGetInfoMessage" =>
+      case "UserGetInfoMessage" =>
         IO(decode[UserGetInfoMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserGetInfoMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
 
-      case "StudentSetInfoMessage" | "TeacherSetInfoMessage" | "AdminSetInfoMessage" =>
+      case "UserSetInfoMessage" =>
         IO(decode[UserSetInfoMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserSetInfoMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)

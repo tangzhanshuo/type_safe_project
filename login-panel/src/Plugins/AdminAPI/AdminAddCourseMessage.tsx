@@ -6,11 +6,9 @@ export class AdminAddCourseMessage extends AdminMessage {
     teacherName: string;
     capacity: number;
     info: string;
-    courseHour: string; //  represented as String
+    courseHour: number[];
     classroomid: number;
     credits: number;
-    enrolledStudents: string; //  represented as String
-    allStudents: string; //  represented as String
 
     constructor(
         courseName: string,
@@ -18,11 +16,9 @@ export class AdminAddCourseMessage extends AdminMessage {
         teacherName: string,
         capacity: number,
         info: string,
-        courseHour: string,
+        courseHour: number[],
         classroomid: number,
         credits: number,
-        enrolledStudents: string,
-        allStudents: string
     ) {
         super();
         this.courseName = courseName;
@@ -33,7 +29,5 @@ export class AdminAddCourseMessage extends AdminMessage {
         this.courseHour = courseHour;
         this.classroomid = classroomid;
         this.credits = credits;
-        this.enrolledStudents = enrolledStudents;
-        this.allStudents = allStudents;
     }
 }

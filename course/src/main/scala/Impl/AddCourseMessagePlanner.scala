@@ -19,12 +19,13 @@ case class AddCourseMessagePlanner(
                                     courseHour: List[Int],
                                     classroomid: Int,
                                     credits: Int,
-                                    enrolledStudents: List[EnrolledStudent],
-                                    allStudents: List[AllStudent],
                                     override val planContext: PlanContext
                                   ) extends Planner[Course] {
 
   override def plan(using planContext: PlanContext): IO[Course] = {
+    val enrolledStudents: List[EnrolledStudent] = List.empty
+    val allStudents: List[AllStudent] = List.empty
+
     val checkClassroomExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM classroom WHERE classroomid = ?)",
       List(SqlParameter("int", classroomid.toString))
     )
@@ -65,7 +66,7 @@ case class AddCourseMessagePlanner(
         SqlParameter("int", credits.toString),
         SqlParameter("jsonb", enrolledStudents.asJson.noSpaces),
         SqlParameter("jsonb", allStudents.asJson.noSpaces),
-        SqlParameter("string", "preregister") // Add the default status
+        SqlParameter("string", "preregister")
       )
     ).void
 
@@ -84,7 +85,7 @@ case class AddCourseMessagePlanner(
         SqlParameter("string", info),
         SqlParameter("int", classroomid.toString),
         SqlParameter("int", credits.toString),
-        SqlParameter("string", "preregister") // Add the status to the query
+        SqlParameter("string", "preregister")
       )
     )
 
@@ -100,11 +101,9 @@ case class AddCourseMessagePlanner(
         IO.raiseError(new Exception("Classroom with this id does not exist"))
       } else {
         val courseHourValidation = courseHour.asJson.as[List[Int]].left.map(e => new Exception(s"Invalid JSON for courseHour: ${e.getMessage}"))
-        val enrolledStudentsValidation = enrolledStudents.asJson.as[List[EnrolledStudent]].left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
-        val allStudentsValidation = allStudents.asJson.as[List[AllStudent]].left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
 
-        (courseHourValidation, enrolledStudentsValidation, allStudentsValidation) match {
-          case (Right(_), Right(_), Right(_)) =>
+        courseHourValidation match {
+          case Right(_) =>
             val checkConflictAndCapacityIO = for {
               existingCourses <- getClassroomEnrolledCourses(classroomid)
               conflict = checkCourseHourConflict(existingCourses)
@@ -131,12 +130,10 @@ case class AddCourseMessagePlanner(
               credits,
               enrolledStudents,
               allStudents,
-              "preregister" // Add the default status to the returned Course object
+              "preregister"
             )
 
-          case (Left(courseHourError), _, _) => IO.raiseError(courseHourError)
-          case (_, Left(enrolledStudentsError), _) => IO.raiseError(enrolledStudentsError)
-          case (_, _, Left(allStudentsError)) => IO.raiseError(allStudentsError)
+          case Left(courseHourError) => IO.raiseError(courseHourError)
         }
       }
     }

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { TeacherGetCourseListMessage } from 'Plugins/TeacherAPI/TeacherGetCourseListMessage';
-import { TeacherGetInfoMessage } from 'Plugins/TeacherAPI/TeacherGetInfoMessage';
-import { TeacherSetInfoMessage } from 'Plugins/TeacherAPI/TeacherSetInfoMessage';
+import { UserGetInfoMessage } from 'Plugins/UserAPI/UserGetInfoMessage';
+import { UserSetInfoMessage } from 'Plugins/UserAPI/UserSetInfoMessage';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { TeacherLayout } from 'Components/Teacher/TeacherLayout';
@@ -25,7 +25,7 @@ export function TeacherDashboard() {
     }, []);
 
     const fetchTeacherInfo = async () => {
-        const response = await sendPostRequest(new TeacherGetInfoMessage());
+        const response = await sendPostRequest(new UserGetInfoMessage("teacher", teacherUsername));
         if (response.isError) {
             setErrorMessage(response.error);
             setTeacherName('');
@@ -64,7 +64,7 @@ export function TeacherDashboard() {
             name: teacherName,
             department: teacherDepartment
         };
-        const response = await sendPostRequest(new TeacherSetInfoMessage(updatedInfo));
+        const response = await sendPostRequest(new UserSetInfoMessage("teacher", teacherUsername, updatedInfo));
         if (response.isError) {
             setErrorMessage(response.error);
         } else {

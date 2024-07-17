@@ -1,8 +1,0 @@
-
-.response {
-    opacity: 1;
-    transition: opacity 0.5s ease-out;
-    justify-content: center;
-    color: green;
-    /*text-align: center; Adjust 2s to control the speed of the fade */
-}

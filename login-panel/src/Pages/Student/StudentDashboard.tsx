@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage';
-import { StudentGetInfoMessage } from 'Plugins/StudentAPI/StudentGetInfoMessage';
-import { StudentSetInfoMessage } from 'Plugins/StudentAPI/StudentSetInfoMessage';
+import { UserGetInfoMessage } from 'Plugins/UserAPI/UserGetInfoMessage';
+import { UserSetInfoMessage } from 'Plugins/UserAPI/UserSetInfoMessage';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { StudentLayout } from 'Components/Student/StudentLayout';
@@ -25,7 +25,7 @@ export function StudentDashboard() {
     }, []);
 
     const fetchStudentInfo = async () => {
-        const response = await sendPostRequest(new StudentGetInfoMessage());
+        const response = await sendPostRequest(new UserGetInfoMessage("student", studentName));
         if (response.isError) {
             setErrorMessage(response.error);
             setStudentName('');
@@ -64,7 +64,7 @@ export function StudentDashboard() {
             name: studentName,
             address: studentAddress
         };
-        const response = await sendPostRequest(new StudentSetInfoMessage(updatedInfo));
+        const response = await sendPostRequest(new UserSetInfoMessage("student", studentUsername, updatedInfo));
         if (response.isError) {
             setErrorMessage(response.error);
         } else {
