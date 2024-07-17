@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
-import { sendCourseListRequest, Course } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendCourseListRequest, sendPostRequest, Course } from 'Plugins/CommonUtils/SendPostRequest';
 import { TeacherGetCourseListMessage } from 'Plugins/TeacherAPI/TeacherGetCourseListMessage';
+import { TeacherEndPreRegisterMessage } from 'Plugins/TeacherAPI/TeacherEndPreRegisterMessage';
 import { TeacherLayout } from 'Components/Teacher/TeacherLayout';
-import { FaSync, FaSort, FaSearch } from 'react-icons/fa';
+import { FaSync, FaSort, FaSearch, FaStop } from 'react-icons/fa';
 
 type SortColumn = keyof Course;
 type SortDirection = 'asc' | 'desc';
@@ -85,6 +86,15 @@ export function TeacherMyCourse(): JSX.Element {
 
     const filteredAndSortedCourses = filterCourses(sortedCourses);
 
+    const handleEndPreRegister = async (courseId: number) => {
+        const response = await sendPostRequest(new TeacherEndPreRegisterMessage(courseId));
+        if (response.isError) {
+            setErrorMessage(response.error);
+        } else {
+            getCourses(); // Refresh the course list
+        }
+    };
+
     return (
         <TeacherLayout>
             <div className="space-y-6">
@@ -132,10 +142,10 @@ export function TeacherMyCourse(): JSX.Element {
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                {['courseid', 'courseName', 'capacity', 'credits', 'info', 'courseHour', 'classroomid', 'enrolledStudents'].map((column) => (
+                                {['courseid', 'courseName', 'capacity', 'credits', 'info', 'courseHour', 'classroomid', 'enrolledStudents', 'status', 'action'].map((column) => (
                                     <th
                                         key={column}
-                                        onClick={() => handleSort(column as SortColumn)}
+                                        onClick={() => column !== 'action' && handleSort(column as SortColumn)}
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
                                     >
                                         <div className="flex items-center">
@@ -157,6 +167,18 @@ export function TeacherMyCourse(): JSX.Element {
                                     <td className="px-6 py-4 whitespace-nowrap">{course.courseHour.join(', ')}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.classroomid}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudents.length}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.status}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {course.status === 'preregister' && (
+                                            <button
+                                                onClick={() => handleEndPreRegister(course.courseid)}
+                                                className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
+                                                title="End Preregister"
+                                            >
+                                                <FaStop />
+                                            </button>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>

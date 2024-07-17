@@ -54,7 +54,7 @@ object Init {
            |  all_students,
            |  status
            |)
-           |VALUES (1, 'a', 'a', 'a', 2, 'a', '[1]', -1, 1, '[]', '[]', 'preregister')
+           |VALUES (1, 'a', 'a', 'a', 3, 'a', '[]', -1, 1, '[]', '[]', 'preregister')
            |ON CONFLICT (courseid) DO NOTHING
          """.stripMargin, List()
       )
@@ -74,7 +74,7 @@ object Init {
            |  all_students,
            |  status
            |)
-           |VALUES (2, 'b', 'a', 'a', 2, 'b', '[1]', -1, 1, '[]', '[]', 'open')
+           |VALUES (2, 'b', 'a', 'a', 2, 'b', '[]', -1, 1, '[]', '[]', 'open')
            |ON CONFLICT (courseid) DO NOTHING
          """.stripMargin, List()
       )
