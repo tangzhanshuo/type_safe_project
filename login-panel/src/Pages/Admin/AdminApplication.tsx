@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { API } from 'Plugins/CommonUtils/API';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import Auth from 'Plugins/CommonUtils/AuthState'
 import { logout } from 'Plugins/CommonUtils/UserManager'
 import { AdminDeleteApplicationMessage } from 'Plugins/AdminAPI/AdminDeleteApplicationMessage'
@@ -9,14 +9,16 @@ import { AdminApproveApplicationMessage } from 'Plugins/AdminAPI/AdminApproveApp
 import { AdminRejectApplicationMessage } from 'Plugins/AdminAPI/AdminRejectApplicationMessage'
 import { AdminLayout } from 'Components/Admin/AdminLayout';
 import { sendPostRequest, sendApplicationListRequest, Application, Approver } from 'Plugins/CommonUtils/SendPostRequest'
+import {FaSync, FaPlus, FaMinus} from "react-icons/fa";
 
 export function AdminApplication() {
     const history = useHistory();
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [applications, setApplications] = useState<Application[]>([]);
-
+    const [expandedStates, setExpandedStates] = useState<{ [key: string]: boolean }>({});
     useEffect(() => {
+        handleGetFromApprover();
         const { usertype, username, token } = Auth.getState();
         if (!usertype || !username || !token) {
             history.push('/login');
@@ -25,6 +27,14 @@ export function AdminApplication() {
             history.push('/');
         }
     }, [history]);
+
+    const toggleExpand = (applicationID: string) => {
+        // Toggle the expansion state for the given application ID
+        setExpandedStates(prevState => ({
+            ...prevState,
+            [applicationID]: !prevState[applicationID]
+        }));
+    };
 
     const handleDelete = async (applicationID: string) => {
         const message = new AdminDeleteApplicationMessage(applicationID);
@@ -108,8 +118,12 @@ export function AdminApplication() {
                     {errorMessage && <div className="mb-4 text-red-500 dark:text-red-400">{errorMessage}</div>}
                     {successMessage && <div className="mb-4 text-green-500 dark:text-green-400">{successMessage}</div>}
                     <div className="mb-4">
-                        <button onClick={handleGetFromApprover} className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                            Refresh Applications
+                        <button
+                            onClick={handleGetFromApprover}
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded transition duration-300 hover:scale-105"
+                            title="Refresh information"
+                        >
+                            <FaSync />
                         </button>
                     </div>
 
@@ -127,9 +141,6 @@ export function AdminApplication() {
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Application Type</th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Info</th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Approver 1</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Approver 2</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Approver 3</th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                                     </tr>
                                     </thead>
@@ -139,15 +150,55 @@ export function AdminApplication() {
                                             <td className="px-6 py-4 whitespace-nowrap">{app.usertype}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{app.username}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{app.applicationType}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{app.info}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {!expandedStates[app.applicationID] ? (
+                                                    <button className="text-green-500 hover:text-green-600"
+                                                            onClick={() => toggleExpand(app.applicationID)}
+                                                            style={{display: 'inline-block', cursor: 'pointer'}}>
+                                                        <FaPlus/> {/* Use an actual icon component */}
+                                                    </button>
+                                                ) : (
+                                                    <div>
+                                                        <button className="text-red-500 hover:text-red-600"
+                                                                onClick={() => toggleExpand(app.applicationID)} style={{
+                                                            display: 'inline-block',
+                                                            cursor: 'pointer',
+                                                            marginTop: '5px'
+                                                        }}>
+                                                            <FaMinus/>{/* Use an actual icon component */}
+                                                        </button>
+                                                        {(() => {
+                                                            const infoObj = JSON.parse(app.info);
+                                                            const propertiesToShow = ['courseID', 'info', 'credits', 'capacity', 'courseHour', 'courseName', 'classroomID', 'teacherName'];
+                                                            return propertiesToShow.map((prop, index) => (
+                                                                infoObj[prop] ?
+                                                                    <div key={index} style={{marginBottom: '5px'}}>
+                                                                        <strong>{prop}:</strong> {infoObj[prop]}
+                                                                    </div> : null
+                                                            ));
+                                                        })()}
+                                                        <div style={{marginBottom: '5px'}}>
+                                                            <strong>Approver
+                                                                1:</strong> {renderApproverCell(app.approver[0])}
+                                                            <strong>Approver
+                                                                2:</strong> {renderApproverCell(app.approver[1])}
+                                                            <strong>Approver
+                                                                3:</strong> {renderApproverCell(app.approver[2])}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap">{app.status}</td>
-                                            {renderApproverCell(app.approver[0])}
-                                            {renderApproverCell(app.approver[1])}
-                                            {renderApproverCell(app.approver[2])}
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <button onClick={() => handleApprove(app.applicationID)} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 mr-2">Approve</button>
-                                                <button onClick={() => handleReject(app.applicationID)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-2">Reject</button>
-                                                <button onClick={() => handleDelete(app.applicationID)} className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">Delete</button>
+                                                <button onClick={() => handleApprove(app.applicationID)}
+                                                        className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 mr-2">Approve
+                                                </button>
+                                                <button onClick={() => handleReject(app.applicationID)}
+                                                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-2">Reject
+                                                </button>
+                                                <button onClick={() => handleDelete(app.applicationID)}
+                                                        className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
