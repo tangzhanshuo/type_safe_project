@@ -5,7 +5,6 @@ import { StudentInformation } from 'Pages/Admin/AdminCourse/StudentInformation';
 import { AdminClassroomInformation } from 'Pages/Admin/AdminClassroomInformation';
 import { AdminLayout } from 'Components/Admin/AdminLayout'; // Step 1: Import AdminLayout
 import Auth from 'Plugins/CommonUtils/AuthState';
-import 'Pages/css/AdminCourse.css';
 
 export function AdminCourse() {
     const history = useHistory();

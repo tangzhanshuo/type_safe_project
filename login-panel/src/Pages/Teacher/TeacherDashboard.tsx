@@ -1,43 +1,44 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { TeacherGetCourseListMessage } from 'Plugins/TeacherAPI/TeacherGetCourseListMessage';
+import { TeacherGetInfoMessage } from 'Plugins/TeacherAPI/TeacherGetInfoMessage';
+import { TeacherSetInfoMessage } from 'Plugins/TeacherAPI/TeacherSetInfoMessage';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { TeacherLayout } from 'Components/Teacher/TeacherLayout';
 import { FaSync } from 'react-icons/fa';
-import axios, { isAxiosError } from 'axios';
-import { API } from 'Plugins/CommonUtils/API';
-import { ThemeContext } from 'Plugins/CommonUtils/ThemeContext';
-import 'Pages/css/Main.css';
 
 export function TeacherDashboard() {
     const [teacherUsername, setTeacherUsername] = useState('');
-    const [teacherInfo, setTeacherInfo] = useState('info');
+    const [teacherName, setTeacherName] = useState('');
+    const [teacherDepartment, setTeacherDepartment] = useState('');
     const [selectedCoursesCount, setSelectedCoursesCount] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
     const history = useHistory();
-    const { darkMode } = useContext(ThemeContext);
 
     useEffect(() => {
-        // Assuming username and password are stored in localStorage
-        const { usertype, username, token } = Auth.getState();
-
-        if (!usertype || !username || !token) {
-            // Redirect to login page
-            history.push('/login');
-        }
-        else if (usertype !== 'teacher') {
-            history.push('/');
-        }
+        const username = Auth.getState().username;
+        setTeacherUsername(username);
+        fetchTeacherInfo();
+        fetchSelectedCoursesCount(username);
     }, []);
 
-    useEffect(() => {
-        setTeacherUsername(Auth.getState().username);
-        fetchSelectedCoursesCount();
-    }, []);
+    const fetchTeacherInfo = async () => {
+        const response = await sendPostRequest(new TeacherGetInfoMessage());
+        if (response.isError) {
+            setErrorMessage(response.error);
+            setTeacherName('');
+            setTeacherDepartment('');
+        } else {
+            const info = response.data;
+            setTeacherName(info.name || '');
+            setTeacherDepartment(info.department || '');
+            setErrorMessage('');
+        }
+    };
 
-    const fetchSelectedCoursesCount = async () => {
+    const fetchSelectedCoursesCount = async (username: string) => {
         const response = await sendPostRequest(new TeacherGetCourseListMessage());
         if (response.isError) {
             if (response.error.startsWith("No courses found")) {
@@ -58,9 +59,25 @@ export function TeacherDashboard() {
         }
     }
 
-    const handleSaveInfo = () => {
-        console.log('Saving teacher info:', teacherInfo);
-        // Here you would typically send a request to update the info in the backend
+    const handleSaveInfo = async () => {
+        const updatedInfo = {
+            name: teacherName,
+            department: teacherDepartment
+        };
+        const response = await sendPostRequest(new TeacherSetInfoMessage(updatedInfo));
+        if (response.isError) {
+            setErrorMessage(response.error);
+        } else {
+            console.log('Teacher info saved successfully');
+            setErrorMessage('');
+            // Refresh the teacher info after saving
+            await fetchTeacherInfo();
+        }
+    }
+
+    const handleRefresh = () => {
+        fetchTeacherInfo();
+        fetchSelectedCoursesCount(teacherUsername);
     }
 
     return (
@@ -70,15 +87,38 @@ export function TeacherDashboard() {
 
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                     <h3 className="text-xl font-semibold mb-4">Teacher Information</h3>
-                    <input
-                        type="text"
-                        value={teacherInfo}
-                        onChange={(e) => setTeacherInfo(e.target.value)}
-                        className="w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                    />
+                    <p className="mb-4 text-gray-600 dark:text-gray-400">
+                        Please review and update your professional information below. This information is used for official university records and communications.
+                    </p>
+                    <div className="space-y-4">
+                        <div>
+                            <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                                Enter your full name as it should appear in official documents.
+                            </p>
+                            <input
+                                id="name"
+                                type="text"
+                                value={teacherName}
+                                onChange={(e) => setTeacherName(e.target.value)}
+                                className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            />
+                        </div>
+                        <div>
+                            <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                                Provide your current department. This information is used for administrative purposes.
+                            </p>
+                            <input
+                                id="department"
+                                type="text"
+                                value={teacherDepartment}
+                                onChange={(e) => setTeacherDepartment(e.target.value)}
+                                className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            />
+                        </div>
+                    </div>
                     <button
                         onClick={handleSaveInfo}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                        className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
                     >
                         Save Info
                     </button>
@@ -88,9 +128,9 @@ export function TeacherDashboard() {
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-xl font-semibold">Course Information</h3>
                         <button
-                            onClick={fetchSelectedCoursesCount}
+                            onClick={handleRefresh}
                             className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded transition duration-300"
-                            title="Refresh course information"
+                            title="Refresh information"
                         >
                             <FaSync />
                         </button>
@@ -99,7 +139,6 @@ export function TeacherDashboard() {
                 </div>
 
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-
             </div>
         </TeacherLayout>
     );

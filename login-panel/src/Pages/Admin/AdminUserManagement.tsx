@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import axios, { isAxiosError, AxiosResponse, AxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
-import 'Pages/css/Main.css'; // Import the CSS file
 import { sendUserRequest } from 'Plugins/CommonUtils/UserManager'
 import Auth from 'Plugins/CommonUtils/AuthState'
 import { AdminLayout } from 'Components/Admin/AdminLayout';

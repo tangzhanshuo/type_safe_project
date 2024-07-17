@@ -1,22 +1,18 @@
 import { TeacherMessage } from 'Plugins/TeacherAPI/TeacherMessage'
 
 export class TeacherAddCourseMessage extends TeacherMessage {
-    courseID: number;
     courseName: string;
-    teacherName: string;
     capacity: number;
     info: string;
-    courseHour: string;
+    courseHour: number[];
     classroomID: number;
     credits: number;
 
-    constructor(courseID: number, courseName: string, teacherName: string, capacity: number, info: string, courseHour: string,
+    constructor(courseName: string, capacity: number, info: string, courseHour: number[],
                 classroomID: number,
                 credits: number,) {
         super();
-        this.courseID = courseID;
         this.courseName = courseName;
-        this.teacherName = teacherName;
         this.capacity = capacity;
         this.info = info;
         this.courseHour = courseHour;
