@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { API } from 'Plugins/CommonUtils/API';
 import { useHistory } from 'react-router-dom';
 import 'Pages/css/Main.css';
 import Auth from 'Plugins/CommonUtils/AuthState'
@@ -7,7 +8,24 @@ import { AdminDeleteApplicationMessage } from 'Plugins/AdminAPI/AdminDeleteAppli
 import { AdminGetApplicationFromApproverMessage } from 'Plugins/AdminAPI/AdminGetApplicationFromApproverMessage'
 import { AdminApproveApplicationMessage } from 'Plugins/AdminAPI/AdminApproveApplicationMessage'
 import { AdminRejectApplicationMessage } from 'Plugins/AdminAPI/AdminRejectApplicationMessage'
-import { sendPostRequest, sendApplicationListRequest, Application, Approver } from 'Plugins/CommonUtils/SendPostRequest'
+import { AdminLayout } from 'Components/Admin/AdminLayout';
+import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
+
+interface Approver {
+    approved: boolean;
+    username: string;
+    usertype: 'admin' | 'teacher' | 'student';
+}
+
+interface Application {
+    applicationID: string;
+    usertype: string;
+    username: string;
+    applicationType: string;
+    info: string;
+    approver: Approver[];
+    status: string;
+}
 
 export function AdminApplication() {
     const history = useHistory();
@@ -42,7 +60,7 @@ export function AdminApplication() {
     const handleGetFromApprover = async () => {
         const message = new AdminGetApplicationFromApproverMessage();
 
-        const response = await sendApplicationListRequest(message);
+        const response = await sendPostRequest(message);
         if (!response.isError) {
             // Sort applications by applicationID
             const sortedApplications = response.data.sort((a: Application, b: Application) =>
@@ -91,6 +109,10 @@ export function AdminApplication() {
         }
     };
 
+    const parseApprovers = (approvers: Approver[]): Approver[] => {
+        return approvers || [];
+    };
+
     const renderApproverCell = (approver: Approver | undefined) => {
         if (!approver) return <td>No approver</td>;
         return (
@@ -103,66 +125,67 @@ export function AdminApplication() {
     };
 
     return (
-        <div className="App">
-            <header className="App-header">
-                <h1>AdminApplicationTest</h1>
-            </header>
-            <main className="App-main">
-                {errorMessage && <div className="error-message" style={{color: 'red'}}>{errorMessage}</div>}
-                {successMessage && <div className="success-message" style={{color: 'green'}}>{successMessage}</div>}
-                <div className="button-group">
-                    <button onClick={handleGetFromApprover} className="button">Get Applications</button>
-                    <button onClick={() => logout(history)} className="button">Log out</button>
-                </div>
-
-                {applications.length > 0 && (
-                    <div className="applications-table">
-                        <h2>Applications</h2>
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Application ID</th>
-                                <th>User Type</th>
-                                <th>Username</th>
-                                <th>Application Type</th>
-                                <th>Info</th>
-                                <th>Status</th>
-                                <th>Approver 1</th>
-                                <th>Approver 2</th>
-                                <th>Approver 3</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {applications.map((app) => (
-                                <tr key={app.applicationID}>
-                                    <td>{app.applicationID}</td>
-                                    <td>{app.usertype}</td>
-                                    <td>{app.username}</td>
-                                    <td>{app.applicationType}</td>
-                                    <td>{app.info}</td>
-                                    <td>{app.status}</td>
-                                    {renderApproverCell(app.approver[0])}
-                                    {renderApproverCell(app.approver[1])}
-                                    {renderApproverCell(app.approver[2])}
-                                    <td>
-                                        <button onClick={() => handleApprove(app.applicationID)} className="approve-button">
-                                            Approve
-                                        </button>
-                                        <button onClick={() => handleReject(app.applicationID)} className="reject-button">
-                                            Reject
-                                        </button>
-                                        <button onClick={() => handleDelete(app.applicationID)} className="delete-button">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
+        <AdminLayout>
+            <div className="App dark:bg-gray-900">
+                <main className="App-main">
+                    {errorMessage && <div className="error-message text-red-500 dark:text-pink-500">{errorMessage}</div>}
+                    {successMessage && <div className="success-message text-green-500 dark:text-green-400">{successMessage}</div>}
+                    <div className="button-group">
+                        <button onClick={handleGetFromApprover} className="button refresh-button bg-white dark:bg-gray-700 dark:text-white">
+                            <img src='path/to/light-mode/refresh-icon.svg' alt="Refresh" />
+                        </button>
                     </div>
-                )}
-            </main>
-        </div>
+
+                    {applications.length > 0 && (
+                        <div className="applications-table bg-white dark:bg-gray-800">
+                            <h2>Applications</h2>
+                            <table className="text-gray-900 dark:text-gray-200">
+                                <thead>
+                                <tr>
+                                    <th>User Type</th>
+                                    <th>Username</th>
+                                    <th>Application Type</th>
+                                    <th>Info</th>
+                                    <th>Status</th>
+                                    <th>Approver 1</th>
+                                    <th>Approver 2</th>
+                                    <th>Approver 3</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {applications.map((app) => {
+                                    const approvers = app.approver;
+                                    return (
+                                        <tr key={app.applicationID}>
+                                            <td>{app.usertype}</td>
+                                            <td>{app.username}</td>
+                                            <td>{app.applicationType}</td>
+                                            <td>{app.info}</td>
+                                            <td>{app.status}</td>
+                                            {renderApproverCell(approvers[0])}
+                                            {renderApproverCell(approvers[1])}
+                                            {renderApproverCell(approvers[2])}
+                                            <td>
+                                                <button onClick={() => handleApprove(app.applicationID)} className="approve-button bg-green-500 dark:bg-green-700 text-white">
+                                                    Approve
+                                                </button>
+                                                <button onClick={() => handleReject(app.applicationID)} className="reject-button bg-red-500 dark:bg-red-700 text-white">
+                                                    Reject
+                                                </button>
+                                                <button onClick={() => handleDelete(app.applicationID)} className="delete-button bg-gray-500 dark:bg-gray-700 dark:text-white">
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </main>
+            </div>
+        </AdminLayout>
     );
 }
