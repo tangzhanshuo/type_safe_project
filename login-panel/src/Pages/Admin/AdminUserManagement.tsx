@@ -5,6 +5,8 @@ import { useHistory } from 'react-router-dom';
 import { sendUserRequest } from 'Plugins/CommonUtils/UserManager'
 import Auth from 'Plugins/CommonUtils/AuthState'
 import { AdminLayout } from 'Components/Admin/AdminLayout';
+import { FaUserPlus, FaUserTimes, FaUserEdit } from 'react-icons/fa';
+
 
 export function AdminUserManagement() {
         const history = useHistory();
@@ -46,13 +48,12 @@ export function AdminUserManagement() {
     return (
         <AdminLayout>
             <div className="space-y-6">
-                <h2 className="text-2xl font-bold">Admin User Management</h2>
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                    <div className="input-group">
+                    <div className="input-group flex flex-col space-y-4">
                         <select
                             value={usertype}
                             onChange={(e) => setUsertype(e.target.value)}
-                            className="input-field dark:bg-gray-700 dark:text-white"
+                            className="input-field dark:bg-gray-700 dark:text-white p-2 rounded-md border border-gray-400 focus:border-gray-500"
                         >
                             <option value="">Select Type</option>
                             <option value="admin">Admin</option>
@@ -64,31 +65,31 @@ export function AdminUserManagement() {
                             placeholder="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className="input-field dark:bg-gray-700 dark:text-white"
+                            className="input-field dark:bg-gray-700 dark:text-white p-2 rounded-md border border-gray-400 focus:border-gray-500"
                         />
                         <input
                             type="password"
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="input-field dark:bg-gray-700 dark:text-white"
+                            className="input-field dark:bg-gray-700 dark:text-white p-2 rounded-md border border-gray-400 focus:border-gray-500"
                         />
                     </div>
                     {message && (
                         <p className={messageType === 'success' ? 'text-green-500' : 'text-red-500'}>{message}</p>
                     )}
-                    <div className="button-group mt-4">
+                    <div className="flex items-center space-x-4 p-4">
                         <button onClick={() => handleUserAction('register', usertype, username, password)}
-                                className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded transition duration-300">
-                            Register
+                                className="bg-blue-400 hover:bg-blue-500 text-gray-100 font-semibold py-2 px-4 rounded-full shadow transition ease-in-out duration-500 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white flex items-center justify-center">
+                            <FaUserPlus className="pr-2" size="24"/> <span>Create Account</span>
                         </button>
                         <button onClick={() => handleUserAction('delete', usertype, username, password)}
-                                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300 ml-2">
-                            Delete
+                                className="bg-red-400 hover:bg-red-500 text-gray-100 font-semibold py-2 px-4 rounded-full shadow transition ease-in-out duration-500 dark:bg-red-500 dark:hover:bg-red-600 dark:text-white flex items-center justify-center">
+                            <FaUserTimes className="pr-2" size="24"/> <span>Remove User</span>
                         </button>
                         <button onClick={() => handleUserAction('update', usertype, username, password)}
-                                className="bg-yellow-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300 ml-2">
-                            Update
+                                className="bg-green-500 hover:bg-green-600 text-gray-100 font-semibold py-2 px-4 rounded-full shadow transition ease-in-out duration-500 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white flex items-center justify-center">
+                            <FaUserEdit className="pr-2" size="24"/> <span>Modify Details</span>
                         </button>
                     </div>
                 </div>

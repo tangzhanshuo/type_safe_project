@@ -20,7 +20,7 @@ import { AdminApplication } from 'Pages/Admin/AdminApplication'
 import { StudentDashboard } from 'Pages/Student/StudentDashboard'
 import { StudentMyCourse } from 'Pages/Student/StudentMyCourse'
 import { AdminDashboard } from 'Pages/Admin/AdminDashboard'
-import {AdminClassroomInformation} from "Pages/Admin/AdminClassroomInformation";
+import {AdminClassroom} from "Pages/Admin/AdminClassroom";
 import { NotFoundPage } from 'Pages/NotFoundPage'
 
 
@@ -44,7 +44,7 @@ const Layout = () => {
                     <Route path="/teacher/courseList" exact component={TeacherCourseList} />
                     <Route path="/admin/dashboard" exact component={AdminDashboard} />
                     <Route path="/admin/userManagement" exact component={AdminUserManagement} />
-                    <Route path="/admin/classroom" exact component={AdminClassroomInformation} />
+                    <Route path="/admin/classroom" exact component={AdminClassroom} />
                     <Route path="/admin/course/addCourse" exact component={AdminAddCourse} />
                     <Route path="/admin/course/searchCourse" exact component={AdminSearchCourse} />
                     <Route path="/admin/application" exact component={AdminApplication} />

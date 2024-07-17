@@ -9,7 +9,7 @@ import { AdminApproveApplicationMessage } from 'Plugins/AdminAPI/AdminApproveApp
 import { AdminRejectApplicationMessage } from 'Plugins/AdminAPI/AdminRejectApplicationMessage'
 import { AdminLayout } from 'Components/Admin/AdminLayout';
 import { sendPostRequest, sendApplicationListRequest, Application, Approver } from 'Plugins/CommonUtils/SendPostRequest'
-import {FaSync, FaPlus, FaMinus} from "react-icons/fa";
+import { FaSync, FaPlus, FaMinus } from "react-icons/fa";
 
 export function AdminApplication() {
     const history = useHistory();
@@ -115,9 +115,9 @@ export function AdminApplication() {
         <AdminLayout>
             <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
                 <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    {errorMessage && <div className="mb-4 text-red-500 dark:text-red-400">{errorMessage}</div>}
-                    {successMessage && <div className="mb-4 text-green-500 dark:text-green-400">{successMessage}</div>}
-                    <div className="mb-4">
+                    <div className="flex items-center justify-between mb-4">
+                        {errorMessage && <div className="text-red-500 dark:text-red-400">{errorMessage}</div>}
+                        {successMessage && <div className="text-green-500 dark:text-green-400">{successMessage}</div>}
                         <button
                             onClick={handleGetFromApprover}
                             className="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded transition duration-300 hover:scale-105"
@@ -136,15 +136,30 @@ export function AdminApplication() {
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                     <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User Type</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Username</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Application Type</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Info</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User
+                                            Type
+                                        </th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Username
+                                        </th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Application
+                                            Type
+                                        </th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Info
+                                        </th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status
+                                        </th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions
+                                        </th>
                                     </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                    <tbody
+                                        className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                     {applications.map((app) => (
                                         <tr key={app.applicationID}>
                                             <td className="px-6 py-4 whitespace-nowrap">{app.usertype}</td>
