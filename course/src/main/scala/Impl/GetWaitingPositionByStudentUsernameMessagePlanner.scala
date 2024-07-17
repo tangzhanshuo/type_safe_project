@@ -29,28 +29,34 @@ case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: St
           val credits = row.hcursor.get[Int]("credits").getOrElse(0)
           val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledStudents").getOrElse("[]")
           val allStudentsJsonString = row.hcursor.get[String]("allStudents").getOrElse("[]")
+          val status = row.hcursor.get[String]("status").getOrElse("")
           val enrolledStudents = parse(enrolledStudentsJsonString).flatMap(_.as[List[Map[String, Json]]]).getOrElse(Nil)
           val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[Map[String, Json]]]).getOrElse(Nil)
 
-          val course = Course(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, List.empty, List.empty)
+          val course = Course(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, List.empty, List.empty, status)
 
-          // 检查学生是否在enrolledstudents中但在allstudents中
-          val isEnrolled = enrolledStudents.exists(_("studentUsername").as[String].contains(studentUsername))
-          val isInAllStudents = allStudents.exists(_("studentUsername").as[String].contains(studentUsername))
+          // Check if the course status is not "preregister"
+          if (status != "preregister") {
+            // Check if the student is in enrolledstudents or allstudents
+            val isEnrolled = enrolledStudents.exists(_("studentUsername").as[String].contains(studentUsername))
+            val isInAllStudents = allStudents.exists(_("studentUsername").as[String].contains(studentUsername))
 
-          if (isEnrolled) {
-            // 如果学生在enrolledstudents中，位置返回0
-            Some(CourseWaitingPosition(course, List.fill(9)(0), 0))
-          } else if (isInAllStudents) {
-            // 计算等待列表中该学生的位置
-            val waitingList = allStudents.filterNot(student => enrolledStudents.exists(_("studentUsername") == student("studentUsername")))
-            val position = waitingList.indexWhere(_("studentUsername").as[String].contains(studentUsername))
+            if (isEnrolled) {
+              // If the student is in enrolledstudents, position is 0
+              Some(CourseWaitingPosition(course, List.fill(9)(0), 0))
+            } else if (isInAllStudents) {
+              // Calculate the student's position in the waiting list
+              val waitingList = allStudents.filterNot(student => enrolledStudents.exists(_("studentUsername") == student("studentUsername")))
+              val position = waitingList.indexWhere(_("studentUsername").as[String].contains(studentUsername))
 
-            // 计算优先级统计
-            val priorityCounts = waitingList.groupBy(_("priority").as[Int].getOrElse(0)).mapValues(_.size).toMap
-            val priorityList = (0 to 8).map(priorityCounts.getOrElse(_, 0)).toList
+              // Calculate priority statistics
+              val priorityCounts = waitingList.groupBy(_("priority").as[Int].getOrElse(0)).mapValues(_.size).toMap
+              val priorityList = (0 to 8).map(priorityCounts.getOrElse(_, 0)).toList
 
-            Some(CourseWaitingPosition(course, priorityList, position))
+              Some(CourseWaitingPosition(course, priorityList, position))
+            } else {
+              None
+            }
           } else {
             None
           }

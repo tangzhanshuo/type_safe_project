@@ -10,9 +10,6 @@ import Common.DBAPI.{writeDB, readDBBoolean, readDBInt, readDBString}
 import Common.Object.{SqlParameter, EnrolledStudent, AllStudent, Course}
 import Common.DBAPI.WriteDBMessage
 
-// Define the encoder for WriteDBMessage
-
-
 case class AddCourseMessagePlanner(
                                     courseName: String,
                                     teacherUsername: String,
@@ -54,8 +51,8 @@ case class AddCourseMessagePlanner(
 
     def addCourseToDB(): IO[Unit] = writeDB(s"""
       INSERT INTO course (
-        course_name, teacher_username, teacher_name, capacity, info, course_hour, classroomid, credits, enrolled_students, all_students
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        course_name, teacher_username, teacher_name, capacity, info, course_hour, classroomid, credits, enrolled_students, all_students, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """.stripMargin,
       List(
         SqlParameter("string", courseName),
@@ -67,14 +64,15 @@ case class AddCourseMessagePlanner(
         SqlParameter("int", classroomid.toString),
         SqlParameter("int", credits.toString),
         SqlParameter("jsonb", enrolledStudents.asJson.noSpaces),
-        SqlParameter("jsonb", allStudents.asJson.noSpaces)
+        SqlParameter("jsonb", allStudents.asJson.noSpaces),
+        SqlParameter("string", "preregister") // Add the default status
       )
     ).void
 
     def getCourseid(): IO[Int] = readDBInt(s"""
       SELECT courseid FROM course
       WHERE course_name = ? AND teacher_username = ? AND teacher_name = ? AND capacity = ?
-        AND info = ? AND classroomid = ? AND credits = ?
+        AND info = ? AND classroomid = ? AND credits = ? AND status = ?
       ORDER BY courseid DESC
       LIMIT 1
     """.stripMargin,
@@ -85,7 +83,8 @@ case class AddCourseMessagePlanner(
         SqlParameter("int", capacity.toString),
         SqlParameter("string", info),
         SqlParameter("int", classroomid.toString),
-        SqlParameter("int", credits.toString)
+        SqlParameter("int", credits.toString),
+        SqlParameter("string", "preregister") // Add the status to the query
       )
     )
 
@@ -131,7 +130,8 @@ case class AddCourseMessagePlanner(
               classroomid,
               credits,
               enrolledStudents,
-              allStudents
+              allStudents,
+              "preregister" // Add the default status to the returned Course object
             )
 
           case (Left(courseHourError), _, _) => IO.raiseError(courseHourError)
@@ -142,4 +142,3 @@ case class AddCourseMessagePlanner(
     }
   }
 }
-

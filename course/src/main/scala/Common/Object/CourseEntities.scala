@@ -28,7 +28,8 @@ case class Course(
                    classroomid: Int,
                    credits: Int,
                    enrolledStudents: List[EnrolledStudent],
-                   allStudents: List[AllStudent]
+                   allStudents: List[AllStudent],
+                   status: String
                  )
 object Course {
   implicit val courseEncoder: Encoder[Course] = deriveEncoder

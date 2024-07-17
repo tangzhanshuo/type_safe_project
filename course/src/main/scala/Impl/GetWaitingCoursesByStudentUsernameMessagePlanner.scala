@@ -36,15 +36,16 @@ case class GetWaitingCoursesByStudentUsernameMessagePlanner(studentUsername: Str
           courseHour <- decode[List[Int]](courseHourStr).toOption
           classroomID <- cursor.get[Int]("classroomid").toOption
           credits <- cursor.get[Int]("credits").toOption
+          status <- cursor.get[String]("status").toOption
         } yield {
           val isEnrolled = enrolledStudents.exists(_.studentUsername == studentUsername)
-          if (!isEnrolled) {
+          if (!isEnrolled && status != "preregister") {
             val sortedAllStudents = allStudents.sortBy(_.time)
             val positionInAllStudents = sortedAllStudents.indexWhere(_.studentUsername == studentUsername)
             if (positionInAllStudents >= 0) {
               val waitingPosition = positionInAllStudents - capacity
               Some(WaitingCourse(
-                Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents),
+                Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents, status),
                 waitingPosition
               ))
             } else {

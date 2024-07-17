@@ -31,7 +31,8 @@ case class GetCourseByTeacherUsernameMessagePlanner(teacherUsername: String, ove
             enrolledStudents <- decode[List[EnrolledStudent]](enrolledStudentsStr).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
             allStudentsStr <- cursor.get[String]("allStudents").toOption.toRight(new Exception("Missing allStudents"))
             allStudents <- decode[List[AllStudent]](allStudentsStr).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
-          } yield Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents)
+            status <- cursor.get[String]("status").toOption.toRight(new Exception("Missing status"))
+          } yield Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents, status)
         }
         coursesIO.sequence match {
           case Left(error) => IO.raiseError(error)

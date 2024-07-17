@@ -11,7 +11,7 @@ import cats.implicits.*
 
 case class GetCourseByCourseNameMessagePlanner(courseName: String, override val planContext: PlanContext) extends Planner[List[Course]] {
   override def plan(using planContext: PlanContext): IO[List[Course]] = {
-    val query = "SELECT * FROM course WHERE teacher_username = ?"
+    val query = "SELECT * FROM course WHERE course_name = ?"
     readDBRows(query, List(SqlParameter("string", courseName))).flatMap { rows =>
       if (rows.nonEmpty) {
         val coursesIO = rows.map { row =>
@@ -31,14 +31,15 @@ case class GetCourseByCourseNameMessagePlanner(courseName: String, override val 
             enrolledStudents <- decode[List[EnrolledStudent]](enrolledStudentsStr).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
             allStudentsStr <- cursor.get[String]("allStudents").toOption.toRight(new Exception("Missing allStudents"))
             allStudents <- decode[List[AllStudent]](allStudentsStr).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
-          } yield Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents)
+            status <- cursor.get[String]("status").toOption.toRight(new Exception("Missing status"))
+          } yield Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents, status)
         }
         coursesIO.sequence match {
           case Left(error) => IO.raiseError(error)
           case Right(courses) => IO.pure(courses)
         }
       } else {
-        IO.raiseError(new NoSuchElementException(s"No courses found with teacherUsername: $courseName"))
+        IO.raiseError(new NoSuchElementException(s"No courses found with courseName: $courseName"))
       }
     }
   }

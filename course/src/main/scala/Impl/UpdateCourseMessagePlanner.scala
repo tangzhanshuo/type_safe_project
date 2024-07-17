@@ -17,11 +17,9 @@ case class UpdateCourseMessagePlanner(
                                        teacherName: Option[String],
                                        capacity: Option[Int],
                                        info: Option[String],
-                                       courseHours: Option[List[Int]], // 直接使用 List[Int] 类型
+                                       courseHours: Option[List[Int]],
                                        classroomid: Option[Int],
                                        credits: Option[Int],
-                                       enrolledStudents: Option[List[EnrolledStudent]], // 直接使用 List[EnrolledStudent] 类型
-                                       allStudents: Option[List[AllStudent]], // 直接使用 List[AllStudent] 类型
                                        override val planContext: PlanContext
                                      ) extends Planner[Course] {
   override def plan(using planContext: PlanContext): IO[Course] = {
@@ -78,8 +76,9 @@ case class UpdateCourseMessagePlanner(
           val updatedCourseName = courseName.orElse(cursor.get[String]("courseName").toOption)
           val updatedTeacherUsername = teacherUsername.orElse(cursor.get[String]("teacherUsername").toOption)
           val updatedTeacherName = teacherName.orElse(cursor.get[String]("teacherName").toOption)
-          val updatedCapacity = capacity.orElse(cursor.get[Int]("capacity").toOption)
+          val currentCapacity = cursor.get[Int]("capacity").getOrElse(0)
           val updatedInfo = info.orElse(cursor.get[String]("info").toOption)
+          val currentStatus = cursor.get[String]("status").getOrElse("")
 
           val updatedCourseHours = courseHours.orElse(
             for {
@@ -91,122 +90,101 @@ case class UpdateCourseMessagePlanner(
           val updatedClassroomid = classroomid.orElse(cursor.get[Int]("classroomid").toOption)
           val updatedCredits = credits.orElse(cursor.get[Int]("credits").toOption)
 
-          val updatedEnrolledStudents = enrolledStudents.orElse(
-            for {
-              enrolledStudentsStr <- cursor.get[String]("enrolledStudents").toOption
-              decodedEnrolledStudents <- decode[List[EnrolledStudent]](enrolledStudentsStr).toOption
-            } yield decodedEnrolledStudents
-          )
+          val currentEnrolledStudentsStr = cursor.get[String]("enrolledStudents").getOrElse("[]")
+          val currentAllStudentsStr = cursor.get[String]("allStudents").getOrElse("[]")
+          val currentEnrolledStudents = decode[List[EnrolledStudent]](currentEnrolledStudentsStr).getOrElse(Nil)
+          val currentAllStudents = decode[List[AllStudent]](currentAllStudentsStr).getOrElse(Nil)
 
-          val updatedAllStudents = allStudents.orElse(
-            for {
-              allStudentsStr <- cursor.get[String]("allStudents").toOption
-              decodedAllStudents <- decode[List[AllStudent]](allStudentsStr).toOption
-            } yield decodedAllStudents
-          )
-
-          // Validate the JSON strings by parsing them
-          val courseHourValidation = updatedCourseHours.map(hours => parse(hours.asJson.noSpaces).left.map(e => new Exception(s"Invalid JSON for courseHours: ${e.getMessage}"))).sequence
-          val enrolledStudentsValidation = updatedEnrolledStudents.map(students => parse(students.asJson.noSpaces).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))).sequence
-          val allStudentsValidation = updatedAllStudents.map(students => parse(students.asJson.noSpaces).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))).sequence
-
-          (courseHourValidation, enrolledStudentsValidation, allStudentsValidation) match {
-            case (Right(_), Right(_), Right(_)) =>
-              val checkConflictAndCapacityIO = for {
-                existingCourses <- updatedClassroomid.map(getClassroomEnrolledCourses).getOrElse(IO.pure(Map.empty[Int, List[Int]]))
-                conflict = updatedCourseHours.exists(hours => checkCourseHourConflict(existingCourses, hours))
-                classroomCapacity <- updatedClassroomid.map(getClassroomCapacity).getOrElse(IO.pure(0))
-                _ <- if (conflict && updatedClassroomid.exists(_ >= 0)) IO.raiseError(new Exception("Course hour conflict detected for the given classroom")) else IO.unit
-                _ <- if (classroomCapacity > 0 && updatedCapacity.exists(_ > classroomCapacity)) IO.raiseError(new Exception("Classroom capacity exceeded")) else IO.unit
-              } yield existingCourses
-
-              checkConflictAndCapacityIO.flatMap { existingCourses =>
-                val updatedEnrolledCourses = updatedClassroomid match {
-                  case Some(id) => existingCourses + (courseid -> updatedCourseHours.getOrElse(Nil))
-                  case _ => existingCourses
-                }
-
-                val updates = List(
-                  updatedCourseName.map(_ => "course_name = ?"),
-                  updatedTeacherUsername.map(_ => "teacher_username = ?"),
-                  updatedTeacherName.map(_ => "teacher_name = ?"),
-                  updatedCapacity.map(_ => "capacity = ?"),
-                  updatedInfo.map(_ => "info = ?"),
-                  updatedCourseHours.map(_ => "course_hour = ?"),
-                  updatedClassroomid.map(_ => "classroomid = ?"),
-                  updatedCredits.map(_ => "credits = ?"),
-                  updatedEnrolledStudents.map(_ => "enrolled_students = ?"),
-                  updatedAllStudents.map(_ => "all_students = ?")
-                ).flatten.mkString(", ")
-
-                val params = List(
-                  updatedCourseName.map(SqlParameter("string", _)),
-                  updatedTeacherUsername.map(SqlParameter("string", _)),
-                  updatedTeacherName.map(SqlParameter("string", _)),
-                  updatedCapacity.map(c => SqlParameter("int", c.toString)),
-                  updatedInfo.map(SqlParameter("string", _)),
-                  updatedCourseHours.map(hours => SqlParameter("jsonb", hours.asJson.noSpaces)),
-                  updatedClassroomid.map(c => SqlParameter("int", c.toString)),
-                  updatedCredits.map(c => SqlParameter("int", c.toString)),
-                  updatedEnrolledStudents.map(students => SqlParameter("jsonb", students.asJson.noSpaces)),
-                  updatedAllStudents.map(students => SqlParameter("jsonb", students.asJson.noSpaces)),
-                  Some(SqlParameter("int", courseid.toString))
-                ).flatten
-
-                val updateClassroomsIO: IO[Unit] = {
-                  val removeOldClassroom: IO[Unit] =
-                    if (updatedClassroomid.isDefined && updatedClassroomid != cursor.get[Int]("classroomid").toOption) {
-                      getClassroomEnrolledCourses(cursor.get[Int]("classroomid").getOrElse(0)).flatMap { oldClassroomCourses =>
-                        removeCourseFromClassroom(cursor.get[Int]("classroomid").getOrElse(0), oldClassroomCourses)
-                      }
-                    } else IO.unit
-
-                  val updateNewClassroom: IO[Unit] =
-                    updatedClassroomid.map { classroomid =>
-                      updateClassroomEnrolledCourses(classroomid, updatedEnrolledCourses)
-                    }.getOrElse(IO.unit)
-
-                  removeOldClassroom *> updateNewClassroom
-                }
-
-                val rearrangeStudents = for {
-                  allStudents <- updatedAllStudents.map(IO.pure).getOrElse(IO.pure(List.empty[AllStudent]))
-                  sortedAllStudents = allStudents.sortBy(_.time)
-                  finalEnrolledStudents = sortedAllStudents.take(updatedCapacity.getOrElse(cursor.get[Int]("capacity").getOrElse(0))).map { student =>
-                    EnrolledStudent(student.time, student.priority, student.studentUsername)
-                  }
-                  finalEnrolledStudentsJsonString = finalEnrolledStudents.asJson.noSpaces
-                } yield (finalEnrolledStudents, finalEnrolledStudentsJsonString)
-
-                rearrangeStudents.flatMap { case (finalEnrolledStudents, finalEnrolledStudentsJsonString) =>
-                  val updateEnrolledStudentsQuery = "UPDATE course SET enrolled_students = ? WHERE courseid = ?"
-                  writeDB(updateCourseQuery.format(updates), params).flatMap { result =>
-                    updateClassroomsIO.map(_ => result)
-                  }.flatMap { _ =>
-                    writeDB(updateEnrolledStudentsQuery, List(
-                      SqlParameter("jsonb", finalEnrolledStudentsJsonString),
-                      SqlParameter("int", courseid.toString)
-                    )).map(_ => Course(
-                      courseid,
-                      updatedCourseName.getOrElse(""),
-                      updatedTeacherUsername.getOrElse(""),
-                      updatedTeacherName.getOrElse(""),
-                      updatedCapacity.getOrElse(0),
-                      updatedInfo.getOrElse(""),
-                      updatedCourseHours.getOrElse(Nil),
-                      updatedClassroomid.getOrElse(0),
-                      updatedCredits.getOrElse(0),
-                      finalEnrolledStudents,
-                      updatedAllStudents.getOrElse(Nil)
-                    ))
-                  }
-                }
-
+          // Handle capacity update
+          val (updatedCapacity, updatedStatus, updatedEnrolledStudents) = capacity match {
+            case Some(newCapacity) =>
+              if (currentStatus == "preregister") {
+                (Some(newCapacity), currentStatus, currentEnrolledStudents)
+              } else if (newCapacity < currentEnrolledStudents.size) {
+                return IO.raiseError(new Exception("New capacity is less than the current number of enrolled students"))
+              } else if (newCapacity == currentEnrolledStudents.size) {
+                (Some(newCapacity), "closed", currentEnrolledStudents)
+              } else {
+                val sortedAllStudents = currentAllStudents.sortBy(_.time)
+                val newEnrolledStudents = sortedAllStudents.take(newCapacity).map(s => EnrolledStudent(s.time, s.priority, s.studentUsername))
+                (Some(newCapacity), if (newEnrolledStudents.size == newCapacity) "closed" else "open", newEnrolledStudents)
               }
+            case None => (Some(currentCapacity), currentStatus, currentEnrolledStudents)
+          }
 
-            case (Left(courseHourError), _, _) => IO.raiseError(new Exception(s"Invalid JSON for courseHours: ${courseHourError.getMessage}"))
-            case (_, Left(enrolledStudentsError), _) => IO.raiseError(new Exception(s"Invalid JSON for enrolledStudents: ${enrolledStudentsError.getMessage}"))
-            case (_, _, Left(allStudentsError)) => IO.raiseError(new Exception(s"Invalid JSON for allStudents: ${allStudentsError.getMessage}"))
+          val checkConflictAndCapacityIO = for {
+            existingCourses <- updatedClassroomid.map(getClassroomEnrolledCourses).getOrElse(IO.pure(Map.empty[Int, List[Int]]))
+            conflict = updatedCourseHours.exists(hours => checkCourseHourConflict(existingCourses, hours))
+            classroomCapacity <- updatedClassroomid.map(getClassroomCapacity).getOrElse(IO.pure(0))
+            _ <- if (conflict && updatedClassroomid.exists(_ >= 0)) IO.raiseError(new Exception("Course hour conflict detected for the given classroom")) else IO.unit
+            _ <- if (classroomCapacity > 0 && updatedCapacity.exists(_ > classroomCapacity)) IO.raiseError(new Exception("Classroom capacity exceeded")) else IO.unit
+          } yield existingCourses
+
+          checkConflictAndCapacityIO.flatMap { existingCourses =>
+            val updatedEnrolledCourses = updatedClassroomid match {
+              case Some(id) => existingCourses + (courseid -> updatedCourseHours.getOrElse(Nil))
+              case _ => existingCourses
+            }
+
+            val updates = List(
+              updatedCourseName.map(_ => "course_name = ?"),
+              updatedTeacherUsername.map(_ => "teacher_username = ?"),
+              updatedTeacherName.map(_ => "teacher_name = ?"),
+              updatedCapacity.map(_ => "capacity = ?"),
+              updatedInfo.map(_ => "info = ?"),
+              updatedCourseHours.map(_ => "course_hour = ?"),
+              updatedClassroomid.map(_ => "classroomid = ?"),
+              updatedCredits.map(_ => "credits = ?"),
+              Some("enrolled_students = ?"),
+              Some("status = ?")
+            ).flatten.mkString(", ")
+
+            val params = List(
+              updatedCourseName.map(SqlParameter("string", _)),
+              updatedTeacherUsername.map(SqlParameter("string", _)),
+              updatedTeacherName.map(SqlParameter("string", _)),
+              updatedCapacity.map(c => SqlParameter("int", c.toString)),
+              updatedInfo.map(SqlParameter("string", _)),
+              updatedCourseHours.map(hours => SqlParameter("jsonb", hours.asJson.noSpaces)),
+              updatedClassroomid.map(c => SqlParameter("int", c.toString)),
+              updatedCredits.map(c => SqlParameter("int", c.toString)),
+              Some(SqlParameter("jsonb", updatedEnrolledStudents.asJson.noSpaces)),
+              Some(SqlParameter("string", updatedStatus)),
+              Some(SqlParameter("int", courseid.toString))
+            ).flatten
+
+            val updateClassroomsIO: IO[Unit] = {
+              val removeOldClassroom: IO[Unit] =
+                if (updatedClassroomid.isDefined && updatedClassroomid != cursor.get[Int]("classroomid").toOption) {
+                  getClassroomEnrolledCourses(cursor.get[Int]("classroomid").getOrElse(0)).flatMap { oldClassroomCourses =>
+                    removeCourseFromClassroom(cursor.get[Int]("classroomid").getOrElse(0), oldClassroomCourses)
+                  }
+                } else IO.unit
+
+              val updateNewClassroom: IO[Unit] =
+                updatedClassroomid.map { classroomid =>
+                  updateClassroomEnrolledCourses(classroomid, updatedEnrolledCourses)
+                }.getOrElse(IO.unit)
+
+              removeOldClassroom *> updateNewClassroom
+            }
+
+            writeDB(updateCourseQuery.format(updates), params).flatMap { _ =>
+              updateClassroomsIO.map(_ => Course(
+                courseid,
+                updatedCourseName.getOrElse(""),
+                updatedTeacherUsername.getOrElse(""),
+                updatedTeacherName.getOrElse(""),
+                updatedCapacity.getOrElse(0),
+                updatedInfo.getOrElse(""),
+                updatedCourseHours.getOrElse(Nil),
+                updatedClassroomid.getOrElse(0),
+                updatedCredits.getOrElse(0),
+                updatedEnrolledStudents,
+                currentAllStudents,
+                updatedStatus
+              ))
+            }
           }
 
         case None => IO.raiseError(new Exception(s"Course with id $courseid not found"))

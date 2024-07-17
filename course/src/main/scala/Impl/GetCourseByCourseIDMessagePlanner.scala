@@ -31,10 +31,11 @@ case class GetCourseByCourseIDMessagePlanner(courseid: Int, override val planCon
           val enrolledStudents = enrolledStudentsStr.flatMap(str => decode[List[EnrolledStudent]](str).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}")))
           val allStudentsStr = cursor.get[String]("allStudents").left.map(e => new Exception("Missing allStudents"))
           val allStudents = allStudentsStr.flatMap(str => decode[List[AllStudent]](str).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}")))
+          val status = cursor.get[String]("status").left.map(e => new Exception("Missing status"))
 
-          (courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents) match {
-            case (Right(courseID), Right(courseName), Right(teacherUsername), Right(teacherName), Right(capacity), Right(info), Right(courseHour), Right(classroomID), Right(credits), Right(enrolledStudents), Right(allStudents)) =>
-              IO.pure(Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents))
+          (courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents, status) match {
+            case (Right(courseID), Right(courseName), Right(teacherUsername), Right(teacherName), Right(capacity), Right(info), Right(courseHour), Right(classroomID), Right(credits), Right(enrolledStudents), Right(allStudents), Right(status)) =>
+              IO.pure(Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents, status))
             case _ =>
               IO.raiseError(new Exception("Failed to parse course data"))
           }

@@ -28,7 +28,8 @@ object Init {
            |  classroomid INT,
            |  credits INT,
            |  enrolled_students JSONB,
-           |  all_students JSONB
+           |  all_students JSONB,
+           |  status TEXT
            |)
          """.stripMargin, List()
         // The course_hour should be a list of Ints with value 42*w + 6*d + h where
