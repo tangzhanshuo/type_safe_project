@@ -111,7 +111,7 @@ export function TeacherMyCourse(): JSX.Element {
                         className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold p-2 rounded transition duration-300"
                         title="Refresh courses"
                     >
-                        <FaSync />
+                        <FaSync/>
                     </button>
                 </div>
 
@@ -134,7 +134,8 @@ export function TeacherMyCourse(): JSX.Element {
                             placeholder="Search courses..."
                             className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                         />
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                        <FaSearch
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"/>
                     </div>
                 </div>
 
@@ -155,7 +156,7 @@ export function TeacherMyCourse(): JSX.Element {
                                     >
                                         <div className="flex items-center">
                                             {column}
-                                            {sortColumn === column && <FaSort className="ml-1" />}
+                                            {sortColumn === column && <FaSort className="ml-1"/>}
                                         </div>
                                     </th>
                                 ))}
@@ -171,7 +172,9 @@ export function TeacherMyCourse(): JSX.Element {
                                     <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.courseHour}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.classroomid}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudents}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudents.length}</td>
+
+
                                 </tr>
                             ))}
                             </tbody>

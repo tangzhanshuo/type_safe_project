@@ -76,7 +76,7 @@ export function TeacherAddCourse() {
                         <button onClick={addCourse}
                                 style={{marginTop: '30px'}}
                                 className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transform hover:scale-105">
-                            Register Course
+                            Add Course
                         </button>
                     </div>
 

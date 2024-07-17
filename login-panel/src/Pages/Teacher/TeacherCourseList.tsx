@@ -181,7 +181,7 @@ export function TeacherCourseList(): JSX.Element {
                                     <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.courseHour}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.classroomid}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudents}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudents.length}</td>
                                 </tr>
                             ))}
                             </tbody>

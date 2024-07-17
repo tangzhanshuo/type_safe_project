@@ -1,7 +1,7 @@
 package Impl
 
 import Common.API.{PlanContext, Planner}
-import Common.CourseAPI.{getCourse, getCourseByCourseID}
+import Common.CourseAPI.{getCourseByCourseID}
 import Common.DBAPI.writeDB
 import Common.Object.*
 import cats.effect.IO
