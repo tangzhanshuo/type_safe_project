@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendCourseListRequest, sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
 import { AdminGetCourseByCourseNameMessage } from 'Plugins/AdminAPI/AdminGetCourseByCourseNameMessage';
 import { AdminGetCourseByTeacherUsernameMessage } from 'Plugins/AdminAPI/AdminGetCourseByTeacherUsernameMessage';
 import { AdminGetCourseByCourseIDMessage } from 'Plugins/AdminAPI/AdminGetCourseByCourseIDMessage';
+import { AdminGetAllCoursesMessage } from 'Plugins/AdminAPI/AdminGetAllCoursesMessage';
 import { AdminDeleteCourseMessage } from 'Plugins/AdminAPI/AdminDeleteCourseMessage';
 import { AdminLayout } from 'Components/Admin/AdminLayout';
 import { FaSync, FaTrash, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
 import Auth from 'Plugins/CommonUtils/AuthState'
-import { StudentLayout } from 'Components/Student/StudentLayout'
+import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage'
 
 interface Course {
-    courseid: number;
+    courseID: number;
     courseName: string;
     teacherName: string;
     capacity: number;
@@ -25,8 +26,9 @@ export function AdminSearchCourse() {
     const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState<string>('');
+    const [selectedCourseIds, setSelectedCourseIds] = useState<number[]>([]);
     const [showDeleteResponse, setShowDeleteResponse] = useState<boolean>(false);
-    const [sortColumn, setSortColumn] = useState<keyof Course>('courseid');
+    const [sortColumn, setSortColumn] = useState<keyof Course>('courseID');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchColumn, setSearchColumn] = useState<SearchColumn>('All');
@@ -38,40 +40,53 @@ export function AdminSearchCourse() {
 
     const fetchSelectedCourses = async () => {
         let response;
+
         switch (searchColumn) {
             case 'CourseID':
-                response = await sendPostRequest(new AdminGetCourseByCourseIDMessage(parseInt(searchTerm, 10)));
-                break;
-            case 'CourseName':
-                response = await sendPostRequest(new AdminGetCourseByCourseNameMessage(searchTerm));
+                const courseID = parseInt(searchTerm, 10);
+                if (isNaN(courseID)) {
+                    setErrorMessage('Course ID must be a number');
+                    setSelectedCourses([]);
+                    return;
+                }
+                response = await sendCourseListRequest(new AdminGetCourseByCourseIDMessage(courseID));
                 break;
             case 'TeacherName':
-                response = await sendPostRequest(new AdminGetCourseByTeacherUsernameMessage(searchTerm));
+                response = await sendCourseListRequest(new AdminGetCourseByTeacherUsernameMessage(searchTerm));
                 break;
+            case 'CourseName':
+                response = await sendCourseListRequest(new AdminGetCourseByCourseNameMessage(searchTerm));
+                break;
+            case 'All':
+                response = await sendCourseListRequest(new AdminGetAllCoursesMessage(searchTerm));
+                break;
+            default:
+                setErrorMessage('Invalid search column');
+                setSelectedCourses([]);
+                return;
         }
 
         if (response.isError) {
-            setErrorMessage(response.error);
-            setSelectedCourses([]);
-        } else {
-            setSelectedCourses(response.data.map((course: any) => ({
-                courseid: course.courseid,
-                courseName: course.courseName,
-                teacherName: course.teacherName,
-                capacity: course.capacity,
-                credits: course.credits,
-                info: course.info,
-            })));
+            if (response.error.startsWith("No courses found")) {
+                setErrorMessage('');
+                setSelectedCourses([]);
+            } else {
+                setErrorMessage(response.error);
+                setSelectedCourses([]);
+            }
+            return;
         }
-    };
+        console.log(response.data);
+        setSelectedCourses(response.data);
+    }
 
-    const deleteCourseWithId = async (courseid: number) => {
-        const response = await sendPostRequest(new AdminDeleteCourseMessage(courseid));
+    const deleteCourseWithId = async (courseID: number) => {
+        const response = await sendPostRequest(new AdminDeleteCourseMessage(courseID));
         if (response.isError) {
             setDeleteCourseResponse(response.error);
             return;
         }
-        setDeleteCourseResponse('Course ' + courseid + ' deleted successfully');
+        setDeleteCourseResponse('Course ' + courseID + ' deleted successfully');
         setShowDeleteResponse(true);
         setTimeout(() => setShowDeleteResponse(false), 2000);
         fetchSelectedCourses();
@@ -98,24 +113,24 @@ export function AdminSearchCourse() {
             const lowerSearchTerm = searchTerm.toLowerCase();
             switch (searchColumn) {
                 case 'CourseID':
-                    return course.courseid.toString().includes(lowerSearchTerm);
+                    return course.courseID?.toString().includes(lowerSearchTerm) ?? false;
                 case 'CourseName':
-                    return course.courseName.toLowerCase().includes(lowerSearchTerm);
+                    return course.courseName?.toLowerCase().includes(lowerSearchTerm) ?? false;
                 case 'TeacherName':
-                    return course.teacherName.toLowerCase().includes(lowerSearchTerm);
+                    return course.teacherName?.toLowerCase().includes(lowerSearchTerm) ?? false;
                 case 'All':
                     return (
-                        course.courseid.toString().includes(lowerSearchTerm) ||
-                        course.courseName.toLowerCase().includes(lowerSearchTerm) ||
-                        course.teacherName.toLowerCase().includes(lowerSearchTerm)
-                    );
+                        course.courseID?.toString().includes(lowerSearchTerm) ||
+                        course.courseName?.toLowerCase().includes(lowerSearchTerm) ||
+                        course.teacherName?.toLowerCase().includes(lowerSearchTerm)
+                    ) ?? false;
                 default:
                     return true;
             }
         });
     };
 
-    const filteredAndSortedCourses = filterCourses(sortedCourses);
+    const filteredAndSortedCourses = filterCourses(sortedCourses).filter(course => !selectedCourseIds.includes(course.courseID));
 
     const SortIcon = ({ column }: { column: keyof Course }) => {
         if (column !== sortColumn) return null;
@@ -138,7 +153,7 @@ export function AdminSearchCourse() {
         <AdminLayout>
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold">My Courses</h2>
+                    <h2 className="text-2xl font-bold">Search Courses</h2>
                     <button
                         onClick={fetchSelectedCourses}
                         className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded transition duration-300"
@@ -147,7 +162,6 @@ export function AdminSearchCourse() {
                         <FaSync />
                     </button>
                 </div>
-
                 <div className="flex items-center space-x-4 mb-4">
                     <select
                         value={searchColumn}
@@ -167,7 +181,8 @@ export function AdminSearchCourse() {
                             placeholder="Search courses..."
                             className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                         />
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                        <FaSearch
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     </div>
                 </div>
 
@@ -177,7 +192,7 @@ export function AdminSearchCourse() {
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    {renderSortableHeader('courseid', 'Course ID')}
+                                    {renderSortableHeader('courseID', 'Course ID')}
                                     {renderSortableHeader('courseName', 'Course Name')}
                                     {renderSortableHeader('teacherName', 'Teacher')}
                                     {renderSortableHeader('capacity', 'Capacity')}
@@ -186,12 +201,14 @@ export function AdminSearchCourse() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
                                 </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                <tbody
+                                    className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 {filteredAndSortedCourses.map((course) => (
-                                    <tr key={course.courseid}>
+                                    <tr key={course.courseID}>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/student/course/${course.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                {course.courseid}
+                                            <Link to={`/admin/course/searchCourse/${course.courseID}`}
+                                                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                                {course.courseID}
                                             </Link>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.courseName}</td>
@@ -201,7 +218,7 @@ export function AdminSearchCourse() {
                                         <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <button
-                                                onClick={() => deleteCourseWithId(course.courseid)}
+                                                onClick={() => deleteCourseWithId(course.courseID)}
                                                 className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
                                                 title="Delete course"
                                             >
@@ -214,7 +231,8 @@ export function AdminSearchCourse() {
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No selected courses found matching your search criteria.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No selected courses found matching your search
+                            criteria.</p>
                     )}
                 </div>
 

@@ -8,10 +8,10 @@ import io.circe.generic.auto._
 import Common.Object.Course
 
 case class AdminGetCourseByCourseIDMessagePlanner(
-                                         courseid: Int,
+                                         courseID: Int,
                                          override val planContext: PlanContext
                                        ) extends Planner[Course] {
   override def plan(using planContext: PlanContext): IO[Course] = {
-    getCourseByCourseID(courseid)
+    getCourseByCourseID(courseID)
   }
 }
