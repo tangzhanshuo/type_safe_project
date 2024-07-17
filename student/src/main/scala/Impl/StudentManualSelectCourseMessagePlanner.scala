@@ -38,7 +38,7 @@ case class StudentManualSelectCourseMessagePlanner(
     val application = Application.create(usertype, username, "StudentManualSelectCourse")
     application.addInfo("courseID", courseID)
     application.addInfo("reason", reason)
-    application.addApprover("teacher", course.teacherUsername)
+    application.addApprover("admin")
     application
   }
 }

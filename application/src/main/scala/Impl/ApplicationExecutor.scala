@@ -5,7 +5,7 @@ import Common.DBAPI.*
 import Common.Object.{SqlParameter, EnrolledStudent, AllStudent, Course}
 import io.circe.parser.{parse, decode}
 import io.circe.{Encoder, Json}
-import Common.CourseAPI.{addCourse, addStudent2Course, deleteCourse}
+import Common.CourseAPI.{addCourse, forceAddStudent2Course, deleteCourse}
 import Common.API.PlanContext
 
 object ApplicationExecutor {
@@ -39,23 +39,18 @@ object ApplicationExecutor {
 
   private def executeBasedOnType(applicationType: String, usertype: String, username: String, info: Json)(using planContext: PlanContext): IO[Unit] = {
     (applicationType, usertype.toLowerCase) match {
-      case ("StudentAdd2Course", "student") => executeStudentAdd2Course(username, info)
+      case ("StudentManualSelectCourse", "student") => executeStudentManualSelectCourse(username, info)
       case ("TeacherAddCourse", "teacher") => executeTeacherAddCourse(username, info)
       case ("TeacherDeleteCourse", "teacher") => executeTeacherDeleteCourse(info)
       case (appType, uType) => IO.raiseError(new Exception(s"Unsupported application type or invalid user type: $appType for $uType"))
     }
   }
 
-  private def executeStudentAdd2Course(username: String, info: Json)(using planContext: PlanContext): IO[Unit] = {
+  private def executeStudentManualSelectCourse(username: String, info: Json)(using planContext: PlanContext): IO[Unit] = {
     for {
       courseID <- IO.fromOption(info.hcursor.downField("courseID").as[Int].toOption)(new Exception("courseID not found in info"))
-      priority <- info.hcursor.downField("priority").as[Int].toOption match {
-        case Some(value) => IO.pure(Some(value))
-        case None => IO.pure(None)  // priority is optional, so we use None if it's not provided
-      }
-      result <- addStudent2Course(courseID, Some(username), priority)
-      priorityStr = priority.map(p => s" with priority $p").getOrElse("")
-      _ <- IO.println(s"Student $username added to course $courseID$priorityStr. Result: $result")
+      result <- forceAddStudent2Course(courseID, Some(username))
+      _ <- IO.println(s"Student $username force added to course $courseID. Result: $result")
     } yield ()
   }
 
