@@ -48,8 +48,8 @@ case class UserRegisterMessagePlanner(usertype: String, username: String, passwo
 
     val additionalInfo = usertype.toLowerCase match {
       case "student" => JsonObject(
-        "grade" -> Json.fromString(""),
-        "enrollmentYear" -> Json.fromString("")
+        "planid" -> Json.fromInt(1),
+        "year" -> Json.fromInt(1)
       )
       case "teacher" => JsonObject(
         "subject" -> Json.fromString(""),
