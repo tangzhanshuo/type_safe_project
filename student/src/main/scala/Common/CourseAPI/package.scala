@@ -111,7 +111,7 @@ package object CourseAPI {
                   priority: Option[Map[Int, Map[Int, Int]]]
                 )(using PlanContext): IO[Plan] =
     UpdatePlanMessage(planid, planName, creditsLimits, priority ).send
-  
+
 
   def getPriorityByPlanIDYearCourseID(
                                        planid: Int,
@@ -119,4 +119,13 @@ package object CourseAPI {
                                        courseid: Int
                                      )(using PlanContext): IO[Int] =
     GetPriorityByPlanIDYearCourseIDMessage(planid, year, courseid).send
+
+  def getPlan(planid: Int)(using PlanContext): IO[Plan] =
+    GetPlanMessage(planid).send
+
+  def getPlanList()(using PlanContext): IO[List[Plan]] =
+    GetPlanListMessage().send
+
+  def UpdateCoursePriority(planid: Int, year: Int, courseid: Int, priority: Int)(using PlanContext): IO[Plan] =
+    UpdateCoursePriorityMessage(planid, year, courseid, priority).send
 }

@@ -133,7 +133,22 @@ object Routes:
             m.fullPlan.map(_.asJson.noSpaces)
           }
       case "GetPriorityByPlanIDYearCourseIDMessage" =>
-        IO(decode[GetPriorityByPlanIDYearCourseIDMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UpdatePlanMessage")))
+        IO(decode[GetPriorityByPlanIDYearCourseIDMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetPriorityByPlanIDYearCourseIDMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "GetPlanMessage" =>
+        IO(decode[GetPlanMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetPlanMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "GetPlanListMessage" =>
+        IO(decode[GetPlanListMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetPlanMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "UpdateCoursePriorityMessage"=>
+        IO(decode[UpdateCoursePriorityMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetPlanMessage")))
           .flatMap { m =>
             m.fullPlan.map(_.asJson.noSpaces)
           }
