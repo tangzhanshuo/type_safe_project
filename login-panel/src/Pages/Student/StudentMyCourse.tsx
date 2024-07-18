@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest, sendStudentCourseListRequest, StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
-import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
+import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { StudentCourse, StudentWaitingPosition } from 'Plugins/CommonUtils/StudentUtils';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import { StudentLayout } from 'Components/Student/StudentLayout';
 import { FaSync, FaTrash, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
+import { StudentGetWaitingPositionMessage } from 'Plugins/StudentAPI/StudentGetWaitingPositionMessage';
 
 type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'All';
 type FilterStatus = 'Preregister' | 'Enrolled' | 'Waiting';
 
 export function StudentMyCourse() {
-    const [selectedCourses, setSelectedCourses] = useState<StudentCourse[]>([]);
+    const [waitingPositions, setWaitingPositions] = useState<StudentWaitingPosition[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState<string>('');
     const [showDeleteResponse, setShowDeleteResponse] = useState<boolean>(false);
@@ -28,21 +29,21 @@ export function StudentMyCourse() {
     }, []);
 
     const fetchSelectedCourses = async () => {
-        const response = await sendStudentCourseListRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
+        const response = await sendPostRequest(new StudentGetWaitingPositionMessage());
         if (response.isError) {
             if (response.error.startsWith("No courses found")) {
                 setErrorMessage('');
-                setSelectedCourses([]);
+                setWaitingPositions([]);
             } else {
                 setErrorMessage(response.error);
-                setSelectedCourses([]);
+                setWaitingPositions([]);
             }
             return;
         }
         if (response.data) {
-            setSelectedCourses(response.data);
+            setWaitingPositions(response.data);
         } else {
-            setSelectedCourses([]);
+            setWaitingPositions([]);
         }
     };
 
@@ -67,28 +68,28 @@ export function StudentMyCourse() {
         }
     };
 
-    const sortedCourses = [...selectedCourses].sort((a, b) => {
-        if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-        if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
+    const sortedPositions = [...waitingPositions].sort((a, b) => {
+        if (a.studentCourse[sortColumn] < b.studentCourse[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
+        if (a.studentCourse[sortColumn] > b.studentCourse[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
         return 0;
     });
 
-    const filterCourses = (courses: StudentCourse[]) => {
-        return courses.filter(course => {
+    const filterPositions = (positions: StudentWaitingPosition[]) => {
+        return positions.filter(position => {
             if (searchTerm === '') return true;
             const lowerSearchTerm = searchTerm.toLowerCase();
             switch (searchColumn) {
                 case 'ID':
-                    return course.courseid.toString().includes(lowerSearchTerm);
+                    return position.studentCourse.courseid.toString().includes(lowerSearchTerm);
                 case 'Name':
-                    return course.courseName.toLowerCase().includes(lowerSearchTerm);
+                    return position.studentCourse.courseName.toLowerCase().includes(lowerSearchTerm);
                 case 'Teacher':
-                    return course.teacherName.toLowerCase().includes(lowerSearchTerm);
+                    return position.studentCourse.teacherName.toLowerCase().includes(lowerSearchTerm);
                 case 'All':
                     return (
-                        course.courseid.toString().includes(lowerSearchTerm) ||
-                        course.courseName.toLowerCase().includes(lowerSearchTerm) ||
-                        course.teacherName.toLowerCase().includes(lowerSearchTerm)
+                        position.studentCourse.courseid.toString().includes(lowerSearchTerm) ||
+                        position.studentCourse.courseName.toLowerCase().includes(lowerSearchTerm) ||
+                        position.studentCourse.teacherName.toLowerCase().includes(lowerSearchTerm)
                     );
                 default:
                     return true;
@@ -96,24 +97,24 @@ export function StudentMyCourse() {
         });
     };
 
-    const filterByStatus = (courses: StudentCourse[]) => {
+    const filterByStatus = (positions: StudentWaitingPosition[]) => {
         switch (filterStatus) {
             case 'Preregister':
-                return courses.filter(course => course.status === 'preregister');
+                return positions.filter(position => position.studentCourse.status === 'preregister');
             case 'Enrolled':
-                return courses.filter(course =>
-                    course.status !== 'preregister' && course.studentStatus === 'Enrolled'
+                return positions.filter(position =>
+                    position.studentCourse.status !== 'preregister' && position.studentCourse.studentStatus === 'Enrolled'
                 );
             case 'Waiting':
-                return courses.filter(course =>
-                    course.status !== 'preregister' && course.studentStatus === 'Waiting'
+                return positions.filter(position =>
+                    position.studentCourse.status !== 'preregister' && position.studentCourse.studentStatus === 'Waiting'
                 );
             default:
-                return courses;
+                return positions;
         }
     };
 
-    const filteredAndSortedCourses = filterByStatus(filterCourses(sortedCourses));
+    const filteredAndSortedPositions = filterByStatus(filterPositions(sortedPositions));
 
     const SortIcon = ({ column }: { column: keyof StudentCourse }) => {
         if (column !== sortColumn) return null;
@@ -186,7 +187,7 @@ export function StudentMyCourse() {
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                    {filteredAndSortedCourses.length > 0 ? (
+                    {filteredAndSortedPositions.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
@@ -197,25 +198,43 @@ export function StudentMyCourse() {
                                     {renderSortableHeader('capacity', 'Capacity')}
                                     {renderSortableHeader('credits', 'Credits')}
                                     {renderSortableHeader('info', 'Info')}
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
+                                    {filterStatus === 'Waiting' && (
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Position
+                                        </th>
+                                    )}
+                                    {filterStatus === 'Preregister' && (
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Priority (Right is Highest)
+                                        </th>
+                                    )}
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Options
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                {filteredAndSortedCourses.map((course) => (
-                                    <tr key={course.courseid}>
+                                {filteredAndSortedPositions.map((position) => (
+                                    <tr key={position.studentCourse.courseid}>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/student/course/${course.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                {course.courseid}
+                                            <Link to={`/student/course/${position.studentCourse.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                                {position.studentCourse.courseid}
                                             </Link>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.courseName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.teacherName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{position.studentCourse.courseName}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{position.studentCourse.teacherName}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{position.studentCourse.capacity}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{position.studentCourse.credits}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{position.studentCourse.info}</td>
+                                        {filterStatus === 'Waiting' && (
+                                            <td className="px-6 py-4 whitespace-nowrap">{position.position + 1}</td>
+                                        )}
+                                        {filterStatus === 'Preregister' && (
+                                            <td className="px-6 py-4 whitespace-nowrap">{position.priority.join(', ')}</td>
+                                        )}
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <button
-                                                onClick={() => deleteCourseWithId(course.courseid)}
+                                                onClick={() => deleteCourseWithId(position.studentCourse.courseid)}
                                                 className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
                                                 title="Delete course"
                                             >

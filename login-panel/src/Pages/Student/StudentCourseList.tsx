@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { StudentLayout } from 'Components/Student/StudentLayout';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest, sendStudentCourseListRequest, StudentCourse} from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest} from 'Plugins/CommonUtils/SendPostRequest';
+import { StudentCourse } from 'Plugins/CommonUtils/StudentUtils';
 import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourseListMessage';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
 import { StudentManualSelectCourseMessage } from 'Plugins/StudentAPI/StudentManualSelectCourseMessage';
@@ -40,7 +41,7 @@ export function StudentCourseList() {
     }, []);
 
     const fetchSelectedCourses = async () => {
-        const response = await sendStudentCourseListRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
+        const response = await sendPostRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
         if (response.isError) {
             if (!response.error.startsWith("No courses found")) {
                 setErrorMessage(response.error);
@@ -70,7 +71,7 @@ export function StudentCourseList() {
     };
 
     const getCourseList = async () => {
-        const response = await sendStudentCourseListRequest(new StudentGetCourseListMessage());
+        const response = await sendPostRequest(new StudentGetCourseListMessage());
         if (response.isError) {
             setErrorMessage(response.error);
             return;

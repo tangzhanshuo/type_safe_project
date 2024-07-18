@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
+import { StudentCourse } from 'Plugins/CommonUtils/StudentUtils';
 
 interface ManualSelectBoxProps {
     course: StudentCourse;

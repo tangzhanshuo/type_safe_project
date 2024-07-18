@@ -1,6 +1,9 @@
 import axios, { isAxiosError } from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import Auth from 'Plugins/CommonUtils/AuthState';
+import {StudentCourse, StudentWaitingPosition} from 'Plugins/CommonUtils/StudentUtils'
+
+'Plugins/CommonUtils/StudentUtils.tsx'
 
 export class Response {
     isError: boolean;
@@ -53,50 +56,6 @@ export class Course {
         this.status = status; // Initialize the new status field
     }
 }
-
-export class StudentCourse {
-    courseid: number;
-    courseName: string;
-    teacherName: string;
-    capacity: number;
-    credits: number;
-    info: string;
-    courseHour: number[];
-    classroomid: number;
-    enrolledStudentsNumber: number;
-    allStudentsNumber: number;
-    status: string;
-    studentStatus: 'NotEnrolled' | 'Enrolled' | 'Waiting';
-
-    constructor(courseid: number, courseName: string, teacherName: string, capacity: number, credits: number, info: string, courseHour: number[], classroomid: number, enrolledStudentsNumber: number, allStudentsNumber: number, status: string, studentStatus: string) {
-        this.courseid = courseid;
-        this.courseName = courseName;
-        this.teacherName = teacherName;
-        this.capacity = capacity;
-        this.credits = credits;
-        this.info = info;
-        this.courseHour = courseHour;
-        this.classroomid = classroomid;
-        this.enrolledStudentsNumber = enrolledStudentsNumber;
-        this.allStudentsNumber = allStudentsNumber;
-        this.status = status;
-        this.studentStatus = this.parseStudentStatus(studentStatus);
-    }
-
-    private parseStudentStatus(studentStatus: string): 'NotEnrolled' | 'Enrolled' | 'Waiting' {
-        if (studentStatus == 'NotEnrolled'){
-            return 'NotEnrolled'
-        }
-        if (studentStatus == 'Enrolled'){
-            return 'Enrolled'
-        }
-        if (studentStatus == 'Waiting'){
-            return 'Waiting'
-        }
-        throw new Error(`Unknown student status: ${JSON.stringify(studentStatus)}`);
-    }
-}
-
 
 
 export class Approver {
@@ -252,33 +211,7 @@ export const sendCourseListRequest = async (message: API) => {
     return response;
 };
 
-export const sendStudentCourseListRequest = async (message: API) => {
-    const response = await sendPostRequest(message);
 
-    if (!response.isError && Array.isArray(response.data)) {
-        // Convert each course in the response to a StudentCourse object
-        const studentCourseList: StudentCourse[] = response.data.map((courseData: any) => {
-            return new StudentCourse(
-                courseData.courseid,
-                courseData.courseName,
-                courseData.teacherName,
-                courseData.capacity,
-                courseData.credits,
-                courseData.info,
-                courseData.courseHour,
-                courseData.classroomid,
-                courseData.enrolledStudentsNumber,
-                courseData.allStudentsNumber,
-                courseData.status,
-                courseData.studentStatus
-            );
-        });
-
-        // Replace the response.data with the new array of StudentCourse objects
-        response.data = studentCourseList;
-    }
-    return response;
-};
 
 export const sendApplicationRequest = async (message: API) => {
     const response = await sendPostRequest(message);

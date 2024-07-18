@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { sendPostRequest, sendStudentCourseListRequest } from 'Plugins/CommonUtils/SendPostRequest'
+import { sendPostRequest} from 'Plugins/CommonUtils/SendPostRequest'
 import { StudentGetCourseMessage } from 'Plugins/StudentAPI/StudentGetCourseMessage';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { StudentLayout } from 'Components/Student/StudentLayout';
-import { StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
+import { StudentCourse } from 'Plugins/CommonUtils/StudentUtils';
 
 export function StudentCourseDetail() {
     const history = useHistory();
@@ -28,7 +28,7 @@ export function StudentCourseDetail() {
             return;
         }
 
-        const response = await sendStudentCourseListRequest(new StudentGetCourseMessage(id));
+        const response = await sendPostRequest(new StudentGetCourseMessage(id));
         if (response.isError) {
             setErrorMessage(response.error);
             return;
