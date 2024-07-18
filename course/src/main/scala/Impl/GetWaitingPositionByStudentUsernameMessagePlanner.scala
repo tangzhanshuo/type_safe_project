@@ -35,8 +35,7 @@ case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: St
 
           val course = Course(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, List.empty, List.empty, status)
 
-          // Check if the course status is not "preregister"
-          if (status != "preregister") {
+
             // Check if the student is in enrolledstudents or allstudents
             val isEnrolled = enrolledStudents.exists(_("studentUsername").as[String].contains(studentUsername))
             val isInAllStudents = allStudents.exists(_("studentUsername").as[String].contains(studentUsername))
@@ -57,9 +56,7 @@ case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: St
             } else {
               List.empty[CourseWaitingPosition]
             }
-          } else {
-            List.empty[CourseWaitingPosition]
-          }
+
         }
 
         if (result.isEmpty) IO.pure(None)
