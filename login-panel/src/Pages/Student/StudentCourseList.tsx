@@ -40,7 +40,7 @@ export function StudentCourseList() {
     }, []);
 
     const fetchSelectedCourses = async () => {
-        const response = await sendPostRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
+        const response = await sendStudentCourseListRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
         if (response.isError) {
             if (!response.error.startsWith("No courses found")) {
                 setErrorMessage(response.error);

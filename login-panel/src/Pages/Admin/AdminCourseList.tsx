@@ -22,7 +22,7 @@ interface Course {
 
 type SearchColumn = 'CourseID' | 'TeacherName' | 'CourseName' | 'All';
 
-export function AdminSearchCourse() {
+export function AdminCourseList() {
     const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState<string>('');
