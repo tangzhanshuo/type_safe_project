@@ -252,12 +252,54 @@ export const sendCourseListRequest = async (message: API) => {
     return response;
 };
 
+export const sendStudentCourseRequest = async (message: API) => {
+    const response = await sendCourseRequest(message);
+
+    if (!response.isError && response.data) {
+        const courseData = response.data as Course;
+        const { username } = Auth.getState();
+
+        let studentStatus: 'NotEnrolled' | 'Enrolled' | 'Waiting' = 'NotEnrolled';
+        if (courseData.enrolledStudents.some(student => student.studentUsername === username)) {
+            studentStatus = 'Enrolled';
+        } else if (courseData.allStudents.some(student => student.studentUsername === username)) {
+            studentStatus = 'Waiting';
+        }
+
+        const studentCourse = new StudentCourse(
+            courseData.courseid,
+            courseData.courseName,
+            courseData.teacherName,
+            courseData.capacity,
+            courseData.credits,
+            courseData.info,
+            courseData.courseHour,
+            courseData.classroomid,
+            courseData.enrolledStudents.length,
+            courseData.allStudents.length,
+            courseData.status,
+            studentStatus
+        );
+
+        response.data = studentCourse;
+    }
+    return response;
+};
+
 export const sendStudentCourseListRequest = async (message: API) => {
-    const response = await sendPostRequest(message);
+    const response = await sendCourseListRequest(message);
 
     if (!response.isError && Array.isArray(response.data)) {
-        // Convert each course in the response to a StudentCourse object
-        const studentCourseList: StudentCourse[] = response.data.map((courseData: any) => {
+        const { username } = Auth.getState();
+
+        const studentCourseList: StudentCourse[] = response.data.map((courseData: Course) => {
+            let studentStatus: 'NotEnrolled' | 'Enrolled' | 'Waiting' = 'NotEnrolled';
+            if (courseData.enrolledStudents.some(student => student.studentUsername === username)) {
+                studentStatus = 'Enrolled';
+            } else if (courseData.allStudents.some(student => student.studentUsername === username)) {
+                studentStatus = 'Waiting';
+            }
+
             return new StudentCourse(
                 courseData.courseid,
                 courseData.courseName,
@@ -267,14 +309,13 @@ export const sendStudentCourseListRequest = async (message: API) => {
                 courseData.info,
                 courseData.courseHour,
                 courseData.classroomid,
-                courseData.enrolledStudentsNumber,
-                courseData.allStudentsNumber,
+                courseData.enrolledStudents.length,
+                courseData.allStudents.length,
                 courseData.status,
-                courseData.studentStatus
+                studentStatus
             );
         });
 
-        // Replace the response.data with the new array of StudentCourse objects
         response.data = studentCourseList;
     }
     return response;
