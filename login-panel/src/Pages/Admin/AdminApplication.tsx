@@ -33,6 +33,8 @@ export const AdminApplication: React.FC = () => {
         if (response.isError) throw new Error(response.error || 'Failed to reject application');
     };
 
+
+
     return (
         <BaseApplicationPage
             userType="admin"
