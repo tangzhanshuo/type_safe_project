@@ -20,7 +20,7 @@ interface Course {
 
 export function AdminCourseDetail() {
     const history = useHistory();
-    const { courseID } = useParams<{ courseID: string }>();
+    const { courseid } = useParams<{ courseid: string }>();
     const [errorMessage, setErrorMessage] = useState('');
     const [updateCourseResponse, setUpdateCourseResponse] = useState('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
@@ -28,7 +28,7 @@ export function AdminCourseDetail() {
 
     useEffect(() => {
         getCourse();
-    }, [courseID]);
+    }, []);
 
     // Step 1: Define a type for the accumulator
     type Schedule = {
@@ -71,7 +71,7 @@ export function AdminCourseDetail() {
     }
 
     const getCourse = async () => {
-        const id = parseInt(courseID, 10);
+        const id = parseInt(courseid, 10);
         if (isNaN(id)) {
             setErrorMessage('Invalid course ID');
             return;
