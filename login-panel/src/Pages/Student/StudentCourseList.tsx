@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StudentLayout } from 'Components/Student/StudentLayout';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest, sendCourseListRequest, StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest, sendStudentCourseListRequest, StudentCourse} from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourseListMessage';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
 import { StudentManualSelectCourseMessage } from 'Plugins/StudentAPI/StudentManualSelectCourseMessage';
@@ -70,7 +70,7 @@ export function StudentCourseList() {
     };
 
     const getCourseList = async () => {
-        const response = await sendCourseListRequest(new StudentGetCourseListMessage());
+        const response = await sendStudentCourseListRequest(new StudentGetCourseListMessage());
         if (response.isError) {
             setErrorMessage(response.error);
             return;

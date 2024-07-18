@@ -1,6 +1,6 @@
 package Common.Object
 
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, Encoder, HCursor, Json}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 
 sealed trait StudentStatus
@@ -9,8 +9,17 @@ object StudentStatus {
   case object Enrolled extends StudentStatus
   case object Waiting extends StudentStatus
 
-  implicit val statusEncoder: Encoder[StudentStatus] = deriveEncoder
-  implicit val statusDecoder: Decoder[StudentStatus] = deriveDecoder
+  implicit val encodeStudentStatus: Encoder[StudentStatus] = new Encoder[StudentStatus] {
+    final def apply(a: StudentStatus): Json = Json.fromString(a.toString)
+  }
+
+  implicit val decodeStudentStatus: Decoder[StudentStatus] = new Decoder[StudentStatus] {
+    final def apply(c: HCursor): Decoder.Result[StudentStatus] = c.as[String].map {
+      case "NotEnrolled" => NotEnrolled
+      case "Enrolled" => Enrolled
+      case "Waiting" => Waiting
+    }
+  }
 }
 
 case class StudentCourse(

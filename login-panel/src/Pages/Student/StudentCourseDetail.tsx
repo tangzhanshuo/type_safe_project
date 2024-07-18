@@ -58,6 +58,7 @@ export function StudentCourseDetail() {
             classroomid: response.data.classroomid,
             enrolledStudentsNumber: response.data.enrolledStudentsNumber,
             allStudentsNumber: response.data.allStudentsNumber,
+            status: response.data.status,
             studentStatus: response.data.studentStatus
         };
 
