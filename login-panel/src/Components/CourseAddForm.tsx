@@ -29,7 +29,7 @@ export function CourseAddForm({ isAdmin, onSubmit }: CourseAddFormProps): JSX.El
     const [courseHours, setCourseHours] = useState<CourseHour[]>([{ weekday: '0', hours: [] }]);
     const [errorMessage, setErrorMessage] = useState<string>('');
 
-    const weekdays: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const weekdays: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const timeSlots: string[] = [
         "8:00-9:35",
         "9:50-12:15",
