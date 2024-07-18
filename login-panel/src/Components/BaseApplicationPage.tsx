@@ -56,6 +56,10 @@ export const BaseApplicationPage: React.FC<BaseApplicationPageProps> = ({
     const [applications, setApplications] = useState<Application[]>([]);
     const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
 
+    useEffect(() => {
+        handleGetApplications();
+    }, []);
+
     const handleGetApplications = async () => {
         try {
             const apps = await getApplications();
