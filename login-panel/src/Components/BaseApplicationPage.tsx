@@ -175,7 +175,7 @@ export const BaseApplicationPage: React.FC<BaseApplicationPageProps> = ({
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">{app.status}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                {showApproveReject && (
+                                                {showApproveReject && app.status.toLowerCase() === 'pending' && (
                                                     <>
                                                         <button
                                                             onClick={() => handleApprove(app.applicationID)}
@@ -220,10 +220,10 @@ export const BaseApplicationPage: React.FC<BaseApplicationPageProps> = ({
                         applicationType: getApplicationTypeDisplay(selectedApplication.applicationType)
                     }}
                     onClose={() => setSelectedApplication(null)}
-                    onApprove={showApproveReject ? handleApprove : undefined}
-                    onReject={showApproveReject ? handleReject : undefined}
+                    onApprove={showApproveReject && selectedApplication.status.toLowerCase() === 'pending' ? handleApprove : undefined}
+                    onReject={showApproveReject && selectedApplication.status.toLowerCase() === 'pending' ? handleReject : undefined}
                     onDelete={deleteApplication ? handleDelete : undefined}
-                    showApproveReject={showApproveReject}
+                    showApproveReject={showApproveReject && selectedApplication.status.toLowerCase() === 'pending'}
                 />
             )}
         </Layout>
