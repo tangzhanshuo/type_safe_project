@@ -54,20 +54,6 @@ export class Course {
     }
 }
 
-export class Classroom {
-    classroomid: number;
-    classroomName: string;
-    capacity: number;
-    enrolledCourses: Course[];
-
-    constructor(classroomid: number, classroomName: string, capacity: number, enrolledCourses: Course[]) {
-        this.classroomid = classroomid;
-        this.classroomName = classroomName;
-        this.capacity = capacity;
-        this.enrolledCourses = enrolledCourses;
-    }
-}
-
 export class StudentCourse {
     courseid: number;
     courseName: string;
