@@ -27,6 +27,19 @@ const getApplicationTypeDisplay = (applicationType: string): string => {
     }
 };
 
+const getStatusSortOrder = (status: string): number => {
+    switch (status.toLowerCase()) {
+        case 'pending':
+            return 0;
+        case 'rejected':
+            return 1;
+        case 'approved':
+            return 2;
+        default:
+            return 3;
+    }
+};
+
 export const BaseApplicationPage: React.FC<BaseApplicationPageProps> = ({
                                                                             userType,
                                                                             getApplications,
@@ -43,21 +56,13 @@ export const BaseApplicationPage: React.FC<BaseApplicationPageProps> = ({
     const [applications, setApplications] = useState<Application[]>([]);
     const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
 
-    useEffect(() => {
-        handleGetApplications();
-        const { usertype, username, token } = Auth.getState();
-        if (!usertype || !username || !token) {
-            history.push('/login');
-        }
-        else if (usertype !== userType) {
-            history.push('/');
-        }
-    }, [history, userType]);
-
     const handleGetApplications = async () => {
         try {
             const apps = await getApplications();
-            setApplications(apps);
+            const sortedApps = apps.sort((a, b) =>
+                getStatusSortOrder(a.status) - getStatusSortOrder(b.status)
+            );
+            setApplications(sortedApps);
             setSuccessMessage('Applications retrieved successfully');
             setErrorMessage('');
         } catch (error) {
@@ -147,7 +152,11 @@ export const BaseApplicationPage: React.FC<BaseApplicationPageProps> = ({
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                     {applications.map((app) => (
-                                        <tr key={app.applicationID}>
+                                        <tr key={app.applicationID} className={`${
+                                            app.status.toLowerCase() === 'pending' ? 'bg-yellow-50 dark:bg-yellow-900' :
+                                                app.status.toLowerCase() === 'rejected' ? 'bg-red-50 dark:bg-red-900' :
+                                                    app.status.toLowerCase() === 'approved' ? 'bg-green-50 dark:bg-green-900' : ''
+                                        }`}>
                                             <td className="px-6 py-4 whitespace-nowrap">{app.usertype}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{app.username}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{getApplicationTypeDisplay(app.applicationType)}</td>
