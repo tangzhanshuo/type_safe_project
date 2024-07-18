@@ -31,6 +31,7 @@ export function StudentCourseList() {
     const [searchColumn, setSearchColumn] = useState<SearchColumn>('All');
     const [showManualSelectionPopup, setShowManualSelectionPopup] = useState(false);
     const [selectedCourseForManual, setSelectedCourseForManual] = useState<StudentCourse | null>(null);
+    const [selectedPriority, setSelectedPriority] = useState<number>(3);
     const history = useHistory();
 
     useEffect(() => {
@@ -59,8 +60,10 @@ export function StudentCourseList() {
         }
     };
 
+
     const addCourseWithId = async (courseid: number) => {
-        const response = await sendPostRequest(new StudentAddCourseMessage(courseid, 0));
+        const priority = 3 - selectedPriority; // 将选择的优先度转换为对应的值
+        const response = await sendPostRequest(new StudentAddCourseMessage(courseid, priority));
         if (response.isError) {
             setAddCourseResponse(response.error);
             return;
@@ -251,11 +254,23 @@ export function StudentCourseList() {
                 </span>
                 </div>
                 <div className="w-full h-6 bg-gray-200 rounded-l-full relative">
-                    <div className="absolute left-0 top-0 h-full bg-red-500 rounded-l-full" style={{ width: `${minCreditsPercentage}%` }}></div>
-                    <div className="absolute left-0 top-0 h-full bg-green-500" style={{ width: `${maxCreditsPercentage - minCreditsPercentage}%`, left: `${minCreditsPercentage}%` }}></div>
-                    <div className="absolute left-0 top-0 h-full bg-blue-500 bg-opacity-50 rounded-l-full" style={{ width: `${creditsPercentage}%`, borderRadius: creditsPercentage > 0 ? '9999px 0 0 9999px' : '9999px' }}></div>
-                    <div className="absolute top-0 h-full border-l-2 border-blue-500" style={{ left: `${creditsPercentage}%` }}></div>
-                    <div className="absolute top-0 h-full bg-red-500" style={{ width: `${100 - maxCreditsPercentage}%`, left: `${maxCreditsPercentage}%`, borderRadius: '0 9999px 9999px 0' }}></div>
+                    <div className="absolute left-0 top-0 h-full bg-red-500 rounded-l-full"
+                         style={{ width: `${minCreditsPercentage}%` }}></div>
+                    <div className="absolute left-0 top-0 h-full bg-green-500" style={{
+                        width: `${maxCreditsPercentage - minCreditsPercentage}%`,
+                        left: `${minCreditsPercentage}%`
+                    }}></div>
+                    <div className="absolute left-0 top-0 h-full bg-blue-500 bg-opacity-50 rounded-l-full" style={{
+                        width: `${creditsPercentage}%`,
+                        borderRadius: creditsPercentage > 0 ? '9999px 0 0 9999px' : '9999px'
+                    }}></div>
+                    <div className="absolute top-0 h-full border-l-2 border-blue-500"
+                         style={{ left: `${creditsPercentage}%` }}></div>
+                    <div className="absolute top-0 h-full bg-red-500" style={{
+                        width: `${100 - maxCreditsPercentage}%`,
+                        left: `${maxCreditsPercentage}%`,
+                        borderRadius: '0 9999px 9999px 0'
+                    }}></div>
                 </div>
                 <div className="relative w-full mt-2 text-xs text-gray-600">
                 <span
@@ -280,6 +295,104 @@ export function StudentCourseList() {
         );
     };
 
+    const getBigPriority = (courseid: number) => {
+        if (plan && plan.priority && plan.priority.year) {
+            return plan.priority.year[courseid] ?? 0;
+        }
+        return 0;
+    };
+
+    const coursesByPriority = filteredAndSortedCourses.reduce((acc: { [key: number]: StudentCourse[] }, course) => {
+        const bigPriority = getBigPriority(course.courseid);
+        if (!acc[bigPriority]) acc[bigPriority] = [];
+        acc[bigPriority].push(course);
+        return acc;
+    }, {});
+
+    const renderCoursesByPriority = (priority: number, label: string) => (
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold">{label}</h3>
+                <div>
+                    <label htmlFor={`priority-${priority}`} className="mr-2 text-gray-700 dark:text-gray-300">Select Priority:</label>
+                    <select
+                        id={`priority-${priority}`}
+                        className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                        defaultValue={3}
+                    >
+                        <option value={1}>第1志愿</option>
+                        <option value={2}>第2志愿</option>
+                        <option value={3}>第3志愿</option>
+                    </select>
+                </div>
+            </div>
+            {coursesByPriority[priority] && coursesByPriority[priority].length > 0 ? (
+                <CourseTable
+                    columns={[
+                        'Course ID',
+                        'Course Name',
+                        'Teacher',
+                        'Capacity',
+                        'All Students Number',
+                        'Enrolled Students Number',
+                        'Credits',
+                        'Info',
+                        'Status',
+                        'Options'
+                    ]}
+                    data={coursesByPriority[priority]}
+                    renderCell={(item, column) => {
+                        switch (column) {
+                            case 'Course ID':
+                                return <Link to={`/student/course/${item.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">{item.courseid}</Link>;
+                            case 'Course Name':
+                                return <span>{item.courseName}</span>;
+                            case 'Teacher':
+                                return <span>{item.teacherName}</span>;
+                            case 'Capacity':
+                                return <span>{item.capacity}</span>;
+                            case 'All Students Number':
+                                return <span>{item.allStudentsNumber}</span>;
+                            case 'Enrolled Students Number':
+                                return <span>{item.enrolledStudentsNumber}</span>;
+                            case 'Credits':
+                                return <span>{item.credits}</span>;
+                            case 'Info':
+                                return <span>{item.info}</span>;
+                            case 'Status':
+                                return <span>{item.status}</span>;
+                            case 'Options':
+                                return (
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={() => addCourseWithId(item.courseid)}
+                                            className="text-green-600 hover:text-green-900 dark:hover:text-green-400"
+                                            title="Select course"
+                                        >
+                                            <FaPlus />
+                                        </button>
+                                        <button
+                                            onClick={() => handleManualSelection(item)}
+                                            className="text-orange-600 hover:text-orange-900 dark:hover:text-orange-400"
+                                            title="Manual Selection"
+                                        >
+                                            <FaHandPaper />
+                                        </button>
+                                    </div>
+                                );
+                            default:
+                                return null;
+                        }
+                    }}
+                />
+            ) : (
+                <p className="text-gray-500 dark:text-gray-400">No available courses found matching your search criteria.</p>
+            )}
+        </div>
+    );
+
+
+
     return (
         <StudentLayout>
             <div className="space-y-6">
@@ -295,95 +408,30 @@ export function StudentCourseList() {
                     </button>
                 </div>
 
-                <div className="flex items-center space-x-4 mb-4">
-                    <select
-                        value={searchColumn}
-                        onChange={(e) => setSearchColumn(e.target.value as SearchColumn)}
-                        className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                <div className="flex space-x-4 mb-4">
+                    <button
+                        onClick={() => setSelectedPriority(2)}
+                        className={`px-4 py-2 rounded ${selectedPriority === 2 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                     >
-                        <option value="All">All</option>
-                        <option value="ID">ID</option>
-                        <option value="Name">Name</option>
-                        <option value="Teacher">Teacher</option>
-                        <option value="Status">Status</option>
-                    </select>
-                    <div className="relative flex-grow">
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search courses..."
-                            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                        />
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-                    </div>
+                        必修课
+                    </button>
+                    <button
+                        onClick={() => setSelectedPriority(1)}
+                        className={`px-4 py-2 rounded ${selectedPriority === 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                    >
+                        限选课
+                    </button>
+                    <button
+                        onClick={() => setSelectedPriority(0)}
+                        className={`px-4 py-2 rounded ${selectedPriority === 0 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                    >
+                        任选课
+                    </button>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                    <h3 className="text-xl font-semibold mb-4">Available Courses</h3>
-                    {filteredAndSortedCourses.length > 0 ? (
-                        <CourseTable
-                            columns={[
-                                'Course ID',
-                                'Course Name',
-                                'Teacher',
-                                'Capacity',
-                                'All Students Number',
-                                'Enrolled Students Number',
-                                'Credits',
-                                'Info',
-                                'Status',
-                                'Options'
-                            ]}
-                            data={filteredAndSortedCourses}
-                            renderCell={(item, column) => {
-                                switch (column) {
-                                    case 'Course ID':
-                                        return <Link to={`/student/course/${item.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">{item.courseid}</Link>;
-                                    case 'Course Name':
-                                        return <span>{item.courseName}</span>;
-                                    case 'Teacher':
-                                        return <span>{item.teacherName}</span>;
-                                    case 'Capacity':
-                                        return <span>{item.capacity}</span>;
-                                    case 'All Students Number':
-                                        return <span>{item.allStudentsNumber}</span>;
-                                    case 'Enrolled Students Number':
-                                        return <span>{item.enrolledStudentsNumber}</span>;
-                                    case 'Credits':
-                                        return <span>{item.credits}</span>;
-                                    case 'Info':
-                                        return <span>{item.info}</span>;
-                                    case 'Status':
-                                        return <span>{item.status}</span>;
-                                    case 'Options':
-                                        return (
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => addCourseWithId(item.courseid)}
-                                                    className="text-green-600 hover:text-green-900 dark:hover:text-green-400"
-                                                    title="Select course"
-                                                >
-                                                    <FaPlus />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleManualSelection(item)}
-                                                    className="text-orange-600 hover:text-orange-900 dark:hover:text-orange-400"
-                                                    title="Manual Selection"
-                                                >
-                                                    <FaHandPaper />
-                                                </button>
-                                            </div>
-                                        );
-                                    default:
-                                        return null;
-                                }
-                            }}
-                        />
-                    ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No available courses found matching your search criteria.</p>
-                    )}
-                </div>
+                {selectedPriority === 2 && renderCoursesByPriority(2, '必修课')}
+                {selectedPriority === 1 && renderCoursesByPriority(1, '限选课')}
+                {selectedPriority === 0 && renderCoursesByPriority(0, '任选课')}
 
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
@@ -403,4 +451,5 @@ export function StudentCourseList() {
             </div>
         </StudentLayout>
     );
+
 }

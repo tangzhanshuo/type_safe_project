@@ -24,13 +24,14 @@ case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: St
           val teacherName = row.hcursor.get[String]("teacherName").getOrElse("")
           val capacity = row.hcursor.get[Int]("capacity").getOrElse(0)
           val info = row.hcursor.get[String]("info").getOrElse("")
-          val courseHour = row.hcursor.get[List[Int]]("courseHour").getOrElse(Nil)
+          val courseHourJsonString = row.hcursor.get[String]("courseHour").getOrElse("[]")
           val classroomid = row.hcursor.get[Int]("classroomid").getOrElse(0)
           val credits = row.hcursor.get[Int]("credits").getOrElse(0)
           val enrolledStudentsJsonString = row.hcursor.get[String]("enrolledStudents").getOrElse("[]")
           val allStudentsJsonString = row.hcursor.get[String]("allStudents").getOrElse("[]")
           val status = row.hcursor.get[String]("status").getOrElse("")
 
+          val courseHour = parse(courseHourJsonString).flatMap(_.as[List[Int]]).getOrElse(Nil)
           val enrolledStudents = parse(enrolledStudentsJsonString).flatMap(_.as[List[EnrolledStudent]]).getOrElse(Nil)
           val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[AllStudent]]).getOrElse(Nil)
 

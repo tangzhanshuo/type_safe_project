@@ -153,6 +153,26 @@ export class Application {
     }
 }
 
+export class Classroom {
+    classroomid: number;
+    classroomName: string;
+    capacity: number;
+    enrolledCourses: Map<number, number[]>;
+
+    constructor(
+        classroomid: number,
+        classroomName: string,
+        capacity: number,
+        enrolledCourses: Map<number, number[]>
+    ) {
+        this.classroomid = classroomid;
+        this.classroomName = classroomName;
+        this.capacity = capacity;
+        this.enrolledCourses = enrolledCourses;
+    }
+}
+
+
 export const sendUnverifiedPostRequest = async (message: API) => {
     const returnResponse = new Response()
     try {
