@@ -25,6 +25,7 @@ import { AdminAddClassroom } from 'Pages/Admin/AdminAddClassroom'
 import { NotFoundPage } from 'Pages/NotFoundPage'
 import { TeacherMyApplication } from 'Pages/Teacher/TeacherMyApplication'
 import { TeacherApplication } from 'Pages/Teacher/TeacherApplication'
+import { StudentCurriculum } from 'Pages/Student/StudentCurriculum'
 
 
 const Layout = () => {
@@ -41,6 +42,7 @@ const Layout = () => {
                     <Route path="/student/dashboard" exact component={StudentDashboard} />
                     <Route path="/student/course/:courseid(\d+)" component={StudentCourseDetail} />
                     <Route path="/student/myApplication" exact component={StudentMyApplication} />
+                    <Route path="/student/curriculum" exact component={StudentCurriculum} />
 
                     <Route path="/teacher/dashboard" exact component={TeacherDashboard} />
                     <Route path="/teacher/course/:courseid(\d+)" exact component={TeacherCourseDetail} />
