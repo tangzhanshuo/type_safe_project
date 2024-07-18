@@ -51,10 +51,14 @@ case class StudentAddCourseMessagePlanner(username: String, courseID: Int, prior
       // Get existing courses and priorities
       coursesOption <- getAllCoursesByStudentUsername(username)
       courses = coursesOption.getOrElse(List.empty)
+
+      // Initialize priorityCounts array
       priorityCounts = Array.fill(9)(0)
       _ = courses.foreach { c =>
         c.allStudents.find(_.studentUsername == username).foreach { student =>
-          priorityCounts(student.priority) += 1
+          if (student.priority >= 0 && student.priority < 9) { // Ensure priority is between 0 and 9
+            priorityCounts(student.priority) += 1
+          }
         }
       }
 

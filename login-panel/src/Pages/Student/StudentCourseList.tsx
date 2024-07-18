@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StudentLayout } from 'Components/Student/StudentLayout';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest} from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentCourse } from 'Plugins/CommonUtils/StudentUtils';
 import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourseListMessage';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
@@ -13,10 +13,13 @@ import Auth from 'Plugins/CommonUtils/AuthState';
 import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch, FaHandPaper } from 'react-icons/fa';
 import { ManualSelectBox } from 'Components/Student/ManualSelectBox';
 import { CourseTable } from 'Components/CourseTable';
+import { UserGetInfoMessage } from 'Plugins/UserAPI/UserGetInfoMessage'
 
 type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
 export function StudentCourseList() {
+    const [studentInfo, setStudentInfo] = useState<any>(null);
+    const [studentName, setStudentName] = useState('');
     const [studentUsername, setStudentUsername] = useState<string>('');
     const [courses, setCourses] = useState<StudentCourse[]>([]);
     const [credits, setCredits] = useState<number | null>(null);
@@ -32,11 +35,13 @@ export function StudentCourseList() {
     const [showManualSelectionPopup, setShowManualSelectionPopup] = useState(false);
     const [selectedCourseForManual, setSelectedCourseForManual] = useState<StudentCourse | null>(null);
     const [selectedPriority, setSelectedPriority] = useState<number>(3);
+    const [bigPriority, setBigPriority] = useState<number>(2);
     const history = useHistory();
 
     useEffect(() => {
         getCourseList();
         fetchSelectedCourses();
+        fetchStudentInfo();
         setStudentUsername(Auth.getState().username);
         getCredits();
         getPlan();
@@ -59,7 +64,6 @@ export function StudentCourseList() {
             setErrorMessage('Error parsing course data');
         }
     };
-
 
     const addCourseWithId = async (courseid: number) => {
         const priority = 3 - selectedPriority; // 将选择的优先度转换为对应的值
@@ -85,6 +89,20 @@ export function StudentCourseList() {
             setErrorMessage('');
         } catch (error) {
             setErrorMessage('Error parsing course data');
+        }
+    };
+
+    const fetchStudentInfo = async () => {
+        const response = await sendPostRequest(new UserGetInfoMessage("student", Auth.getState().username));
+        if (response.isError) {
+            setErrorMessage(response.error);
+            setStudentName('');
+            setStudentInfo(null);
+        } else {
+            const info = response.data;
+            setStudentInfo(info);
+            setStudentName(info.name || '');
+            setErrorMessage('');
         }
     };
 
@@ -207,8 +225,8 @@ export function StudentCourseList() {
         const defaultMinCredits = 6;
         const defaultMaxCredits = 26;
 
-        const minCredits = plan ? plan.creditsLimits[Object.keys(plan.creditsLimits)[0]].min : defaultMinCredits;
-        const maxCredits = plan ? plan.creditsLimits[Object.keys(plan.creditsLimits)[0]].max : defaultMaxCredits;
+        const minCredits = plan ? plan.creditsLimits[studentInfo.year].min : defaultMinCredits;
+        const maxCredits = plan ? plan.creditsLimits[studentInfo.year].max : defaultMaxCredits;
         const Credits = credits || 0;
         const maxCreditsPlusOne = maxCredits + 6;
 
@@ -296,11 +314,12 @@ export function StudentCourseList() {
     };
 
     const getBigPriority = (courseid: number) => {
-        if (plan && plan.priority && plan.priority.year) {
-            return plan.priority.year[courseid] ?? 0;
+        if (plan && plan.priority && plan.priority[studentInfo.year]) {
+            return plan.priority[studentInfo.year][courseid] ?? 0;
         }
         return 0;
     };
+
 
     const coursesByPriority = filteredAndSortedCourses.reduce((acc: { [key: number]: StudentCourse[] }, course) => {
         const bigPriority = getBigPriority(course.courseid);
@@ -317,8 +336,9 @@ export function StudentCourseList() {
                     <label htmlFor={`priority-${priority}`} className="mr-2 text-gray-700 dark:text-gray-300">Select Priority:</label>
                     <select
                         id={`priority-${priority}`}
+                        value={selectedPriority}
+                        onChange={(e) => setSelectedPriority(Number(e.target.value))}
                         className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                        defaultValue={3}
                     >
                         <option value={1}>第1志愿</option>
                         <option value={2}>第2志愿</option>
@@ -391,8 +411,6 @@ export function StudentCourseList() {
         </div>
     );
 
-
-
     return (
         <StudentLayout>
             <div className="space-y-6">
@@ -410,28 +428,28 @@ export function StudentCourseList() {
 
                 <div className="flex space-x-4 mb-4">
                     <button
-                        onClick={() => setSelectedPriority(2)}
-                        className={`px-4 py-2 rounded ${selectedPriority === 2 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                        onClick={() => setBigPriority(2)}
+                        className={`px-4 py-2 rounded ${bigPriority === 2 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                     >
                         必修课
                     </button>
                     <button
-                        onClick={() => setSelectedPriority(1)}
-                        className={`px-4 py-2 rounded ${selectedPriority === 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                        onClick={() => setBigPriority(1)}
+                        className={`px-4 py-2 rounded ${bigPriority === 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                     >
                         限选课
                     </button>
                     <button
-                        onClick={() => setSelectedPriority(0)}
-                        className={`px-4 py-2 rounded ${selectedPriority === 0 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                        onClick={() => setBigPriority(0)}
+                        className={`px-4 py-2 rounded ${bigPriority === 0 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                     >
                         任选课
                     </button>
                 </div>
 
-                {selectedPriority === 2 && renderCoursesByPriority(2, '必修课')}
-                {selectedPriority === 1 && renderCoursesByPriority(1, '限选课')}
-                {selectedPriority === 0 && renderCoursesByPriority(0, '任选课')}
+                {bigPriority === 2 && renderCoursesByPriority(2, '必修课')}
+                {bigPriority === 1 && renderCoursesByPriority(1, '限选课')}
+                {bigPriority === 0 && renderCoursesByPriority(0, '任选课')}
 
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
@@ -451,5 +469,4 @@ export function StudentCourseList() {
             </div>
         </StudentLayout>
     );
-
 }
