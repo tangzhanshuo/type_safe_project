@@ -13,6 +13,9 @@ case class TeacherGetCourseListMessagePlanner(usertype: String,
                                               username: String,
                                               override val planContext: PlanContext) extends Planner[List[Course]] {
   override def plan(using planContext: PlanContext): IO[List[Course]] = {
-    getCourseByTeacherUsername(username)
+    getCourseByTeacherUsername(username).flatMap {
+      case Some(courses) => IO.pure(courses)
+      case None => IO.pure(List.empty[Course])
+    }
   }
 }
