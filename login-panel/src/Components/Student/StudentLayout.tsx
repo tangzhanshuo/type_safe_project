@@ -1,11 +1,12 @@
 import React, { ReactNode } from 'react';
 import { DashboardLayout } from 'Components/DashboardLayout';
-import { FaHome, FaBook, FaList } from 'react-icons/fa';
+import { FaHome, FaBook, FaList, FaClipboardList } from 'react-icons/fa'
 
 const studentMenuItems = [
     { path: '/student/dashboard', name: 'Dashboard', icon: FaHome },
     { path: '/student/myCourse', name: 'My Courses', icon: FaBook },
     { path: '/student/courseList', name: 'Courses List', icon: FaList },
+    { path: '/student/myApplication', name: 'Applications', icon: FaClipboardList },
 ];
 
 interface StudentLayoutProps {

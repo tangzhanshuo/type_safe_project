@@ -20,8 +20,11 @@ import { AdminApplication } from 'Pages/Admin/AdminApplication'
 import { StudentDashboard } from 'Pages/Student/StudentDashboard'
 import { StudentMyCourse } from 'Pages/Student/StudentMyCourse'
 import { AdminDashboard } from 'Pages/Admin/AdminDashboard'
-import {AdminClassroom} from "Pages/Admin/AdminClassroom";
+import { AdminClassroom } from 'Pages/Admin/AdminClassroom';
+import { StudentMyApplication } from 'Pages/Student/StudentMyApplication'
 import { NotFoundPage } from 'Pages/NotFoundPage'
+import { TeacherMyApplication } from 'Pages/Teacher/TeacherMyApplication'
+import { TeacherApplication } from 'Pages/Teacher/TeacherApplication'
 
 
 const Layout = () => {
@@ -32,14 +35,20 @@ const Layout = () => {
                     <Route path="/" exact component={Main} />
                     <Route path="/register/:usertype" exact component={Register} />
                     <Route path="/login/:usertype" exact component={Login} />
+
                     <Route path="/student/myCourse" exact component={StudentMyCourse} />
                     <Route path="/student/courseList" exact component={StudentCourseList} />
                     <Route path="/student/dashboard" exact component={StudentDashboard} />
                     <Route path="/student/course/:courseid(\d+)" component={StudentCourseDetail} />
+                    <Route path="/student/myApplication" exact component={StudentMyApplication} />
+
                     <Route path="/teacher/dashboard" exact component={TeacherDashboard} />
                     <Route path="/teacher/course/:courseid(\d+)" exact component={TeacherCourseDetail} />
                     <Route path="/teacher/addCourse" exact component={TeacherAddCourse} />
                     <Route path="/teacher/myCourse" exact component={TeacherMyCourse} />
+                    <Route path="/teacher/myApplication" exact component={TeacherMyApplication} />
+                    <Route path="/teacher/application" exact component={TeacherApplication} />
+
                     <Route path="/admin/dashboard" exact component={AdminDashboard} />
                     <Route path="/admin/userManagement" exact component={AdminUserManagement} />
                     <Route path="/admin/classroom" exact component={AdminClassroom} />
