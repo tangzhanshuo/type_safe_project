@@ -19,14 +19,54 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                                                                       onDelete,
                                                                       showApproveReject
                                                                   }) => {
-    const renderApproverInfo = (approver: Approver | undefined) => {
-        if (!approver) return <div>No approver</div>;
-        return (
-            <div>
-                <div>{approver.usertype}: {approver.username}</div>
-                <div>Approved: {approver.approved ? 'Yes' : 'No'}</div>
-            </div>
-        );
+    const renderApproverInfo = (approvers: Approver[]) => {
+        const approvedLines: JSX.Element[] = [];
+        const pendingLines: JSX.Element[] = [];
+
+        approvers.forEach((approver, index) => {
+            if (approver.approved) {
+                approvedLines.push(
+                    <div key={index} className="text-green-500">
+                        Approved by {approver.usertype} {approver.username}
+                    </div>
+                );
+            } else if (approver.username === "") {
+                pendingLines.push(
+                    <div key={index} className="text-orange-500">
+                        Waiting for a/an {approver.usertype}'s approval
+                    </div>
+                );
+            } else {
+                pendingLines.push(
+                    <div key={index} className="text-orange-500">
+                        Waiting for {approver.usertype} {approver.username}'s approval
+                    </div>
+                );
+            }
+        });
+
+        return [...approvedLines, ...pendingLines];
+    };
+
+    const handleApprove = async () => {
+        if (onApprove) {
+            await onApprove(application.applicationID);
+            onClose();
+        }
+    };
+
+    const handleReject = async () => {
+        if (onReject) {
+            await onReject(application.applicationID);
+            onClose();
+        }
+    };
+
+    const handleDelete = async () => {
+        if (onDelete) {
+            await onDelete(application.applicationID);
+            onClose();
+        }
     };
 
     return (
@@ -67,15 +107,13 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                 <div className="mb-4">
                     <strong>Approvers:</strong>
                     <div className="ml-4">
-                        <div>Approver 1: {renderApproverInfo(application.approver[0])}</div>
-                        <div>Approver 2: {renderApproverInfo(application.approver[1])}</div>
-                        <div>Approver 3: {renderApproverInfo(application.approver[2])}</div>
+                        {renderApproverInfo(application.approver)}
                     </div>
                 </div>
                 <div className="flex justify-end space-x-2">
                     {showApproveReject && onApprove && (
                         <button
-                            onClick={() => onApprove(application.applicationID)}
+                            onClick={handleApprove}
                             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded flex items-center"
                         >
                             <FaCheck className="mr-2" /> Approve
@@ -83,7 +121,7 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                     )}
                     {showApproveReject && onReject && (
                         <button
-                            onClick={() => onReject(application.applicationID)}
+                            onClick={handleReject}
                             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center"
                         >
                             <FaTimes className="mr-2" /> Reject
@@ -91,7 +129,7 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                     )}
                     {onDelete && (
                         <button
-                            onClick={() => onDelete(application.applicationID)}
+                            onClick={handleDelete}
                             className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded flex items-center"
                         >
                             <FaTrash className="mr-2" /> Delete

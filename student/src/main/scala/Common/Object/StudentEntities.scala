@@ -41,3 +41,14 @@ object StudentCourse {
   implicit val courseEncoder: Encoder[StudentCourse] = deriveEncoder
   implicit val courseDecoder: Decoder[StudentCourse] = deriveDecoder
 }
+
+case class StudentCourseWaitingPosition(
+                                  studentCourse: StudentCourse,
+                                  priority: List[Int],
+                                  position: Int
+                                )
+
+object StudentCourseWaitingPosition {
+  implicit val courseWaitingPositionEncoder: Encoder[StudentCourseWaitingPosition] = deriveEncoder
+  implicit val courseWaitingPositionDecoder: Decoder[StudentCourseWaitingPosition] = deriveDecoder
+}
