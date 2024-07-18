@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest, sendCourseListRequest, StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest, sendStudentCourseListRequest, StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import Auth from 'Plugins/CommonUtils/AuthState';
@@ -28,7 +28,7 @@ export function StudentMyCourse() {
     }, []);
 
     const fetchSelectedCourses = async () => {
-        const response = await sendCourseListRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
+        const response = await sendStudentCourseListRequest(new StudentGetAllCoursesByUsernameMessage(Auth.getState().username));
         if (response.isError) {
             if (response.error.startsWith("No courses found")) {
                 setErrorMessage('');
