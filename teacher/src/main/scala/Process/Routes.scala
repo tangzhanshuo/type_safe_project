@@ -38,6 +38,26 @@ object Routes:
           .flatMap { m =>
             m.fullPlan.map(_.asJson.toString)
           }
+      case "TeacherApproveApplicationMessage" =>
+        IO(decode[TeacherApproveApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for TeacherApproveApplication")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "TeacherDeleteApplicationMessage" =>
+        IO(decode[TeacherDeleteApplicationMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for TeacherDeleteApplicationMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "TeacherGetApplicationFromApplicantMessage" =>
+        IO(decode[TeacherGetApplicationFromApplicantMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for TeacherGetApplicationFromApplicantMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
+      case "TeacherGetApplicationFromApproverMessage" =>
+        IO(decode[TeacherGetApplicationFromApproverMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for TeacherGetApplicationFromApproverMessage")))
+          .flatMap { m =>
+            m.fullPlan.map(_.asJson.noSpaces)
+          }
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
