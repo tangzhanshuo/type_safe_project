@@ -10,7 +10,7 @@ const adminMenuItems = [
         icon: FaBook,
         subItems: [
             { path: '/admin/course/addCourse', name: 'Add Course', icon: FaPlus },
-            { path: '/admin/course/searchCourse', name: 'Course List', icon: FaList },
+            { path: '/admin/course', name: 'Course List', icon: FaList },
         ],
     },
     { path: '/admin/classroom', name: 'Classroom Management', icon: FaChalkboardTeacher },

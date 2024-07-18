@@ -206,7 +206,7 @@ export function AdminCourseList() {
                                 {filteredAndSortedCourses.map((course) => (
                                     <tr key={course.courseID}>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/admin/course/searchCourse/${course.courseID}`}
+                                            <Link to={`/admin/course/${course.courseID}`}
                                                   className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                                 {course.courseID}
                                             </Link>

@@ -44,8 +44,8 @@ const Layout = () => {
                     <Route path="/admin/userManagement" exact component={AdminUserManagement} />
                     <Route path="/admin/classroom" exact component={AdminClassroom} />
                     <Route path="/admin/course/addCourse" exact component={AdminAddCourse} />
-                    <Route path="/admin/course/searchCourse" exact component={AdminCourseList} />
-                    <Route path="/admin/course/searchCourse/:courseid(\d+)" exact component={AdminCourseDetail} />
+                    <Route path="/admin/course" exact component={AdminCourseList} />
+                    <Route path="/admin/course/:courseid(\d+)" exact component={AdminCourseDetail} />
                     <Route path="/admin/application" exact component={AdminApplication} />
                     <Route component={NotFoundPage} />
                 </Switch>
