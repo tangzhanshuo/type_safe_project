@@ -9,7 +9,7 @@ import { sendPostRequest, sendApplicationListRequest } from 'Plugins/CommonUtils
 export const TeacherApplication: React.FC = () => {
     const getApplications = async () => {
         const message = new TeacherGetApplicationFromApproverMessage();
-        const response = await sendPostRequest(message);
+        const response = await sendApplicationListRequest(message);
         if (response.isError) throw new Error(response.error || 'Failed to retrieve applications');
         return response.data;
     };
