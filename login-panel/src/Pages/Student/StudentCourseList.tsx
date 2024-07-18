@@ -10,7 +10,7 @@ import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/Studen
 import { StudentGetCreditsMessage } from 'Plugins/StudentAPI/StudentGetCreditsMessage';
 import { StudentGetPlanMessage } from 'Plugins/StudentAPI/StudentGetPlanMessage';
 import Auth from 'Plugins/CommonUtils/AuthState';
-import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
+import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch, FaHandPaper } from 'react-icons/fa';
 import { ManualSelectBox } from 'Components/Student/ManualSelectBox';
 import { CourseTable } from 'Components/CourseTable';
 
@@ -358,13 +358,22 @@ export function StudentCourseList() {
                                         return <span>{item.status}</span>;
                                     case 'Options':
                                         return (
-                                            <button
-                                                onClick={() => item.status === 'closed' ? handleManualSelection(item) : addCourseWithId(item.courseid)}
-                                                className={`text-${item.status === 'closed' ? 'orange' : 'green'}-600 hover:text-${item.status === 'closed' ? 'orange' : 'green'}-900 dark:hover:text-${item.status === 'closed' ? 'orange' : 'green'}-400`}
-                                                title={item.status === 'closed' ? 'Manual Selection' : 'Select course'}
-                                            >
-                                                {item.status === 'closed' ? 'Manual Select' : <FaPlus />}
-                                            </button>
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => addCourseWithId(item.courseid)}
+                                                    className="text-green-600 hover:text-green-900 dark:hover:text-green-400"
+                                                    title="Select course"
+                                                >
+                                                    <FaPlus />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleManualSelection(item)}
+                                                    className="text-orange-600 hover:text-orange-900 dark:hover:text-orange-400"
+                                                    title="Manual Selection"
+                                                >
+                                                    <FaHandPaper />
+                                                </button>
+                                            </div>
                                         );
                                     default:
                                         return null;
