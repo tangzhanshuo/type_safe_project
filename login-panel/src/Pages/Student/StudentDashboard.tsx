@@ -11,6 +11,7 @@ import { FaSync } from 'react-icons/fa';
 
 export function StudentDashboard() {
     const [studentUsername, setStudentUsername] = useState('');
+    const [studentInfo, setStudentInfo] = useState<any>(null);
     const [studentName, setStudentName] = useState('');
     const [studentAddress, setStudentAddress] = useState('');
     const [selectedCoursesCount, setSelectedCoursesCount] = useState(0);
@@ -25,13 +26,15 @@ export function StudentDashboard() {
     }, []);
 
     const fetchStudentInfo = async () => {
-        const response = await sendPostRequest(new UserGetInfoMessage("student", studentName));
+        const response = await sendPostRequest(new UserGetInfoMessage("student", studentUsername));
         if (response.isError) {
             setErrorMessage(response.error);
             setStudentName('');
             setStudentAddress('');
+            setStudentInfo(null);
         } else {
             const info = response.data;
+            setStudentInfo(info);
             setStudentName(info.name || '');
             setStudentAddress(info.address || '');
             setErrorMessage('');
@@ -64,10 +67,17 @@ export function StudentDashboard() {
     };
 
     const handleSaveInfo = async () => {
+        if (!studentInfo) {
+            setErrorMessage('No student information available');
+            return;
+        }
+
         const updatedInfo = {
+            ...studentInfo,
             name: studentName,
             address: studentAddress
         };
+
         const response = await sendPostRequest(new UserSetInfoMessage("student", studentUsername, updatedInfo));
         if (response.isError) {
             setErrorMessage(response.error);

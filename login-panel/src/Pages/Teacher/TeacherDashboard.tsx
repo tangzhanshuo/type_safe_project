@@ -11,6 +11,7 @@ import { FaSync } from 'react-icons/fa';
 
 export function TeacherDashboard() {
     const [teacherUsername, setTeacherUsername] = useState('');
+    const [teacherInfo, setTeacherInfo] = useState<any>(null);
     const [teacherName, setTeacherName] = useState('');
     const [teacherDepartment, setTeacherDepartment] = useState('');
     const [selectedCoursesCount, setSelectedCoursesCount] = useState(0);
@@ -30,8 +31,10 @@ export function TeacherDashboard() {
             setErrorMessage(response.error);
             setTeacherName('');
             setTeacherDepartment('');
+            setTeacherInfo(null);
         } else {
             const info = response.data;
+            setTeacherInfo(info);
             setTeacherName(info.name || '');
             setTeacherDepartment(info.department || '');
             setErrorMessage('');
@@ -60,7 +63,13 @@ export function TeacherDashboard() {
     }
 
     const handleSaveInfo = async () => {
+        if (!teacherInfo) {
+            setErrorMessage('No teacher information available');
+            return;
+        }
+
         const updatedInfo = {
+            ...teacherInfo,
             name: teacherName,
             department: teacherDepartment
         };
