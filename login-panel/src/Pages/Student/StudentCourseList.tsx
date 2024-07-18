@@ -12,6 +12,7 @@ import { StudentGetPlanMessage } from 'Plugins/StudentAPI/StudentGetPlanMessage'
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
 import { ManualSelectBox } from 'Components/Student/ManualSelectBox';
+import { CourseTable } from 'Components/CourseTable';
 
 type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
@@ -321,55 +322,55 @@ export function StudentCourseList() {
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                     <h3 className="text-xl font-semibold mb-4">Available Courses</h3>
                     {filteredAndSortedCourses.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead className="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    {renderSortableHeader('courseid', 'Course ID')}
-                                    {renderSortableHeader('courseName', 'Course Name')}
-                                    {renderSortableHeader('teacherName', 'Teacher')}
-                                    {renderSortableHeader('capacity', 'Capacity')}
-                                    {renderSortableHeader('allStudentsNumber', 'All Students Number')}
-                                    {renderSortableHeader('enrolledStudentsNumber', 'Enrolled Students Number')}
-                                    {renderSortableHeader('credits', 'Credits')}
-                                    {renderSortableHeader('info', 'Info')}
-                                    {renderSortableHeader('status', 'Status')}
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
-                                </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                {filteredAndSortedCourses.map((course) => (
-                                    <tr key={course.courseid}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/student/course/${course.courseid}`}
-                                                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                {course.courseid}
-                                            </Link>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.courseName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.teacherName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.allStudentsNumber}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudentsNumber}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.status}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {(course.status === 'preregister' || course.status === 'open' || course.status === 'closed') && (
-                                                <button
-                                                    onClick={() => course.status === 'closed' ? handleManualSelection(course) : addCourseWithId(course.courseid)}
-                                                    className="text-green-600 hover:text-green-900 dark:hover:text-green-400"
-                                                    title={course.status === 'closed' ? 'Manual Selection' : 'Select course'}
-                                                >
-                                                    <FaPlus />
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <CourseTable
+                            columns={[
+                                'Course ID',
+                                'Course Name',
+                                'Teacher',
+                                'Capacity',
+                                'All Students Number',
+                                'Enrolled Students Number',
+                                'Credits',
+                                'Info',
+                                'Status',
+                                'Options'
+                            ]}
+                            data={filteredAndSortedCourses}
+                            renderCell={(item, column) => {
+                                switch (column) {
+                                    case 'Course ID':
+                                        return <Link to={`/student/course/${item.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">{item.courseid}</Link>;
+                                    case 'Course Name':
+                                        return <span>{item.courseName}</span>;
+                                    case 'Teacher':
+                                        return <span>{item.teacherName}</span>;
+                                    case 'Capacity':
+                                        return <span>{item.capacity}</span>;
+                                    case 'All Students Number':
+                                        return <span>{item.allStudentsNumber}</span>;
+                                    case 'Enrolled Students Number':
+                                        return <span>{item.enrolledStudentsNumber}</span>;
+                                    case 'Credits':
+                                        return <span>{item.credits}</span>;
+                                    case 'Info':
+                                        return <span>{item.info}</span>;
+                                    case 'Status':
+                                        return <span>{item.status}</span>;
+                                    case 'Options':
+                                        return (
+                                            <button
+                                                onClick={() => item.status === 'closed' ? handleManualSelection(item) : addCourseWithId(item.courseid)}
+                                                className={`text-${item.status === 'closed' ? 'orange' : 'green'}-600 hover:text-${item.status === 'closed' ? 'orange' : 'green'}-900 dark:hover:text-${item.status === 'closed' ? 'orange' : 'green'}-400`}
+                                                title={item.status === 'closed' ? 'Manual Selection' : 'Select course'}
+                                            >
+                                                {item.status === 'closed' ? 'Manual Select' : <FaPlus />}
+                                            </button>
+                                        );
+                                    default:
+                                        return null;
+                                }
+                            }}
+                        />
                     ) : (
                         <p className="text-gray-500 dark:text-gray-400">No available courses found matching your search criteria.</p>
                     )}
