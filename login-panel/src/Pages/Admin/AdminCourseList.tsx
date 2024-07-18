@@ -10,7 +10,7 @@ import { AdminLayout } from 'Components/Admin/AdminLayout';
 import { FaSync, FaTrash, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
 import Auth from 'Plugins/CommonUtils/AuthState'
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage'
-
+import { CourseTable } from 'Components/CourseTable';
 interface Course {
     courseID: number;
     courseName: string;
@@ -189,46 +189,41 @@ export function AdminCourseList() {
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                     {filteredAndSortedCourses.length > 0 ? (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead className="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    {renderSortableHeader('courseID', 'Course ID')}
-                                    {renderSortableHeader('courseName', 'Course Name')}
-                                    {renderSortableHeader('teacherName', 'Teacher')}
-                                    {renderSortableHeader('capacity', 'Capacity')}
-                                    {renderSortableHeader('credits', 'Credits')}
-                                    {renderSortableHeader('info', 'Info')}
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
-                                </tr>
-                                </thead>
-                                <tbody
-                                    className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                {filteredAndSortedCourses.map((course) => (
-                                    <tr key={course.courseID}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link to={`/admin/course/${course.courseID}`}
-                                                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                {course.courseID}
-                                            </Link>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.courseName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.teacherName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <button
-                                                onClick={() => deleteCourseWithId(course.courseID)}
-                                                className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
-                                                title="Delete course"
-                                            >
-                                                <FaTrash />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                            <CourseTable
+                                columns={['Course ID', 'Course Name', 'Teacher', 'Capacity', 'Credits', 'Info', 'Options']}
+                                data={filteredAndSortedCourses}
+                                renderCell={(item, column) => {
+                                    switch (column) {
+                                        case 'Course ID':
+                                            return (
+                                                <Link to={`/admin/course/searchCourse/${item.courseID}`}
+                                                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                                    {item.courseID}
+                                                </Link>
+                                            );
+                                        case 'Course Name':
+                                            return <span>{item.courseName}</span>;
+                                        case 'Teacher':
+                                            return <span>{item.teacherName}</span>;
+                                        case 'Capacity':
+                                            return <span>{item.capacity}</span>;
+                                        case 'Credits':
+                                            return <span>{item.credits}</span>;
+                                        case 'Info':
+                                            return <span>{item.info}</span>;
+                                        case 'Options':
+                                            return (
+                                                <button onClick={() => deleteCourseWithId(item.courseID)}
+                                                        className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
+                                                        title="Delete course">
+                                                    <FaTrash />
+                                                </button>
+                                            );
+                                        default:
+                                            return null;
+                                    }
+                                }}
+                            />
                         </div>
                     ) : (
                         <p className="text-gray-500 dark:text-gray-400">No selected courses found matching your search
