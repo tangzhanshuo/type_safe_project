@@ -59,6 +59,7 @@ export function StudentCourseList() {
         }
     };
 
+
     const addCourseWithId = async (courseid: number) => {
         const response = await sendPostRequest(new StudentAddCourseMessage(courseid, 0));
         if (response.isError) {

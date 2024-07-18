@@ -30,6 +30,46 @@ export function AdminCourseDetail() {
         getCourse();
     }, [courseID]);
 
+    // Step 1: Define a type for the accumulator
+    type Schedule = {
+        [key: string]: Set<number>;
+    };
+
+    function formatCourseHours(courseHours: number[]): string {
+        const weekMap = ['前八周', '后八周'];
+        const dayMap = ['日', '一', '二', '三', '四', '五', '六'];
+        const timeMap: { [key: string]: string } = {
+            '0': '8:00~9:35',
+            '1': '9:50~12:15',
+            '2': '13:30~15:05',
+            '3': '15:20~16:55',
+            '4': '17:00~18:45',
+            '5': '19:20~20:55',
+        };
+
+        // Step 2: Use the defined type in the reduce function
+        const schedule = courseHours.reduce<Schedule>((acc, hour) => {
+            const w = Math.floor(hour / 42);
+            const d = Math.floor((hour - 42 * w) / 6);
+            const h = hour - 42 * w - 6 * d;
+            const key = `${d}-${h}`;
+
+            if (!acc[key]) {
+                acc[key] = new Set<number>();
+            }
+            acc[key].add(w);
+
+            return acc;
+        }, {});
+
+        // Step 3: Explicitly declare the type of weeks
+        return Object.entries(schedule).map(([key, weeks]) => {
+            const [d, h] = key.split('-').map(Number);
+            const weekStr = weeks.size === 2 ? '全周' : weekMap[[...weeks][0]];
+            return `${weekStr} 星期${dayMap[d]} ${timeMap[h.toString()]}`;
+        }).join('，');
+    }
+
     const getCourse = async () => {
         const id = parseInt(courseID, 10);
         if (isNaN(id)) {
@@ -96,7 +136,7 @@ export function AdminCourseDetail() {
                                 </tr>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course Hours:</th>
-                                    <td className="px-6 py-4 whitespace-nowrap">{JSON.stringify(course.courseHour)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{formatCourseHours(course.courseHour)}</td>
                                 </tr>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Classroom ID:</th>
