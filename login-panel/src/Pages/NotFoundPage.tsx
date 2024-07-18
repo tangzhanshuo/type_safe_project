@@ -29,10 +29,10 @@ export function NotFoundPage() {
     };
 
     const checkAuthAndRedirect = () => {
-        if (token === '1') {
-            redirectToDashboard();
-        } else if (token === '0') {
+        if (token === '') {
             history.push('/');
+        } else {
+            redirectToDashboard();
         }
     };
 
