@@ -26,7 +26,7 @@ export function StudentDashboard() {
     }, []);
 
     const fetchStudentInfo = async () => {
-        const response = await sendPostRequest(new UserGetInfoMessage("student", studentUsername));
+        const response = await sendPostRequest(new UserGetInfoMessage("student", Auth.getState().username));
         if (response.isError) {
             setErrorMessage(response.error);
             setStudentName('');
@@ -78,7 +78,7 @@ export function StudentDashboard() {
             address: studentAddress
         };
 
-        const response = await sendPostRequest(new UserSetInfoMessage("student", studentUsername, updatedInfo));
+        const response = await sendPostRequest(new UserSetInfoMessage("student", Auth.getState().username, updatedInfo));
         if (response.isError) {
             setErrorMessage(response.error);
         } else {

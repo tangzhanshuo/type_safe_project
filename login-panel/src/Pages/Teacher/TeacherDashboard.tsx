@@ -26,7 +26,7 @@ export function TeacherDashboard() {
     }, []);
 
     const fetchTeacherInfo = async () => {
-        const response = await sendPostRequest(new UserGetInfoMessage("teacher", teacherUsername));
+        const response = await sendPostRequest(new UserGetInfoMessage("teacher", Auth.getState().username));
         if (response.isError) {
             setErrorMessage(response.error);
             setTeacherName('');
@@ -73,7 +73,7 @@ export function TeacherDashboard() {
             name: teacherName,
             department: teacherDepartment
         };
-        const response = await sendPostRequest(new UserSetInfoMessage("teacher", teacherUsername, updatedInfo));
+        const response = await sendPostRequest(new UserSetInfoMessage("teacher", Auth.getState().username, updatedInfo));
         if (response.isError) {
             setErrorMessage(response.error);
         } else {
