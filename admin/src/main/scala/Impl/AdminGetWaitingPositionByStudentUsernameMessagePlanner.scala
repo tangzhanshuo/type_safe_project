@@ -12,6 +12,9 @@ case class AdminGetWaitingPositionByStudentUsernameMessagePlanner(
                                                                    override val planContext: PlanContext
                                                                  ) extends Planner[List[CourseWaitingPosition]] {
   override def plan(using planContext: PlanContext): IO[List[CourseWaitingPosition]] = {
-    getWaitingPositionByStudentUsername(studentUsername)
+    getWaitingPositionByStudentUsername(studentUsername).flatMap {
+      case Some(positions) => IO.pure(positions)
+      case None => IO.pure(List.empty[CourseWaitingPosition])
+    }
   }
 }

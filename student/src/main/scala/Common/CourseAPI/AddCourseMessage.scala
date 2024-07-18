@@ -14,8 +14,6 @@ case class AddCourseMessage(
                              info: String,
                              courseHour: List[Int],
                              classroomid: Int,
-                             credits: Int,
-                             enrolledStudents: List[EnrolledStudent],
-                             allStudents: List[AllStudent]
+                             credits: Int
                            ) extends API[Course](courseServiceCode)
 

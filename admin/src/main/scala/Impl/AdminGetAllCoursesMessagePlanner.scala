@@ -20,7 +20,10 @@ case class AdminGetAllCoursesMessagePlanner(
       case Some(id) => getCourseByCourseID(id).map(List(_))
       case None => IO.pure(List.empty[Course])
     }
-    val coursesByTeacher: IO[List[Course]] = getCourseByTeacherUsername(element)
+    val coursesByTeacher: IO[List[Course]] = getCourseByTeacherUsername(element).flatMap {
+      case Some(courses) => IO.pure(courses)
+      case None => IO.pure(List.empty[Course])
+    }
 
     (coursesByName, coursesById, coursesByTeacher).mapN { (name, id, teacher) =>
       (name ++ id ++ teacher).distinct

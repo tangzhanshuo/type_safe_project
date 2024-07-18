@@ -8,10 +8,14 @@ import io.circe.generic.auto._
 import Common.Object.Course
 
 case class AdminGetCourseByTeacherUsernameMessagePlanner(
-                                                   teacherUsername: String,
-                                                   override val planContext: PlanContext
-                                                 ) extends Planner[List[Course]] {
+                                                          teacherUsername: String,
+                                                          override val planContext: PlanContext
+                                                        ) extends Planner[List[Course]] {
   override def plan(using planContext: PlanContext): IO[List[Course]] = {
-    getCourseByTeacherUsername(teacherUsername)
+    getCourseByTeacherUsername(teacherUsername).flatMap {
+      case Some(courses) => IO.pure(courses)
+      case None => IO.pure(List.empty[Course])
+    }
   }
 }
+
