@@ -1,26 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest, sendStudentCourseListRequest } from 'Plugins/CommonUtils/SendPostRequest'
 import { StudentGetCourseMessage } from 'Plugins/StudentAPI/StudentGetCourseMessage';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { StudentLayout } from 'Components/Student/StudentLayout';
-
-interface StudentCourse {
-    courseid: number;
-    courseName: string;
-    teacherName: string;
-    capacity: number;
-    credits: number;
-    info: string;
-    status: string;
-    enrolledStudentsNumber: number;
-    allStudentsNumber: number;
-    studentStatus: string;
-}
-
+import { StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
 
 export function StudentCourseDetail() {
     const history = useHistory();
@@ -41,28 +28,13 @@ export function StudentCourseDetail() {
             return;
         }
 
-        const response = await sendPostRequest(new StudentGetCourseMessage(id));
+        const response = await sendStudentCourseListRequest(new StudentGetCourseMessage(id));
         if (response.isError) {
             setErrorMessage(response.error);
             return;
         }
 
-        const parsedCourse = {
-            courseid: response.data.courseid,
-            courseName: response.data.courseName,
-            teacherName: response.data.teacherName,
-            capacity: response.data.capacity,
-            credits: response.data.credits,
-            info: response.data.info,
-            courseHour: response.data.courseHour,
-            classroomid: response.data.classroomid,
-            enrolledStudentsNumber: response.data.enrolledStudentsNumber,
-            allStudentsNumber: response.data.allStudentsNumber,
-            status: response.data.status,
-            studentStatus: response.data.studentStatus
-        };
-
-        setCourse(parsedCourse);
+        setCourse(response.data);
     };
 
     const addCourse = async () => {
