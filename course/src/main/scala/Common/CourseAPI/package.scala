@@ -58,7 +58,7 @@ package object CourseAPI {
   def getCourseByCourseID(courseid: Int)(using PlanContext): IO[Course] =
     GetCourseByCourseIDMessage(courseid).send
     
-  def getCourseByCourseName(courseName: String)(using PlanContext): IO[List[Course]] =
+  def getCourseByCourseName(courseName: String)(using PlanContext): IO[Option[List[Course]]] =
     GetCourseByCourseNameMessage(courseName).send
 
   def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[Option[List[Course]]] =

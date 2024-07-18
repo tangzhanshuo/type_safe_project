@@ -15,7 +15,10 @@ case class AdminGetAllCoursesMessagePlanner(
   override def plan(using planContext: PlanContext): IO[List[Course]] = {
     val courseIdOption = element.toIntOption
 
-    val coursesByName: IO[List[Course]] = getCourseByCourseName(element)
+    val coursesByName: IO[List[Course]] = getCourseByCourseName(element).flatMap {
+      case Some(courses) => IO.pure(courses)
+      case None => IO.pure(List.empty[Course])
+    }
     val coursesById: IO[List[Course]] = courseIdOption match {
       case Some(id) => getCourseByCourseID(id).map(List(_))
       case None => IO.pure(List.empty[Course])

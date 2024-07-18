@@ -1,16 +1,16 @@
 package Impl
 
 import cats.effect.IO
-import io.circe.generic.auto.*
+import io.circe.generic.auto._
 import io.circe.parser.decode
-import io.circe.syntax.*
+import io.circe.syntax._
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.readDBRows
 import Common.Object.{Course, EnrolledStudent, AllStudent, SqlParameter}
-import cats.implicits.*
+import cats.implicits._
 
-case class GetCourseByCourseNameMessagePlanner(courseName: String, override val planContext: PlanContext) extends Planner[List[Course]] {
-  override def plan(using planContext: PlanContext): IO[List[Course]] = {
+case class GetCourseByCourseNameMessagePlanner(courseName: String, override val planContext: PlanContext) extends Planner[Option[List[Course]]] {
+  override def plan(using planContext: PlanContext): IO[Option[List[Course]]] = {
     val query = "SELECT * FROM course WHERE course_name = ?"
     readDBRows(query, List(SqlParameter("string", courseName))).flatMap { rows =>
       if (rows.nonEmpty) {
@@ -36,10 +36,10 @@ case class GetCourseByCourseNameMessagePlanner(courseName: String, override val 
         }
         coursesIO.sequence match {
           case Left(error) => IO.raiseError(error)
-          case Right(courses) => IO.pure(courses)
+          case Right(courses) => IO.pure(Some(courses))
         }
       } else {
-        IO.raiseError(new NoSuchElementException(s"No courses found with courseName: $courseName"))
+        IO.pure(None)
       }
     }
   }

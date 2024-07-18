@@ -19,7 +19,7 @@ package object CourseAPI {
                  info: String,
                  courseHour: List[Int],
                  classroomid: Int,
-                 credits: Int
+                 credits: Int,
                )(using PlanContext): IO[Course] = {
     AddCourseMessage(courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits).send
   }
@@ -57,8 +57,8 @@ package object CourseAPI {
 
   def getCourseByCourseID(courseid: Int)(using PlanContext): IO[Course] =
     GetCourseByCourseIDMessage(courseid).send
-
-  def getCourseByCourseName(courseName: String)(using PlanContext): IO[List[Course]] =
+    
+  def getCourseByCourseName(courseName: String)(using PlanContext): IO[Option[List[Course]]] =
     GetCourseByCourseNameMessage(courseName).send
 
   def getCourseByTeacherUsername(teacherUsername: String)(using PlanContext): IO[Option[List[Course]]] =
