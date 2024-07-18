@@ -69,14 +69,62 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
         }
     };
 
+    // Step 1: Define a type for the accumulator
+    type Schedule = {
+        [key: string]: Set<number>;
+    };
+
+    function formatCourseHours(courseHours: number[]): string {
+        const weekMap = ['前八周', '后八周'];
+        const dayMap = ['日', '一', '二', '三', '四', '五', '六'];
+        const timeMap: { [key: string]: string } = {
+            '0': '8:00~9:35',
+            '1': '9:50~12:15',
+            '2': '13:30~15:05',
+            '3': '15:20~16:55',
+            '4': '17:00~18:45',
+            '5': '19:20~20:55',
+        };
+
+        // Step 2: Use the defined type in the reduce function
+        const schedule = courseHours.reduce<Schedule>((acc, hour) => {
+            const w = Math.floor(hour / 42);
+            const d = Math.floor((hour - 42 * w) / 6);
+            const h = hour - 42 * w - 6 * d;
+            const key = `${d}-${h}`;
+
+            if (!acc[key]) {
+                acc[key] = new Set<number>();
+            }
+            acc[key].add(w);
+
+            return acc;
+        }, {});
+
+        // Step 3: Explicitly declare the type of weeks
+        return Object.entries(schedule).map(([key, weeks]) => {
+            const [d, h] = key.split('-').map(Number);
+            const weekStr = weeks.size === 2 ? '全周' : weekMap[[...weeks][0]];
+            return `${weekStr} 星期${dayMap[d]} ${timeMap[h.toString()]}`;
+        }).join('，');
+    }
+
+    function convertStringToNumberArray(inputString: string): number[] {
+        // Step 1: Remove square brackets
+        const trimmedString = inputString.replace(/^\[|\]$/g, '');
+        // Step 2 & 3: Split by comma and convert each to number
+        return trimmedString.split(',').map(Number);
+    }
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto relative">
+            <div
+                className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto relative">
                 <button
                     onClick={onClose}
                     className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
-                    <FaTimes />
+                    <FaTimes/>
                 </button>
                 <h2 className="text-2xl font-bold mb-4">Application Details</h2>
                 <div className="mb-4">
@@ -96,12 +144,16 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                     {(() => {
                         const infoObj = JSON.parse(application.info);
                         const propertiesToShow = ['courseID', 'info', 'credits', 'capacity', 'courseHour', 'courseName', 'classroomID', 'teacherName'];
-                        return propertiesToShow.map((prop, index) => (
-                            infoObj[prop] ?
+                        console.log(convertStringToNumberArray(infoObj['courseHour']));
+                        return propertiesToShow.map((prop, index) => {
+                            // Check if the property is courseHour and call Func if it is
+                            const valueToShow = prop === 'courseHour' ? formatCourseHours(convertStringToNumberArray(infoObj[prop])) : infoObj[prop];
+                            return infoObj[prop] ? (
                                 <div key={index} className="ml-4">
-                                    <strong>{prop}:</strong> {infoObj[prop]}
-                                </div> : null
-                        ));
+                                    <strong>{prop}:</strong> {valueToShow}
+                                </div>
+                            ) : null;
+                        });
                     })()}
                 </div>
                 <div className="mb-4">
@@ -116,7 +168,7 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                             onClick={handleApprove}
                             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded flex items-center"
                         >
-                            <FaCheck className="mr-2" /> Approve
+                            <FaCheck className="mr-2"/> Approve
                         </button>
                     )}
                     {showApproveReject && onReject && (
@@ -124,7 +176,7 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                             onClick={handleReject}
                             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center"
                         >
-                            <FaTimes className="mr-2" /> Reject
+                            <FaTimes className="mr-2"/> Reject
                         </button>
                     )}
                     {onDelete && (
@@ -132,7 +184,7 @@ export const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                             onClick={handleDelete}
                             className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded flex items-center"
                         >
-                            <FaTrash className="mr-2" /> Delete
+                            <FaTrash className="mr-2"/> Delete
                         </button>
                     )}
                 </div>

@@ -60,6 +60,7 @@ export function StudentCourseList() {
         }
     };
 
+
     const addCourseWithId = async (courseid: number) => {
         const priority = 3 - selectedPriority; // 将选择的优先度转换为对应的值
         const response = await sendPostRequest(new StudentAddCourseMessage(courseid, priority));

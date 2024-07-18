@@ -1,95 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { sendCourseListRequest, sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest'
-import { AdminGetCourseByCourseNameMessage } from 'Plugins/AdminAPI/AdminGetCourseByCourseNameMessage';
-import { AdminGetCourseByTeacherUsernameMessage } from 'Plugins/AdminAPI/AdminGetCourseByTeacherUsernameMessage';
-import { AdminGetCourseByCourseIDMessage } from 'Plugins/AdminAPI/AdminGetCourseByCourseIDMessage';
-import { AdminGetAllCoursesMessage } from 'Plugins/AdminAPI/AdminGetAllCoursesMessage';
+import { sendCourseListRequest, sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
+import { Course } from 'Plugins/CommonUtils/SendPostRequest';
 import { AdminDeleteCourseMessage } from 'Plugins/AdminAPI/AdminDeleteCourseMessage';
 import { AdminLayout } from 'Components/Admin/AdminLayout';
 import { FaSync, FaTrash, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
-import Auth from 'Plugins/CommonUtils/AuthState'
-import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage'
 import { CourseTable } from 'Components/CourseTable';
-interface Course {
-    courseID: number;
-    courseName: string;
-    teacherName: string;
-    capacity: number;
-    credits: number;
-    info: string;
-}
+import { AdminGetCourseListMessage } from 'Plugins/AdminAPI/AdminGetCourseListMessage'
 
-type SearchColumn = 'CourseID' | 'TeacherName' | 'CourseName' | 'All';
+type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
 export function AdminCourseList() {
-    const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
+    const [courses, setCourses] = useState<Course[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState<string>('');
-    const [selectedCourseIds, setSelectedCourseIds] = useState<number[]>([]);
     const [showDeleteResponse, setShowDeleteResponse] = useState<boolean>(false);
-    const [sortColumn, setSortColumn] = useState<keyof Course>('courseID');
+    const [sortColumn, setSortColumn] = useState<keyof Course>('courseid');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchColumn, setSearchColumn] = useState<SearchColumn>('All');
     const history = useHistory();
 
     useEffect(() => {
-        fetchSelectedCourses();
+        getCourseList();
     }, []);
 
-    const fetchSelectedCourses = async () => {
-        let response;
-
-        switch (searchColumn) {
-            case 'CourseID':
-                const courseID = parseInt(searchTerm, 10);
-                if (isNaN(courseID)) {
-                    setErrorMessage('Course ID must be a number');
-                    setSelectedCourses([]);
-                    return;
-                }
-                response = await sendCourseListRequest(new AdminGetCourseByCourseIDMessage(courseID));
-                break;
-            case 'TeacherName':
-                response = await sendCourseListRequest(new AdminGetCourseByTeacherUsernameMessage(searchTerm));
-                break;
-            case 'CourseName':
-                response = await sendCourseListRequest(new AdminGetCourseByCourseNameMessage(searchTerm));
-                break;
-            case 'All':
-                response = await sendCourseListRequest(new AdminGetAllCoursesMessage(searchTerm));
-                break;
-            default:
-                setErrorMessage('Invalid search column');
-                setSelectedCourses([]);
-                return;
-        }
-
+    const getCourseList = async () => {
+        const response = await sendCourseListRequest(new AdminGetCourseListMessage());
         if (response.isError) {
-            if (response.error.startsWith("No courses found")) {
-                setErrorMessage('');
-                setSelectedCourses([]);
-            } else {
-                setErrorMessage(response.error);
-                setSelectedCourses([]);
-            }
+            setErrorMessage(response.error);
             return;
         }
-        console.log(response.data);
-        setSelectedCourses(response.data);
-    }
+        try {
+            setCourses(response.data);
+            setErrorMessage('');
+        } catch (error) {
+            setErrorMessage('Error parsing course data');
+        }
+    };
 
-    const deleteCourseWithId = async (courseID: number) => {
-        const response = await sendPostRequest(new AdminDeleteCourseMessage(courseID));
+    const deleteCourseWithId = async (courseid: number) => {
+        const response = await sendPostRequest(new AdminDeleteCourseMessage(courseid));
         if (response.isError) {
             setDeleteCourseResponse(response.error);
             return;
         }
-        setDeleteCourseResponse('Course ' + courseID + ' deleted successfully');
+        setDeleteCourseResponse('Course ' + courseid + ' deleted successfully');
         setShowDeleteResponse(true);
         setTimeout(() => setShowDeleteResponse(false), 2000);
-        fetchSelectedCourses();
+        getCourseList();
     };
 
     const handleSort = (column: keyof Course) => {
@@ -101,10 +60,12 @@ export function AdminCourseList() {
         }
     };
 
-    const sortedCourses = [...selectedCourses].sort((a, b) => {
-        if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-        if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
+    const sortedCourses = [...courses].sort((a, b) => {
+        if (sortDirection === 'asc') {
+            return a[sortColumn] < b[sortColumn] ? -1 : 1;
+        } else {
+            return a[sortColumn] > b[sortColumn] ? -1 : 1;
+        }
     });
 
     const filterCourses = (courses: Course[]) => {
@@ -112,25 +73,28 @@ export function AdminCourseList() {
             if (searchTerm === '') return true;
             const lowerSearchTerm = searchTerm.toLowerCase();
             switch (searchColumn) {
-                case 'CourseID':
-                    return course.courseID?.toString().includes(lowerSearchTerm) ?? false;
-                case 'CourseName':
-                    return course.courseName?.toLowerCase().includes(lowerSearchTerm) ?? false;
-                case 'TeacherName':
-                    return course.teacherName?.toLowerCase().includes(lowerSearchTerm) ?? false;
+                case 'ID':
+                    return course.courseid.toString().includes(lowerSearchTerm);
+                case 'Name':
+                    return course.courseName.toLowerCase().includes(lowerSearchTerm);
+                case 'Teacher':
+                    return course.teacherName.toLowerCase().includes(lowerSearchTerm);
+                case 'Status':
+                    return course.status.toLowerCase().includes(lowerSearchTerm);
                 case 'All':
                     return (
-                        course.courseID?.toString().includes(lowerSearchTerm) ||
-                        course.courseName?.toLowerCase().includes(lowerSearchTerm) ||
-                        course.teacherName?.toLowerCase().includes(lowerSearchTerm)
-                    ) ?? false;
+                        course.courseid.toString().includes(lowerSearchTerm) ||
+                        course.courseName.toLowerCase().includes(lowerSearchTerm) ||
+                        course.teacherName.toLowerCase().includes(lowerSearchTerm) ||
+                        course.status.toLowerCase().includes(lowerSearchTerm)
+                    );
                 default:
                     return true;
             }
         });
     };
 
-    const filteredAndSortedCourses = filterCourses(sortedCourses).filter(course => !selectedCourseIds.includes(course.courseID));
+    const filteredAndSortedCourses = filterCourses(sortedCourses);
 
     const SortIcon = ({ column }: { column: keyof Course }) => {
         if (column !== sortColumn) return null;
@@ -153,15 +117,16 @@ export function AdminCourseList() {
         <AdminLayout>
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold">Search Courses</h2>
+                    <h2 className="text-2xl font-bold">Course List</h2>
                     <button
-                        onClick={fetchSelectedCourses}
+                        onClick={getCourseList}
                         className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded transition duration-300"
                         title="Refresh course list"
                     >
                         <FaSync />
                     </button>
                 </div>
+
                 <div className="flex items-center space-x-4 mb-4">
                     <select
                         value={searchColumn}
@@ -169,9 +134,10 @@ export function AdminCourseList() {
                         className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                     >
                         <option value="All">All</option>
-                        <option value="CourseID">CourseID</option>
-                        <option value="CourseName">CourseName</option>
-                        <option value="TeacherName">TeacherName</option>
+                        <option value="ID">ID</option>
+                        <option value="Name">Name</option>
+                        <option value="Teacher">Teacher</option>
+                        <option value="Status">Status</option>
                     </select>
                     <div className="relative flex-grow">
                         <input
@@ -181,53 +147,64 @@ export function AdminCourseList() {
                             placeholder="Search courses..."
                             className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                         />
-                        <FaSearch
-                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                     </div>
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                    <h3 className="text-xl font-semibold mb-4">All Courses</h3>
                     {filteredAndSortedCourses.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <CourseTable
-                                columns={['Course ID', 'Course Name', 'Teacher', 'Capacity', 'Credits', 'Info', 'Options']}
-                                data={filteredAndSortedCourses}
-                                renderCell={(item, column) => {
-                                    switch (column) {
-                                        case 'Course ID':
-                                            return (
-                                                <Link to={`/admin/course/searchCourse/${item.courseID}`}
-                                                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                    {item.courseID}
-                                                </Link>
-                                            );
-                                        case 'Course Name':
-                                            return <span>{item.courseName}</span>;
-                                        case 'Teacher':
-                                            return <span>{item.teacherName}</span>;
-                                        case 'Capacity':
-                                            return <span>{item.capacity}</span>;
-                                        case 'Credits':
-                                            return <span>{item.credits}</span>;
-                                        case 'Info':
-                                            return <span>{item.info}</span>;
-                                        case 'Options':
-                                            return (
-                                                <button onClick={() => deleteCourseWithId(item.courseID)}
-                                                        className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
-                                                        title="Delete course">
-                                                    <FaTrash />
-                                                </button>
-                                            );
-                                        default:
-                                            return null;
-                                    }
-                                }}
-                            />
-                        </div>
+                        <CourseTable
+                            columns={[
+                                'Course ID',
+                                'Course Name',
+                                'Teacher',
+                                'Capacity',
+                                'All Students Number',
+                                'Enrolled Students Number',
+                                'Credits',
+                                'Info',
+                                'Status',
+                                'Options'
+                            ]}
+                            data={filteredAndSortedCourses}
+                            renderCell={(item, column) => {
+                                switch (column) {
+                                    case 'Course ID':
+                                        return <Link to={`/admin/course/${item.courseid}`} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">{item.courseid}</Link>;
+                                    case 'Course Name':
+                                        return <span>{item.courseName}</span>;
+                                    case 'Teacher':
+                                        return <span>{item.teacherName}</span>;
+                                    case 'Capacity':
+                                        return <span>{item.capacity}</span>;
+                                    case 'All Students Number':
+                                        return <span>{item.allStudents.length}</span>;
+                                    case 'Enrolled Students Number':
+                                        return <span>{item.enrolledStudents.length}</span>;
+                                    case 'Credits':
+                                        return <span>{item.credits}</span>;
+                                    case 'Info':
+                                        return <span>{item.info}</span>;
+                                    case 'Status':
+                                        return <span>{item.status}</span>;
+                                    case 'Options':
+                                        return (
+                                            <button
+                                                onClick={() => deleteCourseWithId(item.courseid)}
+                                                className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
+                                                title="Delete course"
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        );
+                                    default:
+                                        return null;
+                                }
+                            }}
+                        />
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400">No selected courses found matching your search
-                            criteria.</p>
+                        <p className="text-gray-500 dark:text-gray-400">No courses found matching your search criteria.</p>
                     )}
                 </div>
 
