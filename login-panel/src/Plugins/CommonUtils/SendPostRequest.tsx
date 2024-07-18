@@ -54,49 +54,22 @@ export class Course {
     }
 }
 
-export class StudentCourse {
-    courseid: number;
-    courseName: string;
-    teacherName: string;
-    capacity: number;
-    credits: number;
-    info: string;
-    courseHour: number[];
-    classroomid: number;
-    enrolledStudentsNumber: number;
-    allStudentsNumber: number;
-    status: string;
-    studentStatus: 'NotEnrolled' | 'Enrolled' | 'Waiting';
+export class CreditsLimits {
+    min: number;
+    max: number;
 
-    constructor(courseid: number, courseName: string, teacherName: string, capacity: number, credits: number, info: string, courseHour: number[], classroomid: number, enrolledStudentsNumber: number, allStudentsNumber: number, status: string, studentStatus: string) {
-        this.courseid = courseid;
-        this.courseName = courseName;
-        this.teacherName = teacherName;
-        this.capacity = capacity;
-        this.credits = credits;
-        this.info = info;
-        this.courseHour = courseHour;
-        this.classroomid = classroomid;
-        this.enrolledStudentsNumber = enrolledStudentsNumber;
-        this.allStudentsNumber = allStudentsNumber;
-        this.status = status;
-        this.studentStatus = this.parseStudentStatus(studentStatus);
-    }
-
-    private parseStudentStatus(studentStatus: string): 'NotEnrolled' | 'Enrolled' | 'Waiting' {
-        if (studentStatus == 'NotEnrolled'){
-            return 'NotEnrolled'
-        }
-        if (studentStatus == 'Enrolled'){
-            return 'Enrolled'
-        }
-        if (studentStatus == 'Waiting'){
-            return 'Waiting'
-        }
-        throw new Error(`Unknown student status: ${JSON.stringify(studentStatus)}`);
+    constructor(min: number, max: number) {
+        this.min = min;
+        this.max = max;
     }
 }
 
+export class Plan {
+    planid: number;
+    planName: string;
+    creditsLimits: Map<number, CreditsLimits>;
+    priority: Map<number, Map<number, number>>
+}
 
 
 export class Approver {

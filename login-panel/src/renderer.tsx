@@ -27,6 +27,7 @@ import { NotFoundPage } from 'Pages/NotFoundPage'
 import { TeacherMyApplication } from 'Pages/Teacher/TeacherMyApplication'
 import { TeacherApplication } from 'Pages/Teacher/TeacherApplication'
 import { StudentCurriculum } from 'Pages/Student/StudentCurriculum'
+import { AdminPlanList } from 'Pages/Admin/AdminPlanList'
 
 
 const Layout = () => {
@@ -51,6 +52,7 @@ const Layout = () => {
                     <Route path="/teacher/myCourse" exact component={TeacherMyCourse} />
                     <Route path="/teacher/myApplication" exact component={TeacherMyApplication} />
                     <Route path="/teacher/application" exact component={TeacherApplication} />
+
                     <Route path="/admin/dashboard" exact component={AdminDashboard} />
                     <Route path="/admin/userManagement" exact component={AdminUserManagement} />
                     <Route path="/admin/course/addCourse" exact component={AdminAddCourse} />
@@ -59,6 +61,7 @@ const Layout = () => {
                     <Route path="/admin/classroom/addClassroom" exact component={AdminAddClassroom} />
                     <Route path="/admin/classroom/searchClassroom" exact component={AdminClassroomList} />
                     <Route path="/admin/application" exact component={AdminApplication} />
+                    <Route path="/admin/planList" exact component={AdminPlanList} />
                     <Route component={NotFoundPage} />
                 </Switch>
             </HashRouter>

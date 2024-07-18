@@ -21,6 +21,7 @@ const adminMenuItems = [
         ],
     },
     { path: '/admin/application', name: 'Applications', icon: FaClipboardList },
+    { path: '/admin/planList', name: 'Plan Management', icon: FaList },
 ];
 
 interface AdminLayoutProps {
