@@ -7,7 +7,7 @@ import { TeacherGetCourseListMessage } from 'Plugins/TeacherAPI/TeacherGetCourse
 import { TeacherEndPreRegisterMessage } from 'Plugins/TeacherAPI/TeacherEndPreRegisterMessage';
 import { TeacherLayout } from 'Components/Teacher/TeacherLayout';
 import { FaSync, FaSort, FaSearch, FaStop } from 'react-icons/fa';
-
+import { CourseTable } from 'Components/CourseTable';
 type SortColumn = keyof Course;
 type SortDirection = 'asc' | 'desc';
 type SearchColumn = 'courseid' | 'courseName' | 'info' | 'All';
@@ -139,50 +139,44 @@ export function TeacherMyCourse(): JSX.Element {
                     ) : isLoading ? (
                         <p className="text-gray-600 dark:text-gray-400">Loading courses...</p>
                     ) : filteredAndSortedCourses.length > 0 ? (
-                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead className="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                {['courseid', 'courseName', 'capacity', 'credits', 'info', 'courseHour', 'classroomid', 'enrolledStudents', 'status', 'action'].map((column) => (
-                                    <th
-                                        key={column}
-                                        onClick={() => column !== 'action' && handleSort(column as SortColumn)}
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                                    >
-                                        <div className="flex items-center">
-                                            {column}
-                                            {sortColumn === column && <FaSort className="ml-1" />}
-                                        </div>
-                                    </th>
-                                ))}
-                            </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                            {filteredAndSortedCourses.map((course) => (
-                                <tr key={course.courseid} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.courseid}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.courseName}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.courseHour.join(', ')}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.classroomid}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudents.length}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{course.status}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {course.status === 'preregister' && (
+                        <CourseTable
+                            columns={['Course ID', 'Course Name', 'Capacity', 'Credits', 'Info', 'Course Hour', 'Classroom ID', 'Enrolled Students', 'Status', 'Action']}
+                            data={filteredAndSortedCourses}
+                            renderCell={(item, column) => {
+                                switch (column) {
+                                    case 'Course ID':
+                                        return <span>{item.courseid}</span>;
+                                    case 'Course Name':
+                                        return <span>{item.courseName}</span>;
+                                    case 'Capacity':
+                                        return <span>{item.capacity}</span>;
+                                    case 'Credits':
+                                        return <span>{item.credits}</span>;
+                                    case 'Info':
+                                        return <span>{item.info}</span>;
+                                    case 'Course Hour':
+                                        return <span>{item.courseHour.join(', ')}</span>;
+                                    case 'Classroom ID':
+                                        return <span>{item.classroomid}</span>;
+                                    case 'Enrolled Students':
+                                        return <span>{item.enrolledStudents.length}</span>;
+                                    case 'Status':
+                                        return <span>{item.status}</span>;
+                                    case 'Action':
+                                        return item.status === 'preregister' ? (
                                             <button
-                                                onClick={() => handleEndPreRegister(course.courseid)}
+                                                onClick={() => handleEndPreRegister(item.courseid)}
                                                 className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
                                                 title="End Preregister"
                                             >
                                                 <FaStop />
                                             </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
+                                        ) : null;
+                                    default:
+                                        return null;
+                                }
+                            }}
+                        />
                     ) : (
                         <p className="text-gray-600 dark:text-gray-400">No courses available.</p>
                     )}
