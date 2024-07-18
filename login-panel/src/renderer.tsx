@@ -20,8 +20,8 @@ import { AdminApplication } from 'Pages/Admin/AdminApplication'
 import { StudentDashboard } from 'Pages/Student/StudentDashboard'
 import { StudentMyCourse } from 'Pages/Student/StudentMyCourse'
 import { AdminDashboard } from 'Pages/Admin/AdminDashboard'
-import { AdminClassroom } from 'Pages/Admin/AdminClassroom';
 import { StudentMyApplication } from 'Pages/Student/StudentMyApplication'
+import { AdminAddClassroom } from 'Pages/Admin/AdminAddClassroom'
 import { NotFoundPage } from 'Pages/NotFoundPage'
 import { TeacherMyApplication } from 'Pages/Teacher/TeacherMyApplication'
 import { TeacherApplication } from 'Pages/Teacher/TeacherApplication'
@@ -48,13 +48,12 @@ const Layout = () => {
                     <Route path="/teacher/myCourse" exact component={TeacherMyCourse} />
                     <Route path="/teacher/myApplication" exact component={TeacherMyApplication} />
                     <Route path="/teacher/application" exact component={TeacherApplication} />
-
                     <Route path="/admin/dashboard" exact component={AdminDashboard} />
                     <Route path="/admin/userManagement" exact component={AdminUserManagement} />
-                    <Route path="/admin/classroom" exact component={AdminClassroom} />
                     <Route path="/admin/course/addCourse" exact component={AdminAddCourse} />
                     <Route path="/admin/course" exact component={AdminCourseList} />
                     <Route path="/admin/course/:courseid(\d+)" exact component={AdminCourseDetail} />
+                    <Route path="/admin/classroom/addClassroom" exact component={AdminAddClassroom} />
                     <Route path="/admin/application" exact component={AdminApplication} />
                     <Route component={NotFoundPage} />
                 </Switch>

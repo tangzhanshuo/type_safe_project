@@ -13,7 +13,13 @@ const adminMenuItems = [
             { path: '/admin/course', name: 'Course List', icon: FaList },
         ],
     },
-    { path: '/admin/classroom', name: 'Classroom Management', icon: FaChalkboardTeacher },
+    {
+        name: 'Classroom Management', icon: FaChalkboardTeacher,
+        subItems: [
+            { path: '/admin/classroom/addClassroom', name: 'Add Classroom', icon: FaPlus },
+            { path: '/admin/classroom/searchClassroom', name: 'Classroom List', icon: FaList },
+        ],
+    },
     { path: '/admin/application', name: 'Applications', icon: FaClipboardList },
 ];
 
