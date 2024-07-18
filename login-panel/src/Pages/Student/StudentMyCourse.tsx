@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest, sendCourseListRequest, Course } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest, sendCourseListRequest, StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
 import { StudentDeleteCourseMessage } from 'Plugins/StudentAPI/StudentDeleteCourseMessage';
 import Auth from 'Plugins/CommonUtils/AuthState';
@@ -12,11 +12,11 @@ type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'All';
 type FilterStatus = 'Preregister' | 'Enrolled' | 'Waiting';
 
 export function StudentMyCourse() {
-    const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
+    const [selectedCourses, setSelectedCourses] = useState<StudentCourse[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState<string>('');
     const [showDeleteResponse, setShowDeleteResponse] = useState<boolean>(false);
-    const [sortColumn, setSortColumn] = useState<keyof Course>('courseid');
+    const [sortColumn, setSortColumn] = useState<keyof StudentCourse>('courseid');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchColumn, setSearchColumn] = useState<SearchColumn>('All');
@@ -58,7 +58,7 @@ export function StudentMyCourse() {
         fetchSelectedCourses();
     };
 
-    const handleSort = (column: keyof Course) => {
+    const handleSort = (column: keyof StudentCourse) => {
         if (column === sortColumn) {
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
         } else {
@@ -73,7 +73,7 @@ export function StudentMyCourse() {
         return 0;
     });
 
-    const filterCourses = (courses: Course[]) => {
+    const filterCourses = (courses: StudentCourse[]) => {
         return courses.filter(course => {
             if (searchTerm === '') return true;
             const lowerSearchTerm = searchTerm.toLowerCase();
@@ -96,20 +96,17 @@ export function StudentMyCourse() {
         });
     };
 
-    const filterByStatus = (courses: Course[]) => {
-        const username = Auth.getState().username;
+    const filterByStatus = (courses: StudentCourse[]) => {
         switch (filterStatus) {
             case 'Preregister':
                 return courses.filter(course => course.status === 'preregister');
             case 'Enrolled':
                 return courses.filter(course =>
-                    course.status !== 'preregister' &&
-                    course.enrolledStudents.some(student => student.studentUsername === username)
+                    course.status !== 'preregister' && course.studentStatus === 'Enrolled'
                 );
             case 'Waiting':
                 return courses.filter(course =>
-                    course.status !== 'preregister' &&
-                    !course.enrolledStudents.some(student => student.studentUsername === username)
+                    course.status !== 'preregister' && course.studentStatus === 'Waiting'
                 );
             default:
                 return courses;
@@ -118,12 +115,12 @@ export function StudentMyCourse() {
 
     const filteredAndSortedCourses = filterByStatus(filterCourses(sortedCourses));
 
-    const SortIcon = ({ column }: { column: keyof Course }) => {
+    const SortIcon = ({ column }: { column: keyof StudentCourse }) => {
         if (column !== sortColumn) return null;
         return sortDirection === 'asc' ? <FaSortUp className="ml-1" /> : <FaSortDown className="ml-1" />;
     };
 
-    const renderSortableHeader = (column: keyof Course, label: string) => (
+    const renderSortableHeader = (column: keyof StudentCourse, label: string) => (
         <th
             className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
             onClick={() => handleSort(column)}

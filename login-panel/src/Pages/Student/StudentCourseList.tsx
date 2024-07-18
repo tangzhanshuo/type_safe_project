@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StudentLayout } from 'Components/Student/StudentLayout';
 import { useHistory, Link } from 'react-router-dom';
-import { sendPostRequest, sendCourseListRequest, Course } from 'Plugins/CommonUtils/SendPostRequest';
+import { sendPostRequest, sendCourseListRequest, StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
 import { StudentGetCourseListMessage } from 'Plugins/StudentAPI/StudentGetCourseListMessage';
 import { StudentAddCourseMessage } from 'Plugins/StudentAPI/StudentAddCourseMessage';
 import { StudentManualSelectCourseMessage } from 'Plugins/StudentAPI/StudentManualSelectCourseMessage';
@@ -9,26 +9,26 @@ import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/Studen
 import { StudentGetCreditsMessage } from 'Plugins/StudentAPI/StudentGetCreditsMessage';
 import { StudentGetPlanMessage } from 'Plugins/StudentAPI/StudentGetPlanMessage';
 import Auth from 'Plugins/CommonUtils/AuthState';
-import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch, FaHandPaper } from 'react-icons/fa';
+import { FaSync, FaPlus, FaSortUp, FaSortDown, FaSearch } from 'react-icons/fa';
 import { ManualSelectBox } from 'Components/Student/ManualSelectBox';
 
 type SearchColumn = 'ID' | 'Name' | 'Teacher' | 'Status' | 'All';
 
 export function StudentCourseList() {
     const [studentUsername, setStudentUsername] = useState<string>('');
-    const [courses, setCourses] = useState<Course[]>([]);
+    const [courses, setCourses] = useState<StudentCourse[]>([]);
     const [credits, setCredits] = useState<number | null>(null);
     const [plan, setPlan] = useState<any>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [addCourseResponse, setAddCourseResponse] = useState<string>('');
     const [selectedCourseIds, setSelectedCourseIds] = useState<number[]>([]);
     const [showAddResponse, setShowAddResponse] = useState<boolean>(false);
-    const [sortColumn, setSortColumn] = useState<keyof Course>('courseid');
+    const [sortColumn, setSortColumn] = useState<keyof StudentCourse>('courseid');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchColumn, setSearchColumn] = useState<SearchColumn>('All');
     const [showManualSelectionPopup, setShowManualSelectionPopup] = useState(false);
-    const [selectedCourseForManual, setSelectedCourseForManual] = useState<Course | null>(null);
+    const [selectedCourseForManual, setSelectedCourseForManual] = useState<StudentCourse | null>(null);
     const history = useHistory();
 
     useEffect(() => {
@@ -49,7 +49,7 @@ export function StudentCourseList() {
             return;
         }
         try {
-            const selectedCourses: Course[] = response.data;
+            const selectedCourses: StudentCourse[] = response.data;
             setSelectedCourseIds(selectedCourses.map(course => course.courseid));
             setErrorMessage('');
         } catch (error) {
@@ -111,7 +111,7 @@ export function StudentCourseList() {
         }
     };
 
-    const handleSort = (column: keyof Course) => {
+    const handleSort = (column: keyof StudentCourse) => {
         if (column === sortColumn) {
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
         } else {
@@ -121,12 +121,14 @@ export function StudentCourseList() {
     };
 
     const sortedCourses = [...courses].sort((a, b) => {
-        if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-        if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
+        if (sortDirection === 'asc') {
+            return a[sortColumn] < b[sortColumn] ? -1 : 1;
+        } else {
+            return a[sortColumn] > b[sortColumn] ? -1 : 1;
+        }
     });
 
-    const filterCourses = (courses: Course[]) => {
+    const filterCourses = (courses: StudentCourse[]) => {
         return courses.filter(course => {
             if (searchTerm === '') return true;
             const lowerSearchTerm = searchTerm.toLowerCase();
@@ -154,12 +156,12 @@ export function StudentCourseList() {
 
     const filteredAndSortedCourses = filterCourses(sortedCourses).filter(course => !selectedCourseIds.includes(course.courseid));
 
-    const SortIcon = ({ column }: { column: keyof Course }) => {
+    const SortIcon = ({ column }: { column: keyof StudentCourse }) => {
         if (column !== sortColumn) return null;
         return sortDirection === 'asc' ? <FaSortUp className="ml-1" /> : <FaSortDown className="ml-1" />;
     };
 
-    const renderSortableHeader = (column: keyof Course, label: string) => (
+    const renderSortableHeader = (column: keyof StudentCourse, label: string) => (
         <th
             className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
             onClick={() => handleSort(column)}
@@ -171,7 +173,7 @@ export function StudentCourseList() {
         </th>
     );
 
-    const handleManualSelection = (course: Course) => {
+    const handleManualSelection = (course: StudentCourse) => {
         setSelectedCourseForManual(course);
         setShowManualSelectionPopup(true);
     };
@@ -243,7 +245,7 @@ export function StudentCourseList() {
                             whiteSpace: 'pre-wrap'
                         }}
                     >
-                    {'maximum\ncredits:\n' + maxCredits}
+                    {'max\ncredits:\n' + maxCredits}
                 </span>
                 </div>
                 <div className="w-full h-6 bg-gray-200 rounded-l-full relative">
@@ -275,8 +277,6 @@ export function StudentCourseList() {
             </div>
         );
     };
-
-
 
     return (
         <StudentLayout>
@@ -328,6 +328,8 @@ export function StudentCourseList() {
                                     {renderSortableHeader('courseName', 'Course Name')}
                                     {renderSortableHeader('teacherName', 'Teacher')}
                                     {renderSortableHeader('capacity', 'Capacity')}
+                                    {renderSortableHeader('allStudentsNumber', 'All Students Number')}
+                                    {renderSortableHeader('enrolledStudentsNumber', 'Enrolled Students Number')}
                                     {renderSortableHeader('credits', 'Credits')}
                                     {renderSortableHeader('info', 'Info')}
                                     {renderSortableHeader('status', 'Status')}
@@ -346,6 +348,8 @@ export function StudentCourseList() {
                                         <td className="px-6 py-4 whitespace-nowrap">{course.courseName}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.teacherName}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.capacity}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{course.allStudentsNumber}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudentsNumber}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.credits}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.info}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{course.status}</td>

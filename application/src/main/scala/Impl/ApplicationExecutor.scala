@@ -75,9 +75,7 @@ object ApplicationExecutor {
         info = infoStr,
         courseHour = courseHour,
         classroomid = classroomid,
-        credits = credits,
-        enrolledStudents = List.empty,
-        allStudents = List.empty
+        credits = credits
       )
       _ <- IO.println(s"Course added successfully: ${course.courseName} (ID: ${course.courseid}) by teacher: ${course.teacherName} (Username: ${course.teacherUsername})")
     } yield ()

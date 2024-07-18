@@ -54,6 +54,43 @@ export class Course {
     }
 }
 
+export enum StudentStatus {
+    NotEnrolled = 'NotEnrolled',
+    Enrolled = 'Enrolled',
+    Waiting = 'Waiting'
+}
+
+export class StudentCourse {
+    courseid: number;
+    courseName: string;
+    teacherName: string;
+    capacity: number;
+    credits: number;
+    info: string;
+    courseHour: number[];
+    classroomid: number;
+    enrolledStudentsNumber: number;
+    allStudentsNumber: number;
+    status: string;
+    studentStatus: StudentStatus; // New student status field
+
+    constructor(courseid: number, courseName: string, teacherName: string, capacity: number, credits: number, info: string, courseHour: number[], classroomid: number, enrolledStudentsNumber: number, allStudentsNumber: number, status: string, studentStatus: StudentStatus) {
+        this.courseid = courseid;
+        this.courseName = courseName;
+        this.teacherName = teacherName;
+        this.capacity = capacity;
+        this.credits = credits;
+        this.info = info;
+        this.courseHour = courseHour;
+        this.classroomid = classroomid;
+        this.enrolledStudentsNumber = enrolledStudentsNumber;
+        this.allStudentsNumber = allStudentsNumber;
+        this.status = status;
+        this.studentStatus = studentStatus; // Initialize the new student status field
+    }
+}
+
+
 export class Approver {
     approved: boolean;
     username: string;

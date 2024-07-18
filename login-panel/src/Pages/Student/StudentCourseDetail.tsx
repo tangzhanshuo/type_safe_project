@@ -8,17 +8,19 @@ import { logout } from 'Plugins/CommonUtils/UserManager';
 import Auth from 'Plugins/CommonUtils/AuthState';
 import { StudentLayout } from 'Components/Student/StudentLayout';
 
-interface Course {
-    courseid: string;
+interface StudentCourse {
+    courseid: number;
     courseName: string;
     teacherName: string;
     capacity: number;
     credits: number;
     info: string;
-    courseHour: any; // You might want to define a more specific type for this
-    classroomid: string;
-    enrolledStudents: any; // You might want to define a more specific type for this
+    status: string;
+    enrolledStudentsNumber: number;
+    allStudentsNumber: number;
+    studentStatus: string;
 }
+
 
 export function StudentCourseDetail() {
     const history = useHistory();
@@ -26,7 +28,7 @@ export function StudentCourseDetail() {
     const [errorMessage, setErrorMessage] = useState('');
     const [addCourseResponse, setAddCourseResponse] = useState('');
     const [deleteCourseResponse, setDeleteCourseResponse] = useState('');
-    const [course, setCourse] = useState<Course | null>(null);
+    const [course, setCourse] = useState<StudentCourse | null>(null);
 
     useEffect(() => {
         getCourse();
@@ -54,7 +56,9 @@ export function StudentCourseDetail() {
             info: response.data.info,
             courseHour: response.data.courseHour,
             classroomid: response.data.classroomid,
-            enrolledStudents: response.data.enrolledStudents
+            enrolledStudentsNumber: response.data.enrolledStudentsNumber,
+            allStudentsNumber: response.data.allStudentsNumber,
+            studentStatus: response.data.studentStatus
         };
 
         setCourse(parsedCourse);
@@ -129,8 +133,16 @@ export function StudentCourseDetail() {
                                     <td className="px-6 py-4 whitespace-nowrap">{course.classroomid}</td>
                                 </tr>
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Enrolled Students:</th>
-                                    <td className="px-6 py-4 whitespace-nowrap">{JSON.stringify(course.enrolledStudents)}</td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Enrolled Students Number:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.enrolledStudentsNumber}</td>
+                                </tr>
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">All Students Number:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.allStudentsNumber}</td>
+                                </tr>
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student Status:</th>
+                                    <td className="px-6 py-4 whitespace-nowrap">{course.studentStatus}</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -146,6 +158,12 @@ export function StudentCourseDetail() {
                         className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
                     >
                         Register for Course
+                    </button>
+                    <button
+                        onClick={deleteCourse}
+                        className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                    >
+                        Delete Course
                     </button>
                 </div>
             </div>

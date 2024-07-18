@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Course } from 'Plugins/CommonUtils/SendPostRequest';
+import { StudentCourse } from 'Plugins/CommonUtils/SendPostRequest';
 
 interface ManualSelectBoxProps {
-    course: Course;
+    course: StudentCourse;
     onConfirm: (reason: string) => void;
     onCancel: () => void;
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { sendPostRequest } from 'Plugins/CommonUtils/SendPostRequest';
-import { StudentGetCourseByUsernameMessage } from 'Plugins/StudentAPI/StudentGetCourseByUsernameMessage';
+import { StudentGetAllCoursesByUsernameMessage } from 'Plugins/StudentAPI/StudentGetAllCoursesByUsernameMessage';
 import { UserGetInfoMessage } from 'Plugins/UserAPI/UserGetInfoMessage';
 import { UserSetInfoMessage } from 'Plugins/UserAPI/UserSetInfoMessage';
 import { logout } from 'Plugins/CommonUtils/UserManager';
@@ -42,7 +42,7 @@ export function StudentDashboard() {
     };
 
     const fetchSelectedCoursesCount = async (username: string) => {
-        const response = await sendPostRequest(new StudentGetCourseByUsernameMessage(username));
+        const response = await sendPostRequest(new StudentGetAllCoursesByUsernameMessage(username));
         if (response.isError) {
             if (response.error.startsWith("No courses found")) {
                 setErrorMessage('');
