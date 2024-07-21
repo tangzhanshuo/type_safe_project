@@ -2,7 +2,7 @@ package Impl
 
 import cats.effect.IO
 import Common.DBAPI.*
-import Common.Object.{SqlParameter, EnrolledStudent, AllStudent, Course}
+import Common.Object.{SqlParameter, EnrolledStudent, Course}
 import io.circe.parser.{parse, decode}
 import io.circe.{Encoder, Json}
 import Common.CourseAPI.{addCourse, forceAddStudent2Course, deleteCourse}

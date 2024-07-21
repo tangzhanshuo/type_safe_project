@@ -6,7 +6,7 @@ import io.circe.parser.decode
 import io.circe.syntax.*
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.readDBRows
-import Common.Object.{Course, EnrolledStudent, AllStudent, SqlParameter}
+import Common.Object.{Course, EnrolledStudent, SqlParameter}
 import cats.implicits.*
 
 case class GetCourseByCourseIDMessagePlanner(courseid: Int, override val planContext: PlanContext) extends Planner[Course] {
@@ -30,7 +30,7 @@ case class GetCourseByCourseIDMessagePlanner(courseid: Int, override val planCon
           val enrolledStudentsStr = cursor.get[String]("enrolledStudents").left.map(e => new Exception("Missing enrolledStudents"))
           val enrolledStudents = enrolledStudentsStr.flatMap(str => decode[List[EnrolledStudent]](str).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}")))
           val allStudentsStr = cursor.get[String]("allStudents").left.map(e => new Exception("Missing allStudents"))
-          val allStudents = allStudentsStr.flatMap(str => decode[List[AllStudent]](str).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}")))
+          val allStudents = allStudentsStr.flatMap(str => decode[List[EnrolledStudent]](str).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}")))
           val status = cursor.get[String]("status").left.map(e => new Exception("Missing status"))
 
           (courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents, status) match {

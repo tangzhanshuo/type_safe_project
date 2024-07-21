@@ -3,7 +3,7 @@ package Impl
 import cats.effect.IO
 import Common.API.{PlanContext, Planner}
 import Common.CourseAPI.addCourse
-import Common.Object.{EnrolledStudent, AllStudent, Course}
+import Common.Object.{EnrolledStudent, Course}
 import io.circe.parser.decode
 import io.circe.syntax._
 

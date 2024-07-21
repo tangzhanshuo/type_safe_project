@@ -7,7 +7,7 @@ import io.circe.syntax._
 import io.circe.{Json, Decoder}
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI._
-import Common.Object.{SqlParameter, Course, EnrolledStudent, AllStudent}
+import Common.Object.{SqlParameter, Course, EnrolledStudent}
 import java.time.Instant
 import cats.implicits._
 
@@ -43,7 +43,7 @@ case class AddStudent2CourseMessagePlanner(courseid: Int, studentUsername: Optio
             val enrolledStudentsJsonString = cursor.get[String]("enrolledStudents").getOrElse("[]")
             val allStudentsJsonString = cursor.get[String]("allStudents").getOrElse("[]")
             val enrolledStudents = parse(enrolledStudentsJsonString).flatMap(_.as[List[EnrolledStudent]]).getOrElse(Nil)
-            val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[AllStudent]]).getOrElse(Nil)
+            val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[EnrolledStudent]]).getOrElse(Nil)
             val status = cursor.get[String]("status").getOrElse("unknown")
             IO.pure((capacity, enrolledStudents, allStudents, courseHour, status))
           case None => IO.raiseError(new Exception(s"Course with id $courseid not found"))
@@ -75,7 +75,7 @@ case class AddStudent2CourseMessagePlanner(courseid: Int, studentUsername: Optio
               enrolledStudentsStr <- cursor.get[String]("enrolledStudents").toOption.toRight(new Exception("Missing enrolledStudents"))
               enrolledStudents <- decode[List[EnrolledStudent]](enrolledStudentsStr).left.map(e => new Exception(s"Invalid JSON for enrolledStudents: ${e.getMessage}"))
               allStudentsStr <- cursor.get[String]("allStudents").toOption.toRight(new Exception("Missing allStudents"))
-              allStudents <- decode[List[AllStudent]](allStudentsStr).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
+              allStudents <- decode[List[EnrolledStudent]](allStudentsStr).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}"))
               status <- cursor.get[String]("status").toOption.toRight(new Exception("Missing status"))
             } yield Course(courseID, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomID, credits, enrolledStudents, allStudents, status)
           }
@@ -97,7 +97,7 @@ case class AddStudent2CourseMessagePlanner(courseid: Int, studentUsername: Optio
                 if (checkTimeConflict(courseHour, studentCourses)) {
                   IO.raiseError(new Exception(s"Student $username has a time conflict with another course"))
                 } else {
-                  val newStudent = AllStudent(time = getCurrentTime, priority = pri, studentUsername = username)
+                  val newStudent = EnrolledStudent(time = getCurrentTime, priority = pri, studentUsername = username)
                   val updatedAllStudents = allStudents :+ newStudent
                   val updatedAllStudentsJsonString = updatedAllStudents.asJson.noSpaces
 

@@ -1,7 +1,7 @@
 package Common.CourseAPI
 
 import Common.API.API
-import Common.Object.{AllStudent, Course, EnrolledStudent}
+import Common.Object.{Course, EnrolledStudent}
 import Global.ServiceCenter.courseServiceCode
 
 case class UpdateCourseMessage(

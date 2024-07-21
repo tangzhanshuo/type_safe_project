@@ -7,7 +7,7 @@ import io.circe.Json
 import io.circe.parser.parse
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI._
-import Common.Object.{SqlParameter, CourseWaitingPosition, Course, EnrolledStudent, AllStudent}
+import Common.Object.{SqlParameter, CourseWaitingPosition, Course, EnrolledStudent}
 
 case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[Option[List[CourseWaitingPosition]]] {
   override def plan(using planContext: PlanContext): IO[Option[List[CourseWaitingPosition]]] = {
@@ -33,7 +33,7 @@ case class GetWaitingPositionByStudentUsernameMessagePlanner(studentUsername: St
 
           val courseHour = parse(courseHourJsonString).flatMap(_.as[List[Int]]).getOrElse(Nil)
           val enrolledStudents = parse(enrolledStudentsJsonString).flatMap(_.as[List[EnrolledStudent]]).getOrElse(Nil)
-          val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[AllStudent]]).getOrElse(Nil)
+          val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[EnrolledStudent]]).getOrElse(Nil)
 
           val course = Course(courseid, courseName, teacherUsername, teacherName, capacity, info, courseHour, classroomid, credits, enrolledStudents, allStudents, status)
 

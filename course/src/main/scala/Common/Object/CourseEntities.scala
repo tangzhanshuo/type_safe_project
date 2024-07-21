@@ -9,11 +9,6 @@ object EnrolledStudent {
   implicit val enrolledStudentDecoder: Decoder[EnrolledStudent] = deriveDecoder
 }
 
-case class AllStudent(time: Int, priority: Int, studentUsername: String)
-object AllStudent {
-  implicit val allStudentEncoder: Encoder[AllStudent] = deriveEncoder
-  implicit val allStudentDecoder: Decoder[AllStudent] = deriveDecoder
-}
 
 
 
@@ -28,7 +23,7 @@ case class Course(
                    classroomid: Int,
                    credits: Int,
                    enrolledStudents: List[EnrolledStudent],
-                   allStudents: List[AllStudent],
+                   allStudents: List[EnrolledStudent],
                    status: String
                  )
 object Course {

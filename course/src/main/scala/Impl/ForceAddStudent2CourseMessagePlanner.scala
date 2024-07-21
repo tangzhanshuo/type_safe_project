@@ -7,7 +7,7 @@ import io.circe.syntax._
 import io.circe.{Json, Decoder}
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI._
-import Common.Object.{SqlParameter, Course, EnrolledStudent, AllStudent}
+import Common.Object.{SqlParameter, Course, EnrolledStudent}
 import java.time.Instant
 import cats.implicits._
 
@@ -31,7 +31,7 @@ case class ForceAddStudent2CourseMessagePlanner(courseid: Int, studentUsername: 
             val status = cursor.get[String]("status").getOrElse("")
             val capacity = cursor.get[Int]("capacity").getOrElse(0)
             val enrolledStudents = parse(enrolledStudentsJsonString).flatMap(_.as[List[EnrolledStudent]]).getOrElse(Nil)
-            val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[AllStudent]]).getOrElse(Nil)
+            val allStudents = parse(allStudentsJsonString).flatMap(_.as[List[EnrolledStudent]]).getOrElse(Nil)
             IO.pure((enrolledStudents, allStudents, status, capacity))
           case None => IO.raiseError(new Exception(s"Course with id $courseid not found"))
         }
@@ -49,7 +49,7 @@ case class ForceAddStudent2CourseMessagePlanner(courseid: Int, studentUsername: 
             if (isEnrolled) {
               IO.pure(s"Student $username is already enrolled in course $courseid")
             } else {
-              val newStudent = AllStudent(time = getCurrentTime, priority = pri, studentUsername = username)
+              val newStudent = EnrolledStudent(time = getCurrentTime, priority = pri, studentUsername = username)
               val updatedAllStudents = if (isAllStudent) allStudents else allStudents :+ newStudent
               val updatedEnrolledStudents = enrolledStudents :+ EnrolledStudent(time = getCurrentTime, priority = pri, studentUsername = username)
 

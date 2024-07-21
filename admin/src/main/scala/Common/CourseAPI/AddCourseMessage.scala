@@ -1,9 +1,9 @@
 package Common.CourseAPI
 
 import Common.API.API
-import Common.Object.{EnrolledStudent, AllStudent, Course}
+import Common.Object.{Course, EnrolledStudent}
 import Global.ServiceCenter.courseServiceCode
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto.*
 import io.circe.{Decoder, Encoder}
 
 case class AddCourseMessage(
@@ -14,6 +14,6 @@ case class AddCourseMessage(
                              info: String,
                              courseHour: List[Int],
                              classroomid: Int,
-                             credits: Int,
+                             credits: Int
                            ) extends API[Course](courseServiceCode)
 

@@ -7,7 +7,7 @@ import io.circe.Json
 import io.circe.parser.decode
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.readDBRows
-import Common.Object.{SqlParameter, Course, WaitingCourse, EnrolledStudent, AllStudent}
+import Common.Object.{SqlParameter, Course, WaitingCourse, EnrolledStudent}
 import cats.implicits.*
 
 case class GetWaitingCoursesByStudentUsernameMessagePlanner(studentUsername: String, override val planContext: PlanContext) extends Planner[Option[List[WaitingCourse]]] {
@@ -26,7 +26,7 @@ case class GetWaitingCoursesByStudentUsernameMessagePlanner(studentUsername: Str
           enrolledStudentsStr <- cursor.get[String]("enrolledStudents").toOption
           allStudentsStr <- cursor.get[String]("allStudents").toOption
           enrolledStudents <- decode[List[EnrolledStudent]](enrolledStudentsStr).toOption
-          allStudents <- decode[List[AllStudent]](allStudentsStr).toOption
+          allStudents <- decode[List[EnrolledStudent]](allStudentsStr).toOption
           courseID <- cursor.get[Int]("courseid").toOption
           courseName <- cursor.get[String]("courseName").toOption
           teacherUsername <- cursor.get[String]("teacherUsername").toOption

@@ -4,7 +4,7 @@ import cats.effect.IO
 import io.circe.parser.decode
 import Common.API.{PlanContext, Planner}
 import Common.CourseAPI._
-import Common.Object.{EnrolledStudent, AllStudent, Course}
+import Common.Object.{EnrolledStudent, Course}
 import io.circe.generic.auto._
 
 case class AdminUpdateCourseMessagePlanner(

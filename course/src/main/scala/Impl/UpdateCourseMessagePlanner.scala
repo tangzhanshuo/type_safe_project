@@ -8,7 +8,7 @@ import io.circe.syntax._
 import cats.implicits._
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI._
-import Common.Object.{SqlParameter, EnrolledStudent, AllStudent, Course, Classroom}
+import Common.Object.{SqlParameter, EnrolledStudent, Course, Classroom}
 
 case class UpdateCourseMessagePlanner(
                                        courseid: Int,
@@ -93,7 +93,7 @@ case class UpdateCourseMessagePlanner(
           val currentEnrolledStudentsStr = cursor.get[String]("enrolledStudents").getOrElse("[]")
           val currentAllStudentsStr = cursor.get[String]("allStudents").getOrElse("[]")
           val currentEnrolledStudents = decode[List[EnrolledStudent]](currentEnrolledStudentsStr).getOrElse(Nil)
-          val currentAllStudents = decode[List[AllStudent]](currentAllStudentsStr).getOrElse(Nil)
+          val currentAllStudents = decode[List[EnrolledStudent]](currentAllStudentsStr).getOrElse(Nil)
 
           // Handle capacity update
           val (updatedCapacity, updatedStatus, updatedEnrolledStudents) = capacity match {

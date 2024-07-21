@@ -7,7 +7,7 @@ import io.circe.generic.auto._
 import io.circe.{Decoder, Encoder, Json}
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI.{writeDB, readDBBoolean, readDBInt, readDBString}
-import Common.Object.{SqlParameter, EnrolledStudent, AllStudent, Course}
+import Common.Object.{SqlParameter, EnrolledStudent, Course}
 import Common.DBAPI.WriteDBMessage
 
 case class AddCourseMessagePlanner(
@@ -24,7 +24,7 @@ case class AddCourseMessagePlanner(
 
   override def plan(using planContext: PlanContext): IO[Course] = {
     val enrolledStudents: List[EnrolledStudent] = List.empty
-    val allStudents: List[AllStudent] = List.empty
+    val allStudents: List[EnrolledStudent] = List.empty
 
     val checkClassroomExists = readDBBoolean(s"SELECT EXISTS(SELECT 1 FROM classroom WHERE classroomid = ?)",
       List(SqlParameter("int", classroomid.toString))

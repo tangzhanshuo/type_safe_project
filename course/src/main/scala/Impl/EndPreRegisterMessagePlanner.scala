@@ -6,7 +6,7 @@ import io.circe.parser._
 import io.circe.syntax._
 import Common.API.{PlanContext, Planner}
 import Common.DBAPI._
-import Common.Object.{SqlParameter, EnrolledStudent, AllStudent}
+import Common.Object.{SqlParameter, EnrolledStudent}
 
 case class EndPreRegisterMessagePlanner(courseid: Int, override val planContext: PlanContext) extends Planner[String] {
   override def plan(using planContext: PlanContext): IO[String] = {
@@ -27,7 +27,7 @@ case class EndPreRegisterMessagePlanner(courseid: Int, override val planContext:
             courseName <- IO.fromEither(cursor.get[String]("courseName").toOption.toRight(new Exception("Missing courseName")))
             capacity <- IO.fromEither(cursor.get[Int]("capacity").toOption.toRight(new Exception("Missing capacity")))
             allStudentsStr <- IO.fromEither(cursor.get[String]("allStudents").toOption.toRight(new Exception("Missing allStudents")))
-            allStudents <- IO.fromEither(decode[List[AllStudent]](allStudentsStr).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}")))
+            allStudents <- IO.fromEither(decode[List[EnrolledStudent]](allStudentsStr).left.map(e => new Exception(s"Invalid JSON for allStudents: ${e.getMessage}")))
 
             sortedAllStudents = allStudents.sortBy(_.time)
             newEnrolledStudents = sortedAllStudents.take(capacity).map(s => EnrolledStudent(s.time, s.priority, s.studentUsername))

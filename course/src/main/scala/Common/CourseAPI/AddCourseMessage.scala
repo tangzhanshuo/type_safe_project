@@ -1,7 +1,7 @@
 package Common.CourseAPI
 
 import Common.API.API
-import Common.Object.{EnrolledStudent, AllStudent, Course}
+import Common.Object.{EnrolledStudent, Course}
 import Global.ServiceCenter.courseServiceCode
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
